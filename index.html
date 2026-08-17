@@ -15,6 +15,7 @@
         .btn-iniciar { background-color: #007bff; color: white; }
         .btn-nfc { background-color: #28a745; color: white; }
         .btn-finalizar { background-color: #dc3545; color: white; }
+        .btn-pantalla { background-color: #17a2b8; color: white; }
         .btn-borrar { background-color: #6c757d; color: white; margin-top: 15px; }
         button:disabled { background-color: #ccc; cursor: not-allowed; }
         table { width: 100%; margin-top: 20px; border-collapse: collapse; }
@@ -31,6 +32,10 @@
         <button id="btnIniciar" class="btn-iniciar" onclick="iniciarCarrera()">Iniciar Carrera</button>
         <button id="btnActivarNFC" class="btn-nfc" onclick="activarLecturaNFC()" disabled>📡 Activar NFC</button>
         <button id="btnFinalizar" class="btn-finalizar" onclick="finalizarCarrera()" disabled>Finalizar Carrera</button>
+    </div>
+
+    <div style="margin-top: 10px;">
+        <button class="btn-pantalla" onclick="abrirPantallaSecundaria()">🖥️ Abrir Pantalla Secundaria</button>
     </div>
 
     <div id="estadoNFC" class="estado-nfc">Inicia la carrera para activar el lector</div>
@@ -50,7 +55,6 @@
         <tbody id="tablaResultados"></tbody>
     </table>
 
-    <!-- Botón de borrado ubicado al final de los registros -->
     <button id="btnBorrar" class="btn-borrar" onclick="borrarRegistros()">🗑️ Borrar Todos los Registros</button>
 
     <script>
@@ -60,6 +64,9 @@
         let posicion = 1;
         let controladorNFC = null;
         let listaRegistros = JSON.parse(localStorage.getItem('carrera_nfc_registros')) || [];
+
+        // Canal de comunicación para la pantalla secundaria
+        const canalPantalla = new BroadcastChannel('carrera_canal');
 
         window.onload = function() {
             if (listaRegistros.length > 0) {
@@ -78,6 +85,10 @@
             
             const tiempoFormateado = `${hrs}:${min}:${seg}.${ms}`;
             document.getElementById('cronometro').textContent = tiempoFormateado;
+
+            // Enviar tiempo a la ventana secundaria
+            canalPantalla.postMessage({ tipo: 'TIEMPO', tiempo: tiempoFormateado });
+
             return tiempoFormateado;
         }
 
@@ -143,6 +154,9 @@
             posicion++;
             renderizarTabla();
 
+            // Enviar nuevo registro a la pantalla secundaria
+            canalPantalla.postMessage({ tipo: 'NUEVO_REGISTRO', registro: nuevoRegistro });
+
             if (navigator.vibrate) navigator.vibrate(200);
         }
 
@@ -160,13 +174,80 @@
             });
         }
 
+        function abrirPantallaSecundaria() {
+            const ventanaPopup = window.open("", "PantallaSecundaria", "width=800,height=600");
+
+            ventanaPopup.document.write(`
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Cronómetro en Vivo - Carrera</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; background-color: #111; color: #fff; text-align: center; padding: 20px; margin: 0; }
+                        #cronometro { font-size: 6rem; font-weight: bold; color: #00ffcc; margin: 20px 0; font-family: monospace; }
+                        table { width: 90%; margin: 20px auto; border-collapse: collapse; font-size: 1.5rem; }
+                        th, td { border-bottom: 1px solid #444; padding: 12px; }
+                        th { color: #00ffcc; background-color: #222; }
+                        .lugar { font-weight: bold; color: #ffcc00; }
+                    </style>
+                </head>
+                <body>
+                    <h1>TIEMPO EN VIVO</h1>
+                    <div id="cronometro">00:00:00.0</div>
+                    <h2>Últimas Llegadas</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Lugar</th>
+                                <th>Corredor</th>
+                                <th>Tiempo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaPopup"></tbody>
+                    </table>
+
+                    <script>
+                        const canal = new BroadcastChannel('carrera_canal');
+                        const tabla = document.getElementById('tablaPopup');
+
+                        canal.onmessage = (event) => {
+                            if (event.data.tipo === 'TIEMPO') {
+                                document.getElementById('cronometro').textContent = event.data.tiempo;
+                            }
+                            if (event.data.tipo === 'NUEVO_REGISTRO') {
+                                const reg = event.data.registro;
+                                const fila = document.createElement('tr');
+                                fila.innerHTML = \`
+                                    <td class="lugar">#\${reg.lugar}</td>
+                                    <td>\${reg.corredor}</td>
+                                    <td>\${reg.tiempo}</td>
+                                \`;
+                                tabla.insertBefore(fila, tabla.firstChild);
+                            }
+                            if (event.data.tipo === 'BORRAR') {
+                                tabla.innerHTML = "";
+                                document.getElementById('cronometro').textContent = "00:00:00.0";
+                            }
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+
+            // Cargar los registros existentes al abrir la pantalla
+            setTimeout(() => {
+                listaRegistros.slice().reverse().forEach(reg => {
+                    canalPantalla.postMessage({ tipo: 'NUEVO_REGISTRO', registro: reg });
+                });
+            }, 500);
+        }
+
         function finalizarCarrera() {
             clearInterval(intervalo);
             corriendo = false;
 
-            if (controladorNFC) {
-                controladorNFC.abort();
-            }
+            if (controladorNFC) controladorNFC.abort();
 
             document.getElementById('btnActivarNFC').disabled = true;
             document.getElementById('btnFinalizar').disabled = true;
@@ -215,6 +296,7 @@
                 indicador.className = "estado-nfc";
 
                 renderizarTabla();
+                canalPantalla.postMessage({ tipo: 'BORRAR' });
             }
         }
     </script>
