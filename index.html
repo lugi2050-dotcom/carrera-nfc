@@ -15,6 +15,7 @@
         .btn-iniciar { background-color: #007bff; color: white; }
         .btn-nfc { background-color: #28a745; color: white; }
         .btn-finalizar { background-color: #dc3545; color: white; }
+        .btn-borrar { background-color: #6c757d; color: white; margin-top: 15px; }
         button:disabled { background-color: #ccc; cursor: not-allowed; }
         table { width: 100%; margin-top: 20px; border-collapse: collapse; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
@@ -49,12 +50,15 @@
         <tbody id="tablaResultados"></tbody>
     </table>
 
+    <!-- Botón de borrado ubicado al final de los registros -->
+    <button id="btnBorrar" class="btn-borrar" onclick="borrarRegistros()">🗑️ Borrar Todos los Registros</button>
+
     <script>
         let tiempoInicio = 0;
         let intervalo = null;
         let corriendo = false;
         let posicion = 1;
-        let controladorNFC = null; // Para poder detener la lectura NFC
+        let controladorNFC = null;
         let listaRegistros = JSON.parse(localStorage.getItem('carrera_nfc_registros')) || [];
 
         window.onload = function() {
@@ -94,7 +98,7 @@
             const indicador = document.getElementById('estadoNFC');
 
             if (!('NDEFReader' in window)) {
-                indicador.textContent = "❌ Tu navegador/celular no soporta Web NFC (Usa Chrome en Android con HTTPS).";
+                indicador.textContent = "❌ Tu navegador/celular no soporta Web NFC.";
                 indicador.className = "estado-nfc error";
                 return;
             }
@@ -160,7 +164,6 @@
             clearInterval(intervalo);
             corriendo = false;
 
-            // Desactivar lectura NFC si está corriendo
             if (controladorNFC) {
                 controladorNFC.abort();
             }
@@ -189,6 +192,30 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        }
+
+        function borrarRegistros() {
+            if (confirm("¿Estás seguro de que deseas borrar toda la tabla y limpiar la memoria?")) {
+                clearInterval(intervalo);
+                if (controladorNFC) controladorNFC.abort();
+
+                localStorage.removeItem('carrera_nfc_registros');
+                listaRegistros = [];
+                corriendo = false;
+                posicion = 1;
+
+                document.getElementById('cronometro').textContent = "00:00:00.0";
+                document.getElementById('btnIniciar').disabled = false;
+                document.getElementById('btnActivarNFC').disabled = true;
+                document.getElementById('btnFinalizar').disabled = true;
+                document.getElementById('btnExportar').disabled = true;
+
+                const indicador = document.getElementById('estadoNFC');
+                indicador.textContent = "Inicia la carrera para activar el lector";
+                indicador.className = "estado-nfc";
+
+                renderizarTabla();
+            }
         }
     </script>
 </body>
