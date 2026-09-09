@@ -162,6 +162,36 @@
 
     th { background-color: #f1f1f1; }
   </style>
+
+  <!-- Módulos de Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, get, child, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // ⚠️ REEMPLAZA ESTE OBJETO CON TUS CLAVES DE FIREBASE ⚠️
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_PROYECTO.firebaseapp.com",
+      databaseURL: "https://TU_PROYECTO-default-rtdb.firebaseio.com",
+      projectId: "TU_PROYECTO",
+      storageBucket: "TU_PROYECTO.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abc123"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Exponer funciones globales
+    window.db = db;
+    window.dbRef = ref(db);
+    window.dbSet = set;
+    window.dbGet = get;
+    window.dbChild = child;
+    window.dbRemove = remove;
+    window.dbOnValue = onValue;
+    window.ref = ref;
+  </script>
 </head>
 <body>
 
@@ -191,10 +221,10 @@
       </div>
     </div>
 
-    <!-- Panel Admin (Solo visible tras iniciar sesión) -->
+    <!-- Panel Admin -->
     <div id="adminPanel" class="admin-panel">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <h3>Administración de Corredores</h3>
+        <h3>Administración de Corredores (En Línea)</h3>
         <div>
           <button class="btn btn-success" onclick="openCSVModal()">Subir CSV</button>
           <button class="btn btn-primary" onclick="openRunnerModal()">+ Nuevo Corredor</button>
@@ -245,14 +275,14 @@
   <div id="csvModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Cargar Arquivo CSV</h3>
+        <h3>Cargar Base de Datos CSV a la Nube</h3>
         <span style="cursor:pointer" onclick="closeModal('csvModal')">&times;</span>
       </div>
-      <p>Selecciona un archivo CSV con las columnas: <code>LugarGeneral, LugarCategoria, NumeroCorredor, Nombre, Categoria, Tiempo</code></p>
+      <p>Selecciona un archivo CSV. Los datos se guardarán en línea inmediatamente.</p>
       <div class="form-group">
         <input type="file" id="csvFileInput" accept=".csv">
       </div>
-      <button class="btn btn-success" style="width:100%" onclick="processCSV()">Cargar Base de Datos</button>
+      <button class="btn btn-success" style="width:100%" onclick="processCSV()">Cargar a la Nube</button>
     </div>
   </div>
 
@@ -263,7 +293,7 @@
         <h3 id="runnerModalTitle">Agregar Corredor</h3>
         <span style="cursor:pointer" onclick="closeModal('runnerModal')">&times;</span>
       </div>
-      <input type="hidden" id="editIndex">
+      <input type="hidden" id="editKey">
       <div class="form-group">
         <label>Número Corredor:</label>
         <input type="number" id="inputNumero">
@@ -288,15 +318,14 @@
         <label>Tiempo:</label>
         <input type="text" id="inputTiempo" placeholder="00:00:00.0">
       </div>
-      <button class="btn btn-primary" style="width:100%" onclick="saveRunner()">Guardar</button>
+      <button class="btn btn-primary" style="width:100%" onclick="saveRunner()">Guardar en Línea</button>
     </div>
   </div>
 
   <script>
-    let runners = JSON.parse(localStorage.getItem('runners_db')) || [];
     let isAdmin = false;
 
-    // Buscar corredor por número
+    // Buscar corredor en línea
     function searchRunner() {
       const bib = document.getElementById('searchBib').value.trim();
       const resultCard = document.getElementById('resultCard');
@@ -306,20 +335,23 @@
         return;
       }
 
-      const runner = runners.find(r => String(r.NumeroCorredor) === String(bib));
-
-      if (runner) {
-        document.getElementById('resNombre').innerText = runner.Nombre;
-        document.getElementById('resNumero').innerText = runner.NumeroCorredor;
-        document.getElementById('resGlobal').innerText = runner.LugarGeneral;
-        document.getElementById('resCategoria').innerText = runner.Categoria;
-        document.getElementById('resLugarCat').innerText = runner.LugarCategoria;
-        document.getElementById('resTiempo').innerText = runner.Tiempo;
-        resultCard.style.display = 'block';
-      } else {
-        resultCard.style.display = 'none';
-        alert('Número de corredor no encontrado.');
-      }
+      window.dbGet(window.dbChild(window.dbRef, `corredores/${bib}`)).then((snapshot) => {
+        if (snapshot.exists()) {
+          const runner = snapshot.val();
+          document.getElementById('resNombre').innerText = runner.Nombre;
+          document.getElementById('resNumero').innerText = runner.NumeroCorredor;
+          document.getElementById('resGlobal').innerText = runner.LugarGeneral;
+          document.getElementById('resCategoria').innerText = runner.Categoria;
+          document.getElementById('resLugarCat').innerText = runner.LugarCategoria;
+          document.getElementById('resTiempo').innerText = runner.Tiempo;
+          resultCard.style.display = 'block';
+        } else {
+          resultCard.style.display = 'none';
+          alert('Número de corredor no encontrado.');
+        }
+      }).catch((error) => {
+        alert('Error al consultar en línea: ' + error.message);
+      });
     }
 
     // Modal Handlers
@@ -337,8 +369,8 @@
         closeModal('loginModal');
         document.getElementById('authSection').innerHTML = `<button class="btn btn-danger" onclick="logout()">Cerrar Sesión</button>`;
         document.getElementById('adminPanel').style.display = 'block';
-        renderAdminTable();
-        openCSVModal(); // Abre automáticamente el popup para subir CSV
+        listenToRunners();
+        openCSVModal();
       } else {
         alert('Usuario o contraseña incorrectos.');
       }
@@ -350,7 +382,41 @@
       document.getElementById('authSection').innerHTML = `<button class="btn btn-primary" onclick="openLoginModal()">Acceso Admin</button>`;
     }
 
-    // Procesar archivo CSV
+    // Escuchar cambios en tiempo real desde la nube
+    function listenToRunners() {
+      const runnersRef = window.ref(window.db, 'corredores');
+      window.dbOnValue(runnersRef, (snapshot) => {
+        const data = snapshot.val();
+        renderAdminTable(data);
+      });
+    }
+
+    function renderAdminTable(data) {
+      const tbody = document.getElementById('runnersTableBody');
+      tbody.innerHTML = '';
+
+      if (!data) return;
+
+      Object.keys(data).forEach((key) => {
+        const r = data[key];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r.NumeroCorredor}</td>
+          <td>${r.Nombre}</td>
+          <td>${r.LugarGeneral}</td>
+          <td>${r.Categoria}</td>
+          <td>${r.LugarCategoria}</td>
+          <td>${r.Tiempo}</td>
+          <td>
+            <button class="btn btn-primary btn-sm" onclick="editRunner('${r.NumeroCorredor}')">Editar</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteRunner('${r.NumeroCorredor}')">Eliminar</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Cargar CSV completo a la nube
     function processCSV() {
       const fileInput = document.getElementById('csvFileInput');
       const file = fileInput.files[0];
@@ -367,72 +433,54 @@
         if (lines.length < 2) return;
 
         const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-        const newRunners = [];
+        const newRunners = {};
 
         for (let i = 1; i < lines.length; i++) {
           const cols = lines[i].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
           if (cols.length >= headers.length) {
             let row = {};
             headers.forEach((h, idx) => row[h] = cols[idx]);
-            newRunners.push({
-              LugarGeneral: row['LugarGeneral'] || '',
-              LugarCategoria: row['LugarCategoria'] || '',
-              NumeroCorredor: row['NumeroCorredor'] || '',
-              Nombre: row['Nombre'] || '',
-              Categoria: row['Categoria'] || '',
-              Tiempo: row['Tiempo'] || ''
-            });
+            const bib = String(row['NumeroCorredor']);
+            if (bib) {
+              newRunners[bib] = {
+                NumeroCorredor: bib,
+                Nombre: row['Nombre'] || '',
+                LugarGeneral: row['LugarGeneral'] || '',
+                Categoria: row['Categoria'] || '',
+                LugarCategoria: row['LugarCategoria'] || '',
+                Tiempo: row['Tiempo'] || ''
+              };
+            }
           }
         }
 
-        runners = newRunners;
-        saveData();
-        renderAdminTable();
-        closeModal('csvModal');
-        alert('Base de datos CSV cargada correctamente.');
+        // Subir a Firebase en línea
+        window.dbSet(window.ref(window.db, 'corredores'), newRunners).then(() => {
+          closeModal('csvModal');
+          alert('¡Base de datos cargada exitosamente en la nube!');
+        }).catch(err => {
+          alert('Error al guardar en la nube: ' + err.message);
+        });
       };
       reader.readAsText(file);
     }
 
-    // CRUD Operaciones
-    function saveData() {
-      localStorage.setItem('runners_db', JSON.stringify(runners));
-    }
+    function openRunnerModal(key = null) {
+      document.getElementById('editKey').value = key !== null ? key : '';
+      document.getElementById('runnerModalTitle').innerText = key !== null ? 'Editar Corredor' : 'Agregar Corredor';
 
-    function renderAdminTable() {
-      const tbody = document.getElementById('runnersTableBody');
-      tbody.innerHTML = '';
-
-      runners.forEach((r, idx) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${r.NumeroCorredor}</td>
-          <td>${r.Nombre}</td>
-          <td>${r.LugarGeneral}</td>
-          <td>${r.Categoria}</td>
-          <td>${r.LugarCategoria}</td>
-          <td>${r.Tiempo}</td>
-          <td>
-            <button class="btn btn-primary btn-sm" onclick="editRunner(${idx})">Editar</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteRunner(${idx})">Eliminar</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function openRunnerModal(index = null) {
-      document.getElementById('editIndex').value = index !== null ? index : '';
-      document.getElementById('runnerModalTitle').innerText = index !== null ? 'Editar Corredor' : 'Agregar Corredor';
-
-      if (index !== null) {
-        const r = runners[index];
-        document.getElementById('inputNumero').value = r.NumeroCorredor;
-        document.getElementById('inputNombre').value = r.Nombre;
-        document.getElementById('inputGlobal').value = r.LugarGeneral;
-        document.getElementById('inputCategoria').value = r.Categoria;
-        document.getElementById('inputLugarCat').value = r.LugarCategoria;
-        document.getElementById('inputTiempo').value = r.Tiempo;
+      if (key !== null) {
+        window.dbGet(window.dbChild(window.dbRef, `corredores/${key}`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            const r = snapshot.val();
+            document.getElementById('inputNumero').value = r.NumeroCorredor;
+            document.getElementById('inputNombre').value = r.Nombre;
+            document.getElementById('inputGlobal').value = r.LugarGeneral;
+            document.getElementById('inputCategoria').value = r.Categoria;
+            document.getElementById('inputLugarCat').value = r.LugarCategoria;
+            document.getElementById('inputTiempo').value = r.Tiempo;
+          }
+        });
       } else {
         document.getElementById('inputNumero').value = '';
         document.getElementById('inputNombre').value = '';
@@ -445,9 +493,14 @@
     }
 
     function saveRunner() {
-      const idx = document.getElementById('editIndex').value;
-      const newRunner = {
-        NumeroCorredor: document.getElementById('inputNumero').value,
+      const bib = String(document.getElementById('inputNumero').value);
+      if (!bib) {
+        alert('El número de corredor es obligatorio.');
+        return;
+      }
+
+      const runner = {
+        NumeroCorredor: bib,
         Nombre: document.getElementById('inputNombre').value,
         LugarGeneral: document.getElementById('inputGlobal').value,
         Categoria: document.getElementById('inputCategoria').value,
@@ -455,26 +508,18 @@
         Tiempo: document.getElementById('inputTiempo').value
       };
 
-      if (idx === '') {
-        runners.push(newRunner);
-      } else {
-        runners[idx] = newRunner;
-      }
-
-      saveData();
-      renderAdminTable();
-      closeModal('runnerModal');
+      window.dbSet(window.ref(window.db, `corredores/${bib}`), runner).then(() => {
+        closeModal('runnerModal');
+      }).catch(err => alert('Error al guardar: ' + err.message));
     }
 
-    function editRunner(index) {
-      openRunnerModal(index);
+    function editRunner(key) {
+      openRunnerModal(key);
     }
 
-    function deleteRunner(index) {
-      if (confirm('¿Estás seguro de eliminar este registro?')) {
-        runners.splice(index, 1);
-        saveData();
-        renderAdminTable();
+    function deleteRunner(key) {
+      if (confirm('¿Estás seguro de eliminar este registro de la nube?')) {
+        window.dbRemove(window.ref(window.db, `corredores/${key}`));
       }
     }
   </script>
