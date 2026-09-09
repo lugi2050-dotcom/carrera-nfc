@@ -1,304 +1,482 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Carrera NFC</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 500px; margin: 20px auto; padding: 15px; text-align: center; }
-        #cronometro { font-size: 3rem; font-weight: bold; margin: 15px 0; color: #222; }
-        .estado-nfc { padding: 12px; margin: 15px 0; border-radius: 8px; background-color: #e9ecef; font-weight: bold; }
-        .activo { background-color: #d4edda; color: #155724; }
-        .error { background-color: #f8d7da; color: #721c24; }
-        .finalizado { background-color: #fff3cd; color: #856404; }
-        button { font-size: 1rem; padding: 10px 15px; margin: 5px; border-radius: 5px; border: none; cursor: pointer; }
-        .btn-iniciar { background-color: #007bff; color: white; }
-        .btn-nfc { background-color: #28a745; color: white; }
-        .btn-finalizar { background-color: #dc3545; color: white; }
-        .btn-pantalla { background-color: #17a2b8; color: white; }
-        .btn-borrar { background-color: #6c757d; color: white; margin-top: 15px; }
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
-        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
-        th { background-color: #f4f4f4; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consulta de Resultados de Carrera</title>
+  <style>
+    :root {
+      --primary-color: #0056b3;
+      --secondary-color: #28a745;
+      --danger-color: #dc3545;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 900px;
+      margin: 0 auto 30px auto;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #ddd;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+
+    .btn-primary { background-color: var(--primary-color); color: white; }
+    .btn-secondary { background-color: #6c757d; color: white; }
+    .btn-success { background-color: var(--secondary-color); color: white; }
+    .btn-danger { background-color: var(--danger-color); color: white; }
+    .btn-sm { padding: 5px 10px; font-size: 0.85rem; }
+
+    /* Buscador Público */
+    .search-card {
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .search-input {
+      padding: 12px;
+      width: 60%;
+      max-width: 300px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+
+    /* Tarjeta de Resultado */
+    .result-card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      display: none;
+      margin-top: 20px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .data-box {
+      background: #f1f3f5;
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .data-box .label { font-size: 0.85rem; color: #666; margin-bottom: 5px; }
+    .data-box .value { font-size: 1.2rem; font-weight: bold; color: var(--primary-color); }
+
+    /* Modales / Popups */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+    .form-group input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+
+    /* Tabla de Admin */
+    .admin-panel {
+      display: none;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      max-height: 400px;
+      margin-top: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th { background-color: #f1f1f1; }
+  </style>
 </head>
 <body>
 
-    <h2>Control de Carrera NFC</h2>
-    <div id="cronometro">00:00:00.0</div>
+  <div class="header">
+    <h2>Resultados de la Carrera</h2>
+    <div id="authSection">
+      <button class="btn btn-primary" onclick="openLoginModal()">Acceso Admin</button>
+    </div>
+  </div>
 
-    <div class="controles">
-        <button id="btnIniciar" class="btn-iniciar" onclick="iniciarCarrera()">Iniciar Carrera</button>
-        <button id="btnActivarNFC" class="btn-nfc" onclick="activarLecturaNFC()" disabled>📡 Activar NFC</button>
-        <button id="btnFinalizar" class="btn-finalizar" onclick="finalizarCarrera()" disabled>Finalizar Carrera</button>
+  <div class="container">
+    <!-- Buscador Público -->
+    <div class="search-card">
+      <h3>Consultar Número de Corredor</h3>
+      <input type="number" id="searchBib" class="search-input" placeholder="Ej: 44" onkeyup="if(event.key==='Enter') searchRunner()">
+      <button class="btn btn-primary" onclick="searchRunner()">Buscar</button>
+
+      <div id="resultCard" class="result-card">
+        <h3 id="resNombre" style="margin-top:0; color: #333;">-</h3>
+        <div class="result-grid">
+          <div class="data-box"><div class="label">NÚMERO</div><div class="value" id="resNumero">-</div></div>
+          <div class="data-box"><div class="label">LUGAR GLOBAL</div><div class="value" id="resGlobal">-</div></div>
+          <div class="data-box"><div class="label">CATEGORÍA</div><div class="value" id="resCategoria">-</div></div>
+          <div class="data-box"><div class="label">LUGAR CATEGORÍA</div><div class="value" id="resLugarCat">-</div></div>
+          <div class="data-box"><div class="label">TIEMPO</div><div class="value" id="resTiempo">-</div></div>
+        </div>
+      </div>
     </div>
 
-    <div style="margin-top: 10px;">
-        <button class="btn-pantalla" onclick="abrirPantallaSecundaria()">🖥️ Abrir Pantalla Secundaria</button>
-    </div>
+    <!-- Panel Admin (Solo visible tras iniciar sesión) -->
+    <div id="adminPanel" class="admin-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <h3>Administración de Corredores</h3>
+        <div>
+          <button class="btn btn-success" onclick="openCSVModal()">Subir CSV</button>
+          <button class="btn btn-primary" onclick="openRunnerModal()">+ Nuevo Corredor</button>
+        </div>
+      </div>
 
-    <div id="estadoNFC" class="estado-nfc">Inicia la carrera para activar el lector</div>
-
-    <div style="margin-top: 15px;">
-        <button id="btnExportar" class="btn-nfc" onclick="exportarCSV()" disabled>📥 Descargar Resultados (CSV)</button>
-    </div>
-
-    <table>
-        <thead>
+      <div class="table-container">
+        <table>
+          <thead>
             <tr>
-                <th>Lugar</th>
-                <th>ID Corredor (NFC)</th>
-                <th>Tiempo</th>
+              <th>N°</th>
+              <th>Nombre</th>
+              <th>Lugar Gen.</th>
+              <th>Categoría</th>
+              <th>Lugar Cat.</th>
+              <th>Tiempo</th>
+              <th>Acciones</th>
             </tr>
-        </thead>
-        <tbody id="tablaResultados"></tbody>
-    </table>
+          </thead>
+          <tbody id="runnersTableBody">
+            <!-- Filas dinámicas -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
-    <button id="btnBorrar" class="btn-borrar" onclick="borrarRegistros()">🗑️ Borrar Todos los Registros</button>
+  <!-- Modal Login -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Iniciar Sesión Admin</h3>
+        <span style="cursor:pointer" onclick="closeModal('loginModal')">&times;</span>
+      </div>
+      <div class="form-group">
+        <label>Usuario:</label>
+        <input type="text" id="adminUser">
+      </div>
+      <div class="form-group">
+        <label>Contraseña:</label>
+        <input type="password" id="adminPass">
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="login()">Ingresar</button>
+    </div>
+  </div>
 
-    <script>
-        let tiempoInicio = 0;
-        let intervalo = null;
-        let corriendo = false;
-        let posicion = 1;
-        let controladorNFC = null;
-        let listaRegistros = JSON.parse(localStorage.getItem('carrera_nfc_registros')) || [];
+  <!-- Modal Subir CSV -->
+  <div id="csvModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Cargar Arquivo CSV</h3>
+        <span style="cursor:pointer" onclick="closeModal('csvModal')">&times;</span>
+      </div>
+      <p>Selecciona un archivo CSV con las columnas: <code>LugarGeneral, LugarCategoria, NumeroCorredor, Nombre, Categoria, Tiempo</code></p>
+      <div class="form-group">
+        <input type="file" id="csvFileInput" accept=".csv">
+      </div>
+      <button class="btn btn-success" style="width:100%" onclick="processCSV()">Cargar Base de Datos</button>
+    </div>
+  </div>
 
-        // Canal de comunicación para la pantalla secundaria
-        const canalPantalla = new BroadcastChannel('carrera_canal');
+  <!-- Modal Agregar/Editar Corredor -->
+  <div id="runnerModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="runnerModalTitle">Agregar Corredor</h3>
+        <span style="cursor:pointer" onclick="closeModal('runnerModal')">&times;</span>
+      </div>
+      <input type="hidden" id="editIndex">
+      <div class="form-group">
+        <label>Número Corredor:</label>
+        <input type="number" id="inputNumero">
+      </div>
+      <div class="form-group">
+        <label>Nombre:</label>
+        <input type="text" id="inputNombre">
+      </div>
+      <div class="form-group">
+        <label>Lugar General:</label>
+        <input type="number" id="inputGlobal">
+      </div>
+      <div class="form-group">
+        <label>Categoría:</label>
+        <input type="text" id="inputCategoria">
+      </div>
+      <div class="form-group">
+        <label>Lugar Categoría:</label>
+        <input type="number" id="inputLugarCat">
+      </div>
+      <div class="form-group">
+        <label>Tiempo:</label>
+        <input type="text" id="inputTiempo" placeholder="00:00:00.0">
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="saveRunner()">Guardar</button>
+    </div>
+  </div>
 
-        window.onload = function() {
-            if (listaRegistros.length > 0) {
-                posicion = listaRegistros.length + 1;
-                renderizarTabla();
-                document.getElementById('btnExportar').disabled = false;
-            }
-        };
+  <script>
+    let runners = JSON.parse(localStorage.getItem('runners_db')) || [];
+    let isAdmin = false;
 
-        function actualizarCronometro() {
-            const diferencia = Date.now() - tiempoInicio;
-            const ms = Math.floor((diferencia % 1000) / 100);
-            const seg = Math.floor((diferencia / 1000) % 60).toString().padStart(2, '0');
-            const min = Math.floor((diferencia / (1000 * 60)) % 60).toString().padStart(2, '0');
-            const hrs = Math.floor(diferencia / (1000 * 60 * 60)).toString().padStart(2, '0');
-            
-            const tiempoFormateado = `${hrs}:${min}:${seg}.${ms}`;
-            document.getElementById('cronometro').textContent = tiempoFormateado;
+    // Buscar corredor por número
+    function searchRunner() {
+      const bib = document.getElementById('searchBib').value.trim();
+      const resultCard = document.getElementById('resultCard');
+      
+      if (!bib) {
+        alert('Por favor, ingresa un número de corredor.');
+        return;
+      }
 
-            // Enviar tiempo a la ventana secundaria
-            canalPantalla.postMessage({ tipo: 'TIEMPO', tiempo: tiempoFormateado });
+      const runner = runners.find(r => String(r.NumeroCorredor) === String(bib));
 
-            return tiempoFormateado;
-        }
+      if (runner) {
+        document.getElementById('resNombre').innerText = runner.Nombre;
+        document.getElementById('resNumero').innerText = runner.NumeroCorredor;
+        document.getElementById('resGlobal').innerText = runner.LugarGeneral;
+        document.getElementById('resCategoria').innerText = runner.Categoria;
+        document.getElementById('resLugarCat').innerText = runner.LugarCategoria;
+        document.getElementById('resTiempo').innerText = runner.Tiempo;
+        resultCard.style.display = 'block';
+      } else {
+        resultCard.style.display = 'none';
+        alert('Número de corredor no encontrado.');
+      }
+    }
 
-        function iniciarCarrera() {
-            if (!corriendo) {
-                tiempoInicio = Date.now();
-                intervalo = setInterval(actualizarCronometro, 100);
-                corriendo = true;
-                
-                document.getElementById('btnIniciar').disabled = true;
-                document.getElementById('btnActivarNFC').disabled = false;
-                document.getElementById('btnFinalizar').disabled = false;
-                document.getElementById('estadoNFC').textContent = "Presiona 'Activar NFC' y acerca una tarjeta";
-            }
-        }
+    // Modal Handlers
+    function openLoginModal() { document.getElementById('loginModal').style.display = 'flex'; }
+    function openCSVModal() { document.getElementById('csvModal').style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        async function activarLecturaNFC() {
-            const indicador = document.getElementById('estadoNFC');
+    // Autenticación Admin
+    function login() {
+      const u = document.getElementById('adminUser').value;
+      const p = document.getElementById('adminPass').value;
 
-            if (!('NDEFReader' in window)) {
-                indicador.textContent = "❌ Tu navegador/celular no soporta Web NFC.";
-                indicador.className = "estado-nfc error";
-                return;
-            }
+      if (u === 'admin' && p === 'carreraglobal') {
+        isAdmin = true;
+        closeModal('loginModal');
+        document.getElementById('authSection').innerHTML = `<button class="btn btn-danger" onclick="logout()">Cerrar Sesión</button>`;
+        document.getElementById('adminPanel').style.display = 'block';
+        renderAdminTable();
+        openCSVModal(); // Abre automáticamente el popup para subir CSV
+      } else {
+        alert('Usuario o contraseña incorrectos.');
+      }
+    }
 
-            try {
-                controladorNFC = new AbortController();
-                const ndef = new NDEFReader();
-                
-                await ndef.scan({ signal: controladorNFC.signal });
-                
-                indicador.textContent = "🟢 Lector NFC activo. Acerque el chip al celular...";
-                indicador.className = "estado-nfc activo";
+    function logout() {
+      isAdmin = false;
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('authSection').innerHTML = `<button class="btn btn-primary" onclick="openLoginModal()">Acceso Admin</button>`;
+    }
 
-                ndef.addEventListener("reading", ({ serialNumber, message }) => {
-                    if (!corriendo) return;
+    // Procesar archivo CSV
+    function processCSV() {
+      const fileInput = document.getElementById('csvFileInput');
+      const file = fileInput.files[0];
 
-                    let idCapturado = serialNumber;
+      if (!file) {
+        alert('Por favor selecciona un archivo CSV.');
+        return;
+      }
 
-                    for (const record of message.records) {
-                        if (record.recordType === "text") {
-                            const textDecoder = new TextDecoder(record.encoding);
-                            idCapturado = textDecoder.decode(record.data);
-                        }
-                    }
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+        if (lines.length < 2) return;
 
-                    registrarLlegada(idCapturado);
-                });
+        const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+        const newRunners = [];
 
-            } catch (error) {
-                indicador.textContent = "❌ Error al iniciar NFC: " + error;
-                indicador.className = "estado-nfc error";
-            }
-        }
-
-        function registrarLlegada(idCorredor) {
-            const tiempoActual = actualizarCronometro();
-            
-            const nuevoRegistro = { lugar: posicion, corredor: idCorredor, tiempo: tiempoActual };
-            listaRegistros.push(nuevoRegistro);
-            localStorage.setItem('carrera_nfc_registros', JSON.stringify(listaRegistros));
-
-            posicion++;
-            renderizarTabla();
-
-            // Enviar nuevo registro a la pantalla secundaria
-            canalPantalla.postMessage({ tipo: 'NUEVO_REGISTRO', registro: nuevoRegistro });
-
-            if (navigator.vibrate) navigator.vibrate(200);
-        }
-
-        function renderizarTabla() {
-            const tabla = document.getElementById('tablaResultados');
-            tabla.innerHTML = "";
-            listaRegistros.forEach(reg => {
-                const fila = document.createElement('tr');
-                fila.innerHTML = `
-                    <td><strong>#${reg.lugar}</strong></td>
-                    <td>${reg.corredor}</td>
-                    <td>${reg.tiempo}</td>
-                `;
-                tabla.appendChild(fila);
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+          if (cols.length >= headers.length) {
+            let row = {};
+            headers.forEach((h, idx) => row[h] = cols[idx]);
+            newRunners.push({
+              LugarGeneral: row['LugarGeneral'] || '',
+              LugarCategoria: row['LugarCategoria'] || '',
+              NumeroCorredor: row['NumeroCorredor'] || '',
+              Nombre: row['Nombre'] || '',
+              Categoria: row['Categoria'] || '',
+              Tiempo: row['Tiempo'] || ''
             });
+          }
         }
 
-        function abrirPantallaSecundaria() {
-            const ventanaPopup = window.open("", "PantallaSecundaria", "width=800,height=600");
+        runners = newRunners;
+        saveData();
+        renderAdminTable();
+        closeModal('csvModal');
+        alert('Base de datos CSV cargada correctamente.');
+      };
+      reader.readAsText(file);
+    }
 
-            ventanaPopup.document.write(`
-                <!DOCTYPE html>
-                <html lang="es">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Cronómetro en Vivo - Carrera</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; background-color: #111; color: #fff; text-align: center; padding: 20px; margin: 0; }
-                        #cronometro { font-size: 6rem; font-weight: bold; color: #00ffcc; margin: 20px 0; font-family: monospace; }
-                        table { width: 90%; margin: 20px auto; border-collapse: collapse; font-size: 1.5rem; }
-                        th, td { border-bottom: 1px solid #444; padding: 12px; }
-                        th { color: #00ffcc; background-color: #222; }
-                        .lugar { font-weight: bold; color: #ffcc00; }
-                    </style>
-                </head>
-                <body>
-                    <h1>TIEMPO EN VIVO</h1>
-                    <div id="cronometro">00:00:00.0</div>
-                    <h2>Últimas Llegadas</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Lugar</th>
-                                <th>Corredor</th>
-                                <th>Tiempo</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaPopup"></tbody>
-                    </table>
+    // CRUD Operaciones
+    function saveData() {
+      localStorage.setItem('runners_db', JSON.stringify(runners));
+    }
 
-                    <script>
-                        const canal = new BroadcastChannel('carrera_canal');
-                        const tabla = document.getElementById('tablaPopup');
+    function renderAdminTable() {
+      const tbody = document.getElementById('runnersTableBody');
+      tbody.innerHTML = '';
 
-                        canal.onmessage = (event) => {
-                            if (event.data.tipo === 'TIEMPO') {
-                                document.getElementById('cronometro').textContent = event.data.tiempo;
-                            }
-                            if (event.data.tipo === 'NUEVO_REGISTRO') {
-                                const reg = event.data.registro;
-                                const fila = document.createElement('tr');
-                                fila.innerHTML = \`
-                                    <td class="lugar">#\${reg.lugar}</td>
-                                    <td>\${reg.corredor}</td>
-                                    <td>\${reg.tiempo}</td>
-                                \`;
-                                tabla.insertBefore(fila, tabla.firstChild);
-                            }
-                            if (event.data.tipo === 'BORRAR') {
-                                tabla.innerHTML = "";
-                                document.getElementById('cronometro').textContent = "00:00:00.0";
-                            }
-                        };
-                    <\/script>
-                </body>
-                </html>
-            `);
+      runners.forEach((r, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r.NumeroCorredor}</td>
+          <td>${r.Nombre}</td>
+          <td>${r.LugarGeneral}</td>
+          <td>${r.Categoria}</td>
+          <td>${r.LugarCategoria}</td>
+          <td>${r.Tiempo}</td>
+          <td>
+            <button class="btn btn-primary btn-sm" onclick="editRunner(${idx})">Editar</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteRunner(${idx})">Eliminar</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
 
-            // Cargar los registros existentes al abrir la pantalla
-            setTimeout(() => {
-                listaRegistros.slice().reverse().forEach(reg => {
-                    canalPantalla.postMessage({ tipo: 'NUEVO_REGISTRO', registro: reg });
-                });
-            }, 500);
-        }
+    function openRunnerModal(index = null) {
+      document.getElementById('editIndex').value = index !== null ? index : '';
+      document.getElementById('runnerModalTitle').innerText = index !== null ? 'Editar Corredor' : 'Agregar Corredor';
 
-        function finalizarCarrera() {
-            clearInterval(intervalo);
-            corriendo = false;
+      if (index !== null) {
+        const r = runners[index];
+        document.getElementById('inputNumero').value = r.NumeroCorredor;
+        document.getElementById('inputNombre').value = r.Nombre;
+        document.getElementById('inputGlobal').value = r.LugarGeneral;
+        document.getElementById('inputCategoria').value = r.Categoria;
+        document.getElementById('inputLugarCat').value = r.LugarCategoria;
+        document.getElementById('inputTiempo').value = r.Tiempo;
+      } else {
+        document.getElementById('inputNumero').value = '';
+        document.getElementById('inputNombre').value = '';
+        document.getElementById('inputGlobal').value = '';
+        document.getElementById('inputCategoria').value = '';
+        document.getElementById('inputLugarCat').value = '';
+        document.getElementById('inputTiempo').value = '';
+      }
+      document.getElementById('runnerModal').style.display = 'flex';
+    }
 
-            if (controladorNFC) controladorNFC.abort();
+    function saveRunner() {
+      const idx = document.getElementById('editIndex').value;
+      const newRunner = {
+        NumeroCorredor: document.getElementById('inputNumero').value,
+        Nombre: document.getElementById('inputNombre').value,
+        LugarGeneral: document.getElementById('inputGlobal').value,
+        Categoria: document.getElementById('inputCategoria').value,
+        LugarCategoria: document.getElementById('inputLugarCat').value,
+        Tiempo: document.getElementById('inputTiempo').value
+      };
 
-            document.getElementById('btnActivarNFC').disabled = true;
-            document.getElementById('btnFinalizar').disabled = true;
-            document.getElementById('btnExportar').disabled = false;
+      if (idx === '') {
+        runners.push(newRunner);
+      } else {
+        runners[idx] = newRunner;
+      }
 
-            const indicador = document.getElementById('estadoNFC');
-            indicador.textContent = "🏁 Carrera Finalizada. Resultados listos para descargar.";
-            indicador.className = "estado-nfc finalizado";
-        }
+      saveData();
+      renderAdminTable();
+      closeModal('runnerModal');
+    }
 
-        function exportarCSV() {
-            if (listaRegistros.length === 0) return;
+    function editRunner(index) {
+      openRunnerModal(index);
+    }
 
-            let csvContent = "data:text/csv;charset=utf-8,Lugar,ID NFC Corredor,Tiempo\n";
-            listaRegistros.forEach(r => {
-                csvContent += `${r.lugar},${r.corredor},${r.tiempo}\n`;
-            });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `resultados_nfc_${new Date().toISOString().slice(0,10)}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function borrarRegistros() {
-            if (confirm("¿Estás seguro de que deseas borrar toda la tabla y limpiar la memoria?")) {
-                clearInterval(intervalo);
-                if (controladorNFC) controladorNFC.abort();
-
-                localStorage.removeItem('carrera_nfc_registros');
-                listaRegistros = [];
-                corriendo = false;
-                posicion = 1;
-
-                document.getElementById('cronometro').textContent = "00:00:00.0";
-                document.getElementById('btnIniciar').disabled = false;
-                document.getElementById('btnActivarNFC').disabled = true;
-                document.getElementById('btnFinalizar').disabled = true;
-                document.getElementById('btnExportar').disabled = true;
-
-                const indicador = document.getElementById('estadoNFC');
-                indicador.textContent = "Inicia la carrera para activar el lector";
-                indicador.className = "estado-nfc";
-
-                renderizarTabla();
-                canalPantalla.postMessage({ tipo: 'BORRAR' });
-            }
-        }
-    </script>
+    function deleteRunner(index) {
+      if (confirm('¿Estás seguro de eliminar este registro?')) {
+        runners.splice(index, 1);
+        saveData();
+        renderAdminTable();
+      }
+    }
+  </script>
 </body>
 </html>
