@@ -1,6 +1,6 @@
 async function cargarDatos() {
   try {
-    const url = 'https://tu-usuario.github.io/tu-repositorio/datos.json';
+    const url = 'https://lugi2050-dotcom.github.io/carrera-nfc/';
     const respuesta = await fetch(url);
     const datos = await respuesta.json();
     
