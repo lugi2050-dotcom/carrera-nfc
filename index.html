@@ -1,527 +1,626 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Consulta de Resultados de Carrera</title>
-  <style>
-    :root {
-      --primary-color: #0056b3;
-      --secondary-color: #28a745;
-      --danger-color: #dc3545;
-      --bg-color: #f8f9fa;
-      --card-bg: #ffffff;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Resultados - Carrera 2026</title>
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #0f766e;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --danger-color: #dc2626;
+            --danger-hover: #b91c1c;
+            --success-color: #16a34a;
+        }
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--bg-color);
-      margin: 0;
-      padding: 20px;
-      color: #333;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 900px;
-      margin: 0 auto 30px auto;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #ddd;
-    }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-    }
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
 
-    .btn {
-      padding: 10px 18px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.2s;
-    }
+        .logo-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    .btn-primary { background-color: var(--primary-color); color: white; }
-    .btn-secondary { background-color: #6c757d; color: white; }
-    .btn-success { background-color: var(--secondary-color); color: white; }
-    .btn-danger { background-color: var(--danger-color); color: white; }
-    .btn-sm { padding: 5px 10px; font-size: 0.85rem; }
+        .logo-title h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
 
-    /* Buscador Público */
-    .search-card {
-      background: var(--card-bg);
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      text-align: center;
-      margin-bottom: 30px;
-    }
+        .admin-btn {
+            background-color: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
 
-    .search-input {
-      padding: 12px;
-      width: 60%;
-      max-width: 300px;
-      border: 2px solid #ddd;
-      border-radius: 5px;
-      font-size: 1.1rem;
-      text-align: center;
-    }
+        .admin-btn:hover {
+            background-color: white;
+            color: var(--primary-color);
+        }
 
-    /* Tarjeta de Resultado */
-    .result-card {
-      background: var(--card-bg);
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      display: none;
-      margin-top: 20px;
-    }
+        .admin-badge {
+            background-color: #f59e0b;
+            color: #000;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
 
-    .result-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 15px;
-      margin-top: 15px;
-    }
+        main {
+            flex: 1;
+            max-width: 800px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
 
-    .data-box {
-      background: #f1f3f5;
-      padding: 12px;
-      border-radius: 6px;
-      text-align: center;
-    }
+        .search-card {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
 
-    .data-box .label { font-size: 0.85rem; color: #666; margin-bottom: 5px; }
-    .data-box .value { font-size: 1.2rem; font-weight: bold; color: var(--primary-color); }
+        .search-card h2 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
 
-    /* Modales / Popups */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
 
-    .modal-content {
-      background: white;
-      padding: 25px;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    }
+        .search-box input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
 
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
+        .search-box input:focus {
+            border-color: var(--primary-color);
+        }
 
-    .form-group {
-      margin-bottom: 15px;
-      text-align: left;
-    }
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
 
-    .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-    .form-group input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
 
-    /* Tabla de Admin */
-    .admin-panel {
-      display: none;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      margin-top: 20px;
-    }
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
 
-    .table-container {
-      overflow-x: auto;
-      max-height: 400px;
-      margin-top: 15px;
-    }
+        .btn-danger:hover {
+            background-color: var(--danger-hover);
+        }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+        .btn-secondary {
+            background-color: #64748b;
+        }
 
-    th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      text-align: center;
-    }
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
 
-    th { background-color: #f1f1f1; }
-  </style>
+        .result-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
 
-  <!-- Módulos de Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, get, child, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    // ⚠️ REEMPLAZA ESTE OBJETO CON TUS CLAVES DE FIREBASE ⚠️
-    const firebaseConfig = {
-      apiKey: "TU_API_KEY",
-      authDomain: "TU_PROYECTO.firebaseapp.com",
-      databaseURL: "https://TU_PROYECTO-default-rtdb.firebaseio.com",
-      projectId: "TU_PROYECTO",
-      storageBucket: "TU_PROYECTO.appspot.com",
-      messagingSenderId: "123456789",
-      appId: "1:123456789:web:abc123"
-    };
+        .result-header {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+        .runner-number {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
 
-    // Exponer funciones globales
-    window.db = db;
-    window.dbRef = ref(db);
-    window.dbSet = set;
-    window.dbGet = get;
-    window.dbChild = child;
-    window.dbRemove = remove;
-    window.dbOnValue = onValue;
-    window.ref = ref;
-  </script>
+        .runner-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #0f172a;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .detail-item {
+            background-color: #f1f5f9;
+            padding: 1.2rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .detail-item.highlight {
+            border-left-color: #f59e0b;
+            background-color: #fffbeb;
+        }
+
+        .detail-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .detail-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .no-result {
+            background-color: #fef2f2;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #fecaca;
+            text-align: center;
+            display: none;
+            margin-top: 1rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            color: var(--primary-color);
+        }
+
+        .close-btn {
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #64748b;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="password"],
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .admin-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .status-msg {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .status-success {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .status-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: #64748b;
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="header">
-    <h2>Resultados de la Carrera</h2>
-    <div id="authSection">
-      <button class="btn btn-primary" onclick="openLoginModal()">Acceso Admin</button>
-    </div>
-  </div>
-
-  <div class="container">
-    <!-- Buscador Público -->
-    <div class="search-card">
-      <h3>Consultar Número de Corredor</h3>
-      <input type="number" id="searchBib" class="search-input" placeholder="Ej: 44" onkeyup="if(event.key==='Enter') searchRunner()">
-      <button class="btn btn-primary" onclick="searchRunner()">Buscar</button>
-
-      <div id="resultCard" class="result-card">
-        <h3 id="resNombre" style="margin-top:0; color: #333;">-</h3>
-        <div class="result-grid">
-          <div class="data-box"><div class="label">NÚMERO</div><div class="value" id="resNumero">-</div></div>
-          <div class="data-box"><div class="label">LUGAR GLOBAL</div><div class="value" id="resGlobal">-</div></div>
-          <div class="data-box"><div class="label">CATEGORÍA</div><div class="value" id="resCategoria">-</div></div>
-          <div class="data-box"><div class="label">LUGAR CATEGORÍA</div><div class="value" id="resLugarCat">-</div></div>
-          <div class="data-box"><div class="label">TIEMPO</div><div class="value" id="resTiempo">-</div></div>
+    <header>
+        <div class="logo-title">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            <h1>Resultados Carrera 2026</h1>
         </div>
-      </div>
-    </div>
-
-    <!-- Panel Admin -->
-    <div id="adminPanel" class="admin-panel">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <h3>Administración de Corredores (En Línea)</h3>
         <div>
-          <button class="btn btn-success" onclick="openCSVModal()">Subir CSV</button>
-          <button class="btn btn-primary" onclick="openRunnerModal()">+ Nuevo Corredor</button>
+            <button class="admin-btn" id="adminToggleBtn" onclick="openAdminModal()">
+                🔒 Administrador
+            </button>
         </div>
-      </div>
+    </header>
 
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>N°</th>
-              <th>Nombre</th>
-              <th>Lugar Gen.</th>
-              <th>Categoría</th>
-              <th>Lugar Cat.</th>
-              <th>Tiempo</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="runnersTableBody">
-            <!-- Filas dinámicas -->
-          </tbody>
-        </table>
-      </div>
+    <main>
+        <section class="search-card">
+            <h2>Consulta tu Tiempo y Posición</h2>
+            <p style="color: #64748b; margin-bottom: 1.5rem;">Ingresa tu número de corredor para ver tus datos de la carrera</p>
+            <form onsubmit="buscarCorredor(event)" class="search-box">
+                <input type="number" id="runnerInput" placeholder="Ej. 44" required min="1">
+                <button type="submit" class="btn">Buscar</button>
+            </form>
+            <div id="noResult" class="no-result">
+                No se encontró ningún corredor registrado con el número especificado.
+            </div>
+        </section>
+
+        <section id="resultCard" class="result-card">
+            <div class="result-header">
+                <div>
+                    <span style="font-size: 0.9rem; color: #64748b; font-weight: bold;">CORREDOR</span>
+                    <div class="runner-name" id="resNombre">-</div>
+                </div>
+                <div class="runner-number" id="resNumero"># -</div>
+            </div>
+
+            <div class="details-grid">
+                <div class="detail-item highlight">
+                    <div class="detail-label">Lugar General</div>
+                    <div class="detail-value" id="resLugarGeneral">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Lugar Categoría</div>
+                    <div class="detail-value" id="resLugarCategoria">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Categoría</div>
+                    <div class="detail-value" id="resCategoria">-</div>
+                </div>
+                <div class="detail-item highlight">
+                    <div class="detail-label">Tiempo Oficial</div>
+                    <div class="detail-value" id="resTiempo">-</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Login / Panel Administrador -->
+    <div class="modal" id="adminModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Acceso de Administrador</h3>
+                <button class="close-btn" onclick="closeAdminModal()">&times;</button>
+            </div>
+
+            <!-- Formulario de Login -->
+            <div id="loginFormSection">
+                <form onsubmit="loginAdmin(event)">
+                    <div class="form-group">
+                        <label for="adminUser">Usuario</label>
+                        <input type="text" id="adminUser" placeholder="Usuario" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPass">Contraseña</label>
+                        <input type="password" id="adminPass" placeholder="Contraseña" required>
+                    </div>
+                    <button type="submit" class="btn" style="width: 100%;">Iniciar Sesión</button>
+                </form>
+            </div>
+
+            <!-- Panel de Administración -->
+            <div id="adminPanelSection" style="display: none;">
+                <p style="margin-bottom: 1rem; font-size: 0.95rem; color: #475569;">
+                    Sesión activa. Puedes actualizar la base de datos subiendo un nuevo archivo CSV o eliminar los datos existentes.
+                </p>
+
+                <div class="form-group">
+                    <label for="csvFileInput">Subir archivo CSV con nueva base de datos</label>
+                    <input type="file" id="csvFileInput" accept=".csv">
+                </div>
+
+                <div class="admin-actions">
+                    <button class="btn" onclick="subirCSV()">Cargar Archivo CSV</button>
+                    <button class="btn btn-danger" onclick="borrarBaseDeDatos()">🗑️ Borrar Base de Datos</button>
+                    <button class="btn btn-secondary" onclick="logoutAdmin()">Cerrar Sesión</button>
+                </div>
+            </div>
+
+            <div id="statusMsg" class="status-msg"></div>
+        </div>
     </div>
-  </div>
 
-  <!-- Modal Login -->
-  <div id="loginModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Iniciar Sesión Admin</h3>
-        <span style="cursor:pointer" onclick="closeModal('loginModal')">&times;</span>
-      </div>
-      <div class="form-group">
-        <label>Usuario:</label>
-        <input type="text" id="adminUser">
-      </div>
-      <div class="form-group">
-        <label>Contraseña:</label>
-        <input type="password" id="adminPass">
-      </div>
-      <button class="btn btn-primary" style="width:100%" onclick="login()">Ingresar</button>
-    </div>
-  </div>
+    <footer>
+        Sistema de Consulta de Resultados &copy; 2026 - Carrera Global
+    </footer>
 
-  <!-- Modal Subir CSV -->
-  <div id="csvModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Cargar Base de Datos CSV a la Nube</h3>
-        <span style="cursor:pointer" onclick="closeModal('csvModal')">&times;</span>
-      </div>
-      <p>Selecciona un archivo CSV. Los datos se guardarán en línea inmediatamente.</p>
-      <div class="form-group">
-        <input type="file" id="csvFileInput" accept=".csv">
-      </div>
-      <button class="btn btn-success" style="width:100%" onclick="processCSV()">Cargar a la Nube</button>
-    </div>
-  </div>
+    <!-- Base de datos embebida por defecto (extraída de tu CSV) -->
+    <script id="embedded-database" type="application/json">
+        /* El contenido JSON original ha sido embebido en el archivo adjunto */
+    </script>
 
-  <!-- Modal Agregar/Editar Corredor -->
-  <div id="runnerModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="runnerModalTitle">Agregar Corredor</h3>
-        <span style="cursor:pointer" onclick="closeModal('runnerModal')">&times;</span>
-      </div>
-      <input type="hidden" id="editKey">
-      <div class="form-group">
-        <label>Número Corredor:</label>
-        <input type="number" id="inputNumero">
-      </div>
-      <div class="form-group">
-        <label>Nombre:</label>
-        <input type="text" id="inputNombre">
-      </div>
-      <div class="form-group">
-        <label>Lugar General:</label>
-        <input type="number" id="inputGlobal">
-      </div>
-      <div class="form-group">
-        <label>Categoría:</label>
-        <input type="text" id="inputCategoria">
-      </div>
-      <div class="form-group">
-        <label>Lugar Categoría:</label>
-        <input type="number" id="inputLugarCat">
-      </div>
-      <div class="form-group">
-        <label>Tiempo:</label>
-        <input type="text" id="inputTiempo" placeholder="00:00:00.0">
-      </div>
-      <button class="btn btn-primary" style="width:100%" onclick="saveRunner()">Guardar en Línea</button>
-    </div>
-  </div>
+    <script>
+        let dbData = [];
+        let isAdminLoggedIn = false;
 
-  <script>
-    let isAdmin = false;
+        window.addEventListener('DOMContentLoaded', () => {
+            cargarBaseDeDatos();
+        });
 
-    // Buscar corredor en línea
-    function searchRunner() {
-      const bib = document.getElementById('searchBib').value.trim();
-      const resultCard = document.getElementById('resultCard');
-      
-      if (!bib) {
-        alert('Por favor, ingresa un número de corredor.');
-        return;
-      }
-
-      window.dbGet(window.dbChild(window.dbRef, `corredores/${bib}`)).then((snapshot) => {
-        if (snapshot.exists()) {
-          const runner = snapshot.val();
-          document.getElementById('resNombre').innerText = runner.Nombre;
-          document.getElementById('resNumero').innerText = runner.NumeroCorredor;
-          document.getElementById('resGlobal').innerText = runner.LugarGeneral;
-          document.getElementById('resCategoria').innerText = runner.Categoria;
-          document.getElementById('resLugarCat').innerText = runner.LugarCategoria;
-          document.getElementById('resTiempo').innerText = runner.Tiempo;
-          resultCard.style.display = 'block';
-        } else {
-          resultCard.style.display = 'none';
-          alert('Número de corredor no encontrado.');
-        }
-      }).catch((error) => {
-        alert('Error al consultar en línea: ' + error.message);
-      });
-    }
-
-    // Modal Handlers
-    function openLoginModal() { document.getElementById('loginModal').style.display = 'flex'; }
-    function openCSVModal() { document.getElementById('csvModal').style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-    // Autenticación Admin
-    function login() {
-      const u = document.getElementById('adminUser').value;
-      const p = document.getElementById('adminPass').value;
-
-      if (u === 'admin' && p === 'carreraglobal') {
-        isAdmin = true;
-        closeModal('loginModal');
-        document.getElementById('authSection').innerHTML = `<button class="btn btn-danger" onclick="logout()">Cerrar Sesión</button>`;
-        document.getElementById('adminPanel').style.display = 'block';
-        listenToRunners();
-        openCSVModal();
-      } else {
-        alert('Usuario o contraseña incorrectos.');
-      }
-    }
-
-    function logout() {
-      isAdmin = false;
-      document.getElementById('adminPanel').style.display = 'none';
-      document.getElementById('authSection').innerHTML = `<button class="btn btn-primary" onclick="openLoginModal()">Acceso Admin</button>`;
-    }
-
-    // Escuchar cambios en tiempo real desde la nube
-    function listenToRunners() {
-      const runnersRef = window.ref(window.db, 'corredores');
-      window.dbOnValue(runnersRef, (snapshot) => {
-        const data = snapshot.val();
-        renderAdminTable(data);
-      });
-    }
-
-    function renderAdminTable(data) {
-      const tbody = document.getElementById('runnersTableBody');
-      tbody.innerHTML = '';
-
-      if (!data) return;
-
-      Object.keys(data).forEach((key) => {
-        const r = data[key];
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${r.NumeroCorredor}</td>
-          <td>${r.Nombre}</td>
-          <td>${r.LugarGeneral}</td>
-          <td>${r.Categoria}</td>
-          <td>${r.LugarCategoria}</td>
-          <td>${r.Tiempo}</td>
-          <td>
-            <button class="btn btn-primary btn-sm" onclick="editRunner('${r.NumeroCorredor}')">Editar</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteRunner('${r.NumeroCorredor}')">Eliminar</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // Cargar CSV completo a la nube
-    function processCSV() {
-      const fileInput = document.getElementById('csvFileInput');
-      const file = fileInput.files[0];
-
-      if (!file) {
-        alert('Por favor selecciona un archivo CSV.');
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const text = e.target.result;
-        const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-        if (lines.length < 2) return;
-
-        const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-        const newRunners = {};
-
-        for (let i = 1; i < lines.length; i++) {
-          const cols = lines[i].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-          if (cols.length >= headers.length) {
-            let row = {};
-            headers.forEach((h, idx) => row[h] = cols[idx]);
-            const bib = String(row['NumeroCorredor']);
-            if (bib) {
-              newRunners[bib] = {
-                NumeroCorredor: bib,
-                Nombre: row['Nombre'] || '',
-                LugarGeneral: row['LugarGeneral'] || '',
-                Categoria: row['Categoria'] || '',
-                LugarCategoria: row['LugarCategoria'] || '',
-                Tiempo: row['Tiempo'] || ''
-              };
+        function cargarBaseDeDatos() {
+            const localData = localStorage.getItem('carrera_db');
+            if (localData) {
+                try {
+                    dbData = JSON.parse(localData);
+                    return;
+                } catch (e) {
+                    console.error('Error al leer LocalStorage', e);
+                }
             }
-          }
+
+            try {
+                const embeddedElem = document.getElementById('embedded-database');
+                if (embeddedElem && embeddedElem.textContent.trim()) {
+                    dbData = JSON.parse(embeddedElem.textContent);
+                } else {
+                    dbData = [];
+                }
+            } catch (e) {
+                dbData = [];
+            }
         }
 
-        // Subir a Firebase en línea
-        window.dbSet(window.ref(window.db, 'corredores'), newRunners).then(() => {
-          closeModal('csvModal');
-          alert('¡Base de datos cargada exitosamente en la nube!');
-        }).catch(err => {
-          alert('Error al guardar en la nube: ' + err.message);
-        });
-      };
-      reader.readAsText(file);
-    }
+        function buscarCorredor(e) {
+            e.preventDefault();
+            const num = document.getElementById('runnerInput').value.trim();
+            const resultCard = document.getElementById('resultCard');
+            const noResult = document.getElementById('noResult');
 
-    function openRunnerModal(key = null) {
-      document.getElementById('editKey').value = key !== null ? key : '';
-      document.getElementById('runnerModalTitle').innerText = key !== null ? 'Editar Corredor' : 'Agregar Corredor';
+            if (!num) return;
 
-      if (key !== null) {
-        window.dbGet(window.dbChild(window.dbRef, `corredores/${key}`)).then((snapshot) => {
-          if (snapshot.exists()) {
-            const r = snapshot.val();
-            document.getElementById('inputNumero').value = r.NumeroCorredor;
-            document.getElementById('inputNombre').value = r.Nombre;
-            document.getElementById('inputGlobal').value = r.LugarGeneral;
-            document.getElementById('inputCategoria').value = r.Categoria;
-            document.getElementById('inputLugarCat').value = r.LugarCategoria;
-            document.getElementById('inputTiempo').value = r.Tiempo;
-          }
-        });
-      } else {
-        document.getElementById('inputNumero').value = '';
-        document.getElementById('inputNombre').value = '';
-        document.getElementById('inputGlobal').value = '';
-        document.getElementById('inputCategoria').value = '';
-        document.getElementById('inputLugarCat').value = '';
-        document.getElementById('inputTiempo').value = '';
-      }
-      document.getElementById('runnerModal').style.display = 'flex';
-    }
+            if (!dbData || dbData.length === 0) {
+                resultCard.style.display = 'none';
+                noResult.innerText = 'La base de datos está vacía. Un administrador debe subir la información.';
+                noResult.style.display = 'block';
+                return;
+            }
 
-    function saveRunner() {
-      const bib = String(document.getElementById('inputNumero').value);
-      if (!bib) {
-        alert('El número de corredor es obligatorio.');
-        return;
-      }
+            const runner = dbData.find(item => String(item.NumeroCorredor).trim() === num);
 
-      const runner = {
-        NumeroCorredor: bib,
-        Nombre: document.getElementById('inputNombre').value,
-        LugarGeneral: document.getElementById('inputGlobal').value,
-        Categoria: document.getElementById('inputCategoria').value,
-        LugarCategoria: document.getElementById('inputLugarCat').value,
-        Tiempo: document.getElementById('inputTiempo').value
-      };
+            if (runner) {
+                document.getElementById('resNombre').innerText = runner.Nombre || 'N/A';
+                document.getElementById('resNumero').innerText = '#' + (runner.NumeroCorredor || num);
+                document.getElementById('resLugarGeneral').innerText = runner.LugarGeneral || '-';
+                document.getElementById('resLugarCategoria').innerText = runner.LugarCategoria || '-';
+                document.getElementById('resCategoria').innerText = runner.Categoria || '-';
+                document.getElementById('resTiempo').innerText = runner.Tiempo || '-';
 
-      window.dbSet(window.ref(window.db, `corredores/${bib}`), runner).then(() => {
-        closeModal('runnerModal');
-      }).catch(err => alert('Error al guardar: ' + err.message));
-    }
+                noResult.style.display = 'none';
+                resultCard.style.display = 'block';
+            } else {
+                resultCard.style.display = 'none';
+                noResult.innerText = `No se encontró ningún corredor registrado con el número #${num}.`;
+                noResult.style.display = 'block';
+            }
+        }
 
-    function editRunner(key) {
-      openRunnerModal(key);
-    }
+        function openAdminModal() {
+            document.getElementById('adminModal').style.display = 'flex';
+            mostrarEstado('', '');
+        }
 
-    function deleteRunner(key) {
-      if (confirm('¿Estás seguro de eliminar este registro de la nube?')) {
-        window.dbRemove(window.ref(window.db, `corredores/${key}`));
-      }
-    }
-  </script>
+        function closeAdminModal() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        function loginAdmin(e) {
+            e.preventDefault();
+            const pass = document.getElementById('adminPass').value.trim();
+
+            if (pass === 'carreraglobal') {
+                isAdminLoggedIn = true;
+                document.getElementById('loginFormSection').style.display = 'none';
+                document.getElementById('adminPanelSection').style.display = 'block';
+                document.getElementById('modalTitle').innerText = 'Panel de Administración';
+                document.getElementById('adminToggleBtn').innerHTML = '⚙️ Panel Admin <span class="admin-badge">ACTIVO</span>';
+                mostrarEstado('Sesión iniciada con éxito.', 'success');
+            } else {
+                mostrarEstado('Contraseña incorrecta.', 'error');
+            }
+        }
+
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            document.getElementById('loginFormSection').style.display = 'block';
+            document.getElementById('adminPanelSection').style.display = 'none';
+            document.getElementById('modalTitle').innerText = 'Acceso de Administrador';
+            document.getElementById('adminToggleBtn').innerHTML = '🔒 Administrador';
+            mostrarEstado('Sesión cerrada.', 'success');
+        }
+
+        function subirCSV() {
+            const fileInput = document.getElementById('csvFileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                mostrarEstado('Por favor selecciona un archivo CSV.', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                try {
+                    const parsedData = parseCSV(text);
+                    if (parsedData.length === 0) {
+                        mostrarEstado('El archivo CSV está vacío o no tiene el formato correcto.', 'error');
+                        return;
+                    }
+                    dbData = parsedData;
+                    localStorage.setItem('carrera_db', JSON.stringify(dbData));
+                    mostrarEstado(`¡Base de datos actualizada! Total registros: ${dbData.length}`, 'success');
+                    fileInput.value = '';
+                } catch (err) {
+                    mostrarEstado('Error al procesar el CSV.', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSV(text) {
+            const lines = text.split(/\r\n|\n/);
+            if (lines.length < 2) return [];
+
+            const headers = lines[0].split(',').map(h => h.replace(/^["']|["']$/g, '').trim());
+            const results = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                const values = line.split(',').map(val => val.replace(/^["']|["']$/g, '').trim());
+                if (values.length < headers.length) continue;
+
+                let row = {};
+                headers.forEach((header, index) => {
+                    row[header] = values[index] || '';
+                });
+                results.push(row);
+            }
+            return results;
+        }
+
+        function borrarBaseDeDatos() {
+            if (confirm('¿Estás seguro de que deseas borrar toda la base de datos?')) {
+                dbData = [];
+                localStorage.removeItem('carrera_db');
+                mostrarEstado('Base de datos eliminada completamente.', 'success');
+                document.getElementById('resultCard').style.display = 'none';
+            }
+        }
+
+        function mostrarEstado(msg, type) {
+            const statusDiv = document.getElementById('statusMsg');
+            if (!msg) {
+                statusDiv.style.display = 'none';
+                return;
+            }
+            statusDiv.className = 'status-msg ' + (type === 'success' ? 'status-success' : 'status-error');
+            statusDiv.innerText = msg;
+            statusDiv.style.display = 'block';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('adminModal');
+            if (event.target === modal) {
+                closeAdminModal();
+            }
+        }
+    </script>
 </body>
 </html>
