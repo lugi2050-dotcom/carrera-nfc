@@ -1,626 +1,410 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consulta de Resultados - Carrera 2026</title>
-    <style>
-        :root {
-            --primary-color: #1e3a8a;
-            --primary-hover: #1d4ed8;
-            --secondary-color: #0f766e;
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-color: #1e293b;
-            --border-color: #e2e8f0;
-            --danger-color: #dc2626;
-            --danger-hover: #b91c1c;
-            --success-color: #16a34a;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consulta de Resultados de Carrera</title>
+  <style>
+    :root {
+      --primary-color: #0056b3;
+      --bg-color: #f4f6f9;
+      --card-bg: #ffffff;
+      --text-color: #333;
+      --danger-color: #dc3545;
+      --success-color: #28a745;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+    }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
 
-        header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
 
-        .logo-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
 
-        .logo-title h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
+    .btn-admin { background-color: #ffffff; color: var(--primary-color); }
+    .btn-admin:hover { background-color: #e2e8f0; }
 
-        .admin-btn {
-            background-color: transparent;
-            border: 2px solid white;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
+    .btn-primary { background-color: var(--primary-color); color: white; }
+    .btn-danger { background-color: var(--danger-color); color: white; }
+    .btn-secondary { background-color: #6c757d; color: white; }
 
-        .admin-btn:hover {
-            background-color: white;
-            color: var(--primary-color);
-        }
+    .container {
+      max-width: 600px;
+      margin: 3rem auto;
+      padding: 0 1rem;
+    }
 
-        .admin-badge {
-            background-color: #f59e0b;
-            color: #000;
-            padding: 0.2rem 0.6rem;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-left: 8px;
-        }
+    .search-card {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      text-align: center;
+    }
 
-        main {
-            flex: 1;
-            max-width: 800px;
-            width: 100%;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
+    .form-group {
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
 
-        .search-card {
-            background-color: var(--card-bg);
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            margin-bottom: 2rem;
-        }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
 
-        .search-card h2 {
-            margin-bottom: 1rem;
-            color: var(--primary-color);
-        }
+    input[type="number"], input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 1rem;
+    }
 
-        .search-box {
-            display: flex;
-            gap: 10px;
-            max-width: 500px;
-            margin: 0 auto;
-        }
+    .result-card {
+      display: none;
+      margin-top: 2rem;
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      border-left: 5px solid var(--primary-color);
+    }
 
-        .search-box input {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1.1rem;
-            outline: none;
-            transition: border-color 0.2s;
-        }
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #eee;
+    }
 
-        .search-box input:focus {
-            border-color: var(--primary-color);
-        }
+    .result-item:last-child { border-bottom: none; }
+    .result-label { font-weight: bold; color: #555; }
 
-        .btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
+    /* Modal / Popup */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
 
-        .btn:hover {
-            background-color: var(--primary-hover);
-        }
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
 
-        .btn-danger {
-            background-color: var(--danger-color);
-        }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
 
-        .btn-danger:hover {
-            background-color: var(--danger-hover);
-        }
+    .modal-header h2 { margin: 0; font-size: 1.25rem; }
+    .close-btn { font-size: 1.5rem; cursor: pointer; border: none; background: none; }
 
-        .btn-secondary {
-            background-color: #64748b;
-        }
-
-        .btn-secondary:hover {
-            background-color: #475569;
-        }
-
-        .result-card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            display: none;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .result-header {
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 1rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .runner-number {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 0.4rem 1rem;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .runner-name {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #0f172a;
-        }
-
-        .details-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .detail-item {
-            background-color: #f1f5f9;
-            padding: 1.2rem;
-            border-radius: 8px;
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .detail-item.highlight {
-            border-left-color: #f59e0b;
-            background-color: #fffbeb;
-        }
-
-        .detail-label {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            color: #64748b;
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-        }
-
-        .detail-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--text-color);
-        }
-
-        .no-result {
-            background-color: #fef2f2;
-            color: #991b1b;
-            padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid #fecaca;
-            text-align: center;
-            display: none;
-            margin-top: 1rem;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(4px);
-        }
-
-        .modal-content {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 12px;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            position: relative;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .modal-header h3 {
-            color: var(--primary-color);
-        }
-
-        .close-btn {
-            font-size: 1.5rem;
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: #64748b;
-        }
-
-        .form-group {
-            margin-bottom: 1.2rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .form-group input[type="text"],
-        .form-group input[type="password"],
-        .form-group input[type="file"] {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-        }
-
-        .admin-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .status-msg {
-            margin-top: 1rem;
-            padding: 0.75rem;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            display: none;
-        }
-
-        .status-success {
-            background-color: #dcfce7;
-            color: #166534;
-        }
-
-        .status-error {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-
-        footer {
-            text-align: center;
-            padding: 1.5rem;
-            color: #64748b;
-            font-size: 0.9rem;
-            border-top: 1px solid var(--border-color);
-            margin-top: auto;
-        }
-    </style>
+    .status-msg {
+      margin-top: 1rem;
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .status-success { background: #d4edda; color: #155724; }
+    .status-error { background: #f8d7da; color: #721c24; }
+  </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo-title">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            <h1>Resultados Carrera 2026</h1>
-        </div>
-        <div>
-            <button class="admin-btn" id="adminToggleBtn" onclick="openAdminModal()">
-                🔒 Administrador
-            </button>
-        </div>
-    </header>
+  <header>
+    <h1>Consulta de Corredores</h1>
+    <button class="btn btn-admin" onclick="openModal('authModal')">Panel Admin</button>
+  </header>
 
-    <main>
-        <section class="search-card">
-            <h2>Consulta tu Tiempo y Posición</h2>
-            <p style="color: #64748b; margin-bottom: 1.5rem;">Ingresa tu número de corredor para ver tus datos de la carrera</p>
-            <form onsubmit="buscarCorredor(event)" class="search-box">
-                <input type="number" id="runnerInput" placeholder="Ej. 44" required min="1">
-                <button type="submit" class="btn">Buscar</button>
-            </form>
-            <div id="noResult" class="no-result">
-                No se encontró ningún corredor registrado con el número especificado.
-            </div>
-        </section>
-
-        <section id="resultCard" class="result-card">
-            <div class="result-header">
-                <div>
-                    <span style="font-size: 0.9rem; color: #64748b; font-weight: bold;">CORREDOR</span>
-                    <div class="runner-name" id="resNombre">-</div>
-                </div>
-                <div class="runner-number" id="resNumero"># -</div>
-            </div>
-
-            <div class="details-grid">
-                <div class="detail-item highlight">
-                    <div class="detail-label">Lugar General</div>
-                    <div class="detail-value" id="resLugarGeneral">-</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Lugar Categoría</div>
-                    <div class="detail-value" id="resLugarCategoria">-</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Categoría</div>
-                    <div class="detail-value" id="resCategoria">-</div>
-                </div>
-                <div class="detail-item highlight">
-                    <div class="detail-label">Tiempo Oficial</div>
-                    <div class="detail-value" id="resTiempo">-</div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Modal de Login / Panel Administrador -->
-    <div class="modal" id="adminModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Acceso de Administrador</h3>
-                <button class="close-btn" onclick="closeAdminModal()">&times;</button>
-            </div>
-
-            <!-- Formulario de Login -->
-            <div id="loginFormSection">
-                <form onsubmit="loginAdmin(event)">
-                    <div class="form-group">
-                        <label for="adminUser">Usuario</label>
-                        <input type="text" id="adminUser" placeholder="Usuario" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="adminPass">Contraseña</label>
-                        <input type="password" id="adminPass" placeholder="Contraseña" required>
-                    </div>
-                    <button type="submit" class="btn" style="width: 100%;">Iniciar Sesión</button>
-                </form>
-            </div>
-
-            <!-- Panel de Administración -->
-            <div id="adminPanelSection" style="display: none;">
-                <p style="margin-bottom: 1rem; font-size: 0.95rem; color: #475569;">
-                    Sesión activa. Puedes actualizar la base de datos subiendo un nuevo archivo CSV o eliminar los datos existentes.
-                </p>
-
-                <div class="form-group">
-                    <label for="csvFileInput">Subir archivo CSV con nueva base de datos</label>
-                    <input type="file" id="csvFileInput" accept=".csv">
-                </div>
-
-                <div class="admin-actions">
-                    <button class="btn" onclick="subirCSV()">Cargar Archivo CSV</button>
-                    <button class="btn btn-danger" onclick="borrarBaseDeDatos()">🗑️ Borrar Base de Datos</button>
-                    <button class="btn btn-secondary" onclick="logoutAdmin()">Cerrar Sesión</button>
-                </div>
-            </div>
-
-            <div id="statusMsg" class="status-msg"></div>
-        </div>
+  <div class="container">
+    <div class="search-card">
+      <h2>Ingresa tu Número de Corredor</h2>
+      <div class="form-group">
+        <input type="number" id="runnerNum" placeholder="Ej. 44" min="1">
+      </div>
+      <button class="btn btn-primary" onclick="searchRunner()">Buscar Resultados</button>
     </div>
 
-    <footer>
-        Sistema de Consulta de Resultados &copy; 2026 - Carrera Global
-    </footer>
+    <div id="resultCard" class="result-card">
+      <h3 style="margin-top:0;">Detalles del Corredor</h3>
+      <div class="result-item"><span class="result-label">Nombre:</span> <span id="resNombre">-</span></div>
+      <div class="result-item"><span class="result-label">N° Corredor:</span> <span id="resNumero">-</span></div>
+      <div class="result-item"><span class="result-label">Lugar Global:</span> <span id="resLugarGeneral">-</span></div>
+      <div class="result-item"><span class="result-label">Lugar Categoría:</span> <span id="resLugarCategoria">-</span></div>
+      <div class="result-item"><span class="result-label">Categoría:</span> <span id="resCategoria">-</span></div>
+      <div class="result-item"><span class="result-label">Tiempo:</span> <span id="resTiempo">-</span></div>
+    </div>
+  </div>
 
-    <!-- Base de datos embebida por defecto (extraída de tu CSV) -->
-    <script id="embedded-database" type="application/json">
-        /* El contenido JSON original ha sido embebido en el archivo adjunto */
-    </script>
+  <!-- Modal Autenticación -->
+  <div id="authModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Acceso Administrador</h2>
+        <button class="close-btn" onclick="closeModal('authModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label for="adminUser">Usuario</label>
+        <input type="text" id="adminUser" placeholder="admin">
+      </div>
+      <div class="form-group">
+        <label for="adminPass">Contraseña</label>
+        <input type="password" id="adminPass" placeholder="••••••••">
+      </div>
+      <button class="btn btn-primary" style="width: 100%;" onclick="login()">Ingresar</button>
+      <div id="authError" class="status-msg status-error">Usuario o contraseña incorrectos.</div>
+    </div>
+  </div>
 
-    <script>
-        let dbData = [];
-        let isAdminLoggedIn = false;
+  <!-- Modal Administrador Dashboard -->
+  <div id="adminModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Panel de Administración</h2>
+        <button class="close-btn" onclick="closeModal('adminModal')">&times;</button>
+      </div>
 
-        window.addEventListener('DOMContentLoaded', () => {
-            cargarBaseDeDatos();
+      <div class="form-group">
+        <label for="ghUser">Usuario de GitHub</label>
+        <input type="text" id="ghUser" placeholder="Tu usuario de GitHub">
+      </div>
+      <div class="form-group">
+        <label for="ghRepo">Nombre del Repositorio</label>
+        <input type="text" id="ghRepo" placeholder="ejemplo: carrera-2026">
+      </div>
+      <div class="form-group">
+        <label for="ghToken">Personal Access Token (GitHub)</label>
+        <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx">
+      </div>
+
+      <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid #ccc;">
+
+      <div class="form-group">
+        <label for="csvFile">Subir Base de Datos (.csv)</label>
+        <input type="file" id="csvFile" accept=".csv">
+      </div>
+      <button class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" onclick="uploadCSV()">Cargar y Actualizar JSON</button>
+      <button class="btn btn-danger" style="width: 100%;" onclick="clearDatabase()">Borrar Base de Datos</button>
+
+      <div id="adminStatus" class="status-msg"></div>
+    </div>
+  </div>
+
+  <script>
+    const JSON_FILE_PATH = 'resultados.json';
+
+    // Modal helpers
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // Login Admin
+    function login() {
+      const user = document.getElementById('adminUser').value;
+      const pass = document.getElementById('adminPass').value;
+      const errorMsg = document.getElementById('authError');
+
+      if (user === 'admin' && pass === 'carreraglobal') {
+        errorMsg.style.display = 'none';
+        closeModal('authModal');
+        openModal('adminModal');
+      } else {
+        errorMsg.style.display = 'block';
+      }
+    }
+
+    // Buscar corredor leyendo el archivo .json externo
+    async function searchRunner() {
+      const runnerNum = document.getElementById('runnerNum').value.trim();
+      const resultCard = document.getElementById('resultCard');
+
+      if (!runnerNum) {
+        alert('Por favor, ingresa un número de corredor.');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${JSON_FILE_PATH}?t=${new Date().getTime()}`);
+        if (!response.ok) throw new Error('No se pudo cargar la base de datos.');
+        
+        const data = await response.json();
+        const runner = data.find(r => String(r.NumeroCorredor) === runnerNum);
+
+        if (runner) {
+          document.getElementById('resNombre').innerText = runner.Nombre || '-';
+          document.getElementById('resNumero').innerText = runner.NumeroCorredor || '-';
+          document.getElementById('resLugarGeneral').innerText = runner.LugarGeneral || '-';
+          document.getElementById('resLugarCategoria').innerText = runner.LugarCategoria || '-';
+          document.getElementById('resCategoria').innerText = runner.Categoria || '-';
+          document.getElementById('resTiempo').innerText = runner.Tiempo || '-';
+          resultCard.style.display = 'block';
+        } else {
+          alert('Número de corredor no encontrado.');
+          resultCard.style.display = 'none';
+        }
+      } catch (err) {
+        alert('Error al consultar los datos. Asegúrate de que el archivo resultados.json exista.');
+        console.error(err);
+      }
+    }
+
+    // Convertidor CSV a JSON
+    function parseCSV(text) {
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      if (lines.length < 2) return [];
+
+      const headers = lines[0].split(',').map(h => h.trim());
+      const result = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim());
+        if (values.length === headers.length) {
+          let obj = {};
+          headers.forEach((header, index) => {
+            obj[header] = values[index];
+          });
+          result.push(obj);
+        }
+      }
+      return result;
+    }
+
+    // Guardar cambios directamente en GitHub mediante su API
+    async function updateGitHubFile(contentArray, message) {
+      const user = document.getElementById('ghUser').value.trim();
+      const repo = document.getElementById('ghRepo').value.trim();
+      const token = document.getElementById('ghToken').value.trim();
+      const status = document.getElementById('adminStatus');
+
+      if (!user || !repo || !token) {
+        status.className = 'status-msg status-error';
+        status.innerText = 'Por favor completa los credenciales de GitHub (Usuario, Repositorio y Token).';
+        status.style.display = 'block';
+        return;
+      }
+
+      status.className = 'status-msg';
+      status.innerText = 'Procesando...';
+      status.style.display = 'block';
+
+      const url = `https://api.github.com/repos/${user}/${repo}/contents/${JSON_FILE_PATH}`;
+      
+      try {
+        // Obtener el SHA actual del archivo resultados.json
+        let sha = '';
+        const getFileRes = await fetch(url, {
+          headers: { 'Authorization': `token ${token}` }
+        });
+        
+        if (getFileRes.ok) {
+          const fileData = await getFileRes.json();
+          sha = fileData.sha;
+        }
+
+        // Codificar nuevo contenido a Base64
+        const jsonString = JSON.stringify(contentArray, null, 2);
+        const encodedContent = btoa(unescape(encodeURIComponent(jsonString)));
+
+        // Petición PUT para actualizar el archivo
+        const bodyData = {
+          message: message,
+          content: encodedContent,
+          ...(sha && { sha: sha })
+        };
+
+        const putRes = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(bodyData)
         });
 
-        function cargarBaseDeDatos() {
-            const localData = localStorage.getItem('carrera_db');
-            if (localData) {
-                try {
-                    dbData = JSON.parse(localData);
-                    return;
-                } catch (e) {
-                    console.error('Error al leer LocalStorage', e);
-                }
-            }
+        if (putRes.ok) {
+          status.className = 'status-msg status-success';
+          status.innerText = '¡Base de datos actualizada con éxito en GitHub!';
+        } else {
+          const errData = await putRes.json();
+          throw new Error(errData.message || 'Error al actualizar en GitHub');
+        }
+      } catch (err) {
+        status.className = 'status-msg status-error';
+        status.innerText = 'Error: ' + err.message;
+      }
+    }
 
-            try {
-                const embeddedElem = document.getElementById('embedded-database');
-                if (embeddedElem && embeddedElem.textContent.trim()) {
-                    dbData = JSON.parse(embeddedElem.textContent);
-                } else {
-                    dbData = [];
-                }
-            } catch (e) {
-                dbData = [];
-            }
+    // Subir CSV y actualizar JSON
+    function uploadCSV() {
+      const fileInput = document.getElementById('csvFile');
+      if (!fileInput.files.length) {
+        alert('Selecciona un archivo CSV.');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const jsonData = parseCSV(text);
+        
+        if (jsonData.length === 0) {
+          alert('El archivo CSV está vacío o tiene formato incorrecto.');
+          return;
         }
 
-        function buscarCorredor(e) {
-            e.preventDefault();
-            const num = document.getElementById('runnerInput').value.trim();
-            const resultCard = document.getElementById('resultCard');
-            const noResult = document.getElementById('noResult');
+        updateGitHubFile(jsonData, 'Actualizar resultados.json desde el panel admin');
+      };
 
-            if (!num) return;
+      reader.readAsText(file);
+    }
 
-            if (!dbData || dbData.length === 0) {
-                resultCard.style.display = 'none';
-                noResult.innerText = 'La base de datos está vacía. Un administrador debe subir la información.';
-                noResult.style.display = 'block';
-                return;
-            }
-
-            const runner = dbData.find(item => String(item.NumeroCorredor).trim() === num);
-
-            if (runner) {
-                document.getElementById('resNombre').innerText = runner.Nombre || 'N/A';
-                document.getElementById('resNumero').innerText = '#' + (runner.NumeroCorredor || num);
-                document.getElementById('resLugarGeneral').innerText = runner.LugarGeneral || '-';
-                document.getElementById('resLugarCategoria').innerText = runner.LugarCategoria || '-';
-                document.getElementById('resCategoria').innerText = runner.Categoria || '-';
-                document.getElementById('resTiempo').innerText = runner.Tiempo || '-';
-
-                noResult.style.display = 'none';
-                resultCard.style.display = 'block';
-            } else {
-                resultCard.style.display = 'none';
-                noResult.innerText = `No se encontró ningún corredor registrado con el número #${num}.`;
-                noResult.style.display = 'block';
-            }
-        }
-
-        function openAdminModal() {
-            document.getElementById('adminModal').style.display = 'flex';
-            mostrarEstado('', '');
-        }
-
-        function closeAdminModal() {
-            document.getElementById('adminModal').style.display = 'none';
-        }
-
-        function loginAdmin(e) {
-            e.preventDefault();
-            const pass = document.getElementById('adminPass').value.trim();
-
-            if (pass === 'carreraglobal') {
-                isAdminLoggedIn = true;
-                document.getElementById('loginFormSection').style.display = 'none';
-                document.getElementById('adminPanelSection').style.display = 'block';
-                document.getElementById('modalTitle').innerText = 'Panel de Administración';
-                document.getElementById('adminToggleBtn').innerHTML = '⚙️ Panel Admin <span class="admin-badge">ACTIVO</span>';
-                mostrarEstado('Sesión iniciada con éxito.', 'success');
-            } else {
-                mostrarEstado('Contraseña incorrecta.', 'error');
-            }
-        }
-
-        function logoutAdmin() {
-            isAdminLoggedIn = false;
-            document.getElementById('loginFormSection').style.display = 'block';
-            document.getElementById('adminPanelSection').style.display = 'none';
-            document.getElementById('modalTitle').innerText = 'Acceso de Administrador';
-            document.getElementById('adminToggleBtn').innerHTML = '🔒 Administrador';
-            mostrarEstado('Sesión cerrada.', 'success');
-        }
-
-        function subirCSV() {
-            const fileInput = document.getElementById('csvFileInput');
-            const file = fileInput.files[0];
-
-            if (!file) {
-                mostrarEstado('Por favor selecciona un archivo CSV.', 'error');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const text = e.target.result;
-                try {
-                    const parsedData = parseCSV(text);
-                    if (parsedData.length === 0) {
-                        mostrarEstado('El archivo CSV está vacío o no tiene el formato correcto.', 'error');
-                        return;
-                    }
-                    dbData = parsedData;
-                    localStorage.setItem('carrera_db', JSON.stringify(dbData));
-                    mostrarEstado(`¡Base de datos actualizada! Total registros: ${dbData.length}`, 'success');
-                    fileInput.value = '';
-                } catch (err) {
-                    mostrarEstado('Error al procesar el CSV.', 'error');
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function parseCSV(text) {
-            const lines = text.split(/\r\n|\n/);
-            if (lines.length < 2) return [];
-
-            const headers = lines[0].split(',').map(h => h.replace(/^["']|["']$/g, '').trim());
-            const results = [];
-
-            for (let i = 1; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (!line) continue;
-                const values = line.split(',').map(val => val.replace(/^["']|["']$/g, '').trim());
-                if (values.length < headers.length) continue;
-
-                let row = {};
-                headers.forEach((header, index) => {
-                    row[header] = values[index] || '';
-                });
-                results.push(row);
-            }
-            return results;
-        }
-
-        function borrarBaseDeDatos() {
-            if (confirm('¿Estás seguro de que deseas borrar toda la base de datos?')) {
-                dbData = [];
-                localStorage.removeItem('carrera_db');
-                mostrarEstado('Base de datos eliminada completamente.', 'success');
-                document.getElementById('resultCard').style.display = 'none';
-            }
-        }
-
-        function mostrarEstado(msg, type) {
-            const statusDiv = document.getElementById('statusMsg');
-            if (!msg) {
-                statusDiv.style.display = 'none';
-                return;
-            }
-            statusDiv.className = 'status-msg ' + (type === 'success' ? 'status-success' : 'status-error');
-            statusDiv.innerText = msg;
-            statusDiv.style.display = 'block';
-        }
-
-        window.onclick = function(event) {
-            const modal = document.getElementById('adminModal');
-            if (event.target === modal) {
-                closeAdminModal();
-            }
-        }
-    </script>
+    // Borrar la base de datos (guardar array vacío)
+    function clearDatabase() {
+      if (confirm('¿Estás seguro de que deseas borrar toda la base de datos?')) {
+        updateGitHubFile([], 'Borrar base de datos resultados.json');
+      }
+    }
+  </script>
 </body>
 </html>
