@@ -302,27 +302,31 @@
       }
     }
 
-    // Convertidor CSV a JSON limpiando comillas y espacios
-    function parseCSV(text) {
-      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
-      if (lines.length < 2) return [];
+    // Convertidor CSV a JSON ignorando "LugarGeneral" / "Lugar Global"
+function parseCSV(text) {
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+  if (lines.length < 2) return [];
 
-      const cleanVal = (v) => v ? v.replace(/^["']|["']$/g, '').trim() : '';
-      const headers = lines[0].split(',').map(cleanVal);
-      const result = [];
+  const cleanVal = (v) => v ? v.replace(/^["']|["']$/g, '').trim() : '';
+  const headers = lines[0].split(',').map(cleanVal);
+  const result = [];
 
-      for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split(',').map(cleanVal);
-        if (values.length === headers.length) {
-          let obj = {};
-          headers.forEach((header, index) => {
-            obj[header] = values[index];
-          });
-          result.push(obj);
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(',').map(cleanVal);
+    if (values.length === headers.length) {
+      let obj = {};
+      headers.forEach((header, index) => {
+        // Omite la columna de Lugar General/Global
+        const cleanHeader = header.replace(/["'\s]/g, '').toLowerCase();
+        if (cleanHeader !== 'lugargeneral' && cleanHeader !== 'lugarglobal') {
+          obj[header] = values[index];
         }
-      }
-      return result;
+      });
+      result.push(obj);
     }
+  }
+  return result;
+}
 
     // Actualizar archivo en GitHub a través de su API
     async function updateGitHubFile(contentArray, message) {
