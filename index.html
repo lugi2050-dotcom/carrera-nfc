@@ -51,6 +51,7 @@
 
     .btn-primary { background-color: var(--primary-color); color: white; }
     .btn-danger { background-color: var(--danger-color); color: white; }
+    .btn-success { background-color: var(--success-color); color: white; }
     .btn-secondary { background-color: #6c757d; color: white; }
 
     .container {
@@ -147,6 +148,14 @@
     }
     .status-success { background: #d4edda; color: #155724; }
     .status-error { background: #f8d7da; color: #721c24; }
+
+    .main-footer {
+      text-align: center;
+      padding: 1.5rem 0;
+      margin-top: 2rem;
+      color: #666;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
@@ -154,12 +163,12 @@
   <header>
     <h1>Consulta de Corredores</h1>
     <div style="display: flex; gap: 10px;">
-    <!-- Reemplaza la URL por el enlace de tu página de Facebook -->
-    <a href="https://www.facebook.com/MultiMediaRaceAC?locale=es_LA" target="_blank" class="btn btn-facebook">
-      Facebook
-    </a>
-    <!-- <button class="btn btn-admin" onclick="openModal('authModal')">Panel Admin</button> -->
-  </div>
+      <!-- Reemplaza la URL por el enlace de tu página de Facebook -->
+      <a href="https://www.facebook.com/MultiMediaRaceAC?locale=es_LA" target="_blank" class="btn btn-facebook">
+        Facebook
+      </a>
+      <!-- <button class="btn btn-admin" onclick="openModal('authModal')">Panel Admin</button> -->
+    </div>
   </header>
 
   <div class="container">
@@ -179,8 +188,16 @@
       <div class="result-item"><span class="result-label">Lugar Categoría:</span> <span id="resLugarCategoria">-</span></div>
       <div class="result-item"><span class="result-label">Categoría:</span> <span id="resCategoria">-</span></div>
       <div class="result-item"><span class="result-label">Tiempo:</span> <span id="resTiempo">-</span></div>
+      
+      <!-- Botón para descargar Canvas PNG -->
+      <div style="margin-top: 1.5rem; text-align: center;">
+        <button class="btn btn-success" onclick="downloadCanvas()">Descargar Imagen PNG</button>
+      </div>
     </div>
   </div>
+
+  <!-- Canvas Oculto para Generación de la Imagen PNG -->
+  <canvas id="runnerCanvas" width="600" height="600" style="display: none;"></canvas>
 
   <!-- Modal Autenticación -->
   <div id="authModal" class="modal">
@@ -258,6 +275,86 @@
       }
     }
 
+    // Dibujar datos en el Canvas PNG
+    function generateCanvasPNG(nombre, numero, categoria, tiempo) {
+      const canvas = document.getElementById('runnerCanvas');
+      const ctx = canvas.getContext('2d');
+
+      // Fondo del Canvas
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      gradient.addColorStop(0, '#0056b3');
+      gradient.addColorStop(1, '#00264d');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Marco decorativo
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 8;
+      ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+
+      // Título
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.font = 'bold 32px Segoe UI, sans-serif';
+      ctx.fillText('MULTI MEDIA RACE', canvas.width / 2, 80);
+
+      ctx.font = '20px Segoe UI, sans-serif';
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillText('RESULTADOS OFICIALES', canvas.width / 2, 115);
+
+      // Línea divisoria
+      ctx.beginPath();
+      ctx.moveTo(60, 140);
+      ctx.lineTo(canvas.width - 60, 140);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Número de corredor (Caja principal)
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(canvas.width / 2 - 80, 165, 160, 60);
+      ctx.fillStyle = '#0056b3';
+      ctx.font = 'bold 36px Segoe UI, sans-serif';
+      ctx.fillText(`N° ${numero}`, canvas.width / 2, 210);
+
+      // Nombre del corredor
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 28px Segoe UI, sans-serif';
+      ctx.fillText(nombre.toUpperCase(), canvas.width / 2, 280);
+
+      // Categoría
+      ctx.font = 'bold 18px Segoe UI, sans-serif';
+      ctx.fillStyle = '#a0aec0';
+      ctx.fillText('CATEGORÍA', canvas.width / 2, 330);
+      ctx.font = '24px Segoe UI, sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(categoria, canvas.width / 2, 360);
+
+      // Tiempo
+      ctx.font = 'bold 18px Segoe UI, sans-serif';
+      ctx.fillStyle = '#a0aec0';
+      ctx.fillText('TIEMPO OFICIAL', canvas.width / 2, 420);
+      ctx.font = 'bold 42px Segoe UI, sans-serif';
+      ctx.fillStyle = '#28a745';
+      ctx.fillText(tiempo, canvas.width / 2, 465);
+
+      // Pie de página en la imagen
+      ctx.font = '14px Segoe UI, sans-serif';
+      ctx.fillStyle = '#cbd5e0';
+      ctx.fillText('¡Felicidades por completar la carrera!', canvas.width / 2, 540);
+    }
+
+    // Descargar el Canvas como PNG
+    function downloadCanvas() {
+      const canvas = document.getElementById('runnerCanvas');
+      const num = document.getElementById('resNumero').innerText || 'corredor';
+      
+      const link = document.createElement('a');
+      link.download = `resultado_corredor_${num}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
     // Buscar corredor directo desde el archivo resultados.json externo
     async function searchRunner() {
       const runnerNumInput = document.getElementById('runnerNum').value.trim();
@@ -292,11 +389,21 @@
         });
 
         if (runner) {
-          document.getElementById('resNombre').innerText = getValue(runner, 'Nombre');
-          document.getElementById('resNumero').innerText = getValue(runner, 'NumeroCorredor');
-          document.getElementById('resLugarCategoria').innerText = getValue(runner, 'LugarCategoria');
-          document.getElementById('resCategoria').innerText = getValue(runner, 'Categoria');
-          document.getElementById('resTiempo').innerText = getValue(runner, 'Tiempo');
+          const nombre = getValue(runner, 'Nombre');
+          const numero = getValue(runner, 'NumeroCorredor');
+          const lugarCat = getValue(runner, 'LugarCategoria');
+          const categoria = getValue(runner, 'Categoria');
+          const tiempo = getValue(runner, 'Tiempo');
+
+          document.getElementById('resNombre').innerText = nombre;
+          document.getElementById('resNumero').innerText = numero;
+          document.getElementById('resLugarCategoria').innerText = lugarCat;
+          document.getElementById('resCategoria').innerText = categoria;
+          document.getElementById('resTiempo').innerText = tiempo;
+
+          // Generar el gráfico en el Canvas
+          generateCanvasPNG(nombre, numero, categoria, tiempo);
+
           resultCard.style.display = 'block';
         } else {
           alert('Número de corredor no encontrado.');
@@ -309,30 +416,30 @@
     }
 
     // Convertidor CSV a JSON ignorando "LugarGeneral" / "Lugar Global"
-function parseCSV(text) {
-  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
-  if (lines.length < 2) return [];
+    function parseCSV(text) {
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+      if (lines.length < 2) return [];
 
-  const cleanVal = (v) => v ? v.replace(/^["']|["']$/g, '').trim() : '';
-  const headers = lines[0].split(',').map(cleanVal);
-  const result = [];
+      const cleanVal = (v) => v ? v.replace(/^["']|["']$/g, '').trim() : '';
+      const headers = lines[0].split(',').map(cleanVal);
+      const result = [];
 
-  for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',').map(cleanVal);
-    if (values.length === headers.length) {
-      let obj = {};
-      headers.forEach((header, index) => {
-        // Omite la columna de Lugar General/Global
-        const cleanHeader = header.replace(/["'\s]/g, '').toLowerCase();
-        if (cleanHeader !== 'lugargeneral' && cleanHeader !== 'lugarglobal') {
-          obj[header] = values[index];
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(cleanVal);
+        if (values.length === headers.length) {
+          let obj = {};
+          headers.forEach((header, index) => {
+            // Omite la columna de Lugar General/Global
+            const cleanHeader = header.replace(/["'\s]/g, '').toLowerCase();
+            if (cleanHeader !== 'lugargeneral' && cleanHeader !== 'lugarglobal') {
+              obj[header] = values[index];
+            }
+          });
+          result.push(obj);
         }
-      });
-      result.push(obj);
+      }
+      return result;
     }
-  }
-  return result;
-}
 
     // Actualizar archivo en GitHub a través de su API
     async function updateGitHubFile(contentArray, message) {
@@ -429,13 +536,12 @@ function parseCSV(text) {
       }
     }
   </script>
+
   <footer class="main-footer">
-  <div class="footer-content">
-    <p>&copy; Multi Media Race. Todos los derechos reservados.</p>
-    <p>Impulsamos deporte, cuidamos el planeta.</p>
-    <p>Sistema cronometraje. 5618782196</p>
-    
-  </div>
-</footer>
+    <div class="footer-content">
+      <p>&copy; Multi Media Race. Todos los derechos reservados.</p>
+      <p>Sistema cronometraje. 5618782196</p>
+    </div>
+  </footer>
 </body>
 </html>
