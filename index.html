@@ -272,7 +272,10 @@
 
   <!-- Encabezado con descripción de la medalla -->
   <div class="header-card">
-    <h1>¿Podrás sostener la gloria en tus manos?</h1>
+    <div id="progress-text" class="loading-percentage" slot="progress-bar">
+      Cargando 0%
+    </div>
+<h1>¿Podrás sostener la gloria en tus manos?</h1>
     <p>Sabemos que cada kilómetro entrenado, cada sudor frío al amanecer y cada gota de esfuerzo merecen un símbolo a la altura de tu esfuerzo. Por eso, hemos diseñado una joya metálica única para esta edición... pero aún no podemos mostrarte todos los detalles.</p>
   </div>
 
@@ -289,9 +292,7 @@
     touch-action="pan-y">
     
     <!-- Elemento del porcentaje en la parte inferior -->
-    <div id="progress-text" class="loading-percentage" slot="progress-bar">
-      Cargando 0%
-    </div>
+    
   </model-viewer>
 
   <script>
