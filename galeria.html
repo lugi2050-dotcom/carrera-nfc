@@ -3,80 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Galería de Fotos</title>
+  <title>Galería de Fotos - Pantalla Completa</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    .aspect-photo {
-      aspect-ratio: 16 / 9;
-    }
-  </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+<body class="bg-slate-950 text-slate-100 h-screen flex flex-col font-sans overflow-hidden">
 
   <!-- Header / Barra Superior -->
-  <header class="bg-slate-800/80 backdrop-blur-md border-b border-slate-700/50 sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+  <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 shrink-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <a href="index.html" class="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-700 text-slate-300 transition-colors">
+        <a href="index.html" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors">
           <i class="fa-solid fa-arrow-left"></i>
         </a>
-        <h1 class="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-          Galería
+        <h1 class="text-lg font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+          Galería de Fotos
         </h1>
       </div>
-      <span class="text-xs text-slate-400 bg-slate-800 border border-slate-700 px-3 py-1 rounded-full" id="counterBadge">
+      <span class="text-xs text-slate-400 bg-slate-800 border border-slate-700 px-3 py-1 rounded-full font-mono" id="counterBadge">
         0 / 0 Fotos
       </span>
     </div>
   </header>
 
-  <!-- Contenido Principal -->
-  <main class="max-w-5xl mx-auto px-4 py-8 flex-1 w-full flex flex-col items-center justify-center">
+  <!-- Visor Principal Pantalla Completa -->
+  <main class="relative flex-1 w-full flex items-center justify-center p-2 sm:p-4 bg-slate-950 overflow-hidden group">
+    
+    <!-- Imagen a tamaño completo -->
+    <img id="mainImage" src="" alt="Foto" class="max-w-full max-h-full object-contain drop-shadow-2xl transition-all duration-300">
 
-    <!-- Visor Principal / Carrusel -->
-    <div class="relative w-full bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl aspect-photo group">
-      
-      <!-- Imagen Activa -->
-      <img id="mainImage" src="" alt="Foto" class="w-full h-full object-contain transition-all duration-300">
-
-      <!-- Capa con Título y Descripción -->
-      <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent p-6 pt-16 pointer-events-none">
-        <h2 id="photoTitle" class="text-xl font-bold text-white mb-1"></h2>
-        <p id="photoDesc" class="text-sm text-slate-300"></p>
-      </div>
-
-      <!-- Botón Anterior -->
-      <button id="prevBtn" onclick="changeSlide(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 bg-slate-900/70 hover:bg-cyan-500 hover:text-slate-950 text-white p-3 rounded-full backdrop-blur-md transition-all border border-slate-700/50 shadow-lg group-hover:opacity-100 opacity-90">
-        <i class="fa-solid fa-chevron-left text-lg"></i>
-      </button>
-
-      <!-- Botón Siguiente -->
-      <button id="nextBtn" onclick="changeSlide(1)" class="absolute right-4 top-1/2 -translate-y-1/2 bg-slate-900/70 hover:bg-cyan-500 hover:text-slate-950 text-white p-3 rounded-full backdrop-blur-md transition-all border border-slate-700/50 shadow-lg group-hover:opacity-100 opacity-90">
-        <i class="fa-solid fa-chevron-right text-lg"></i>
-      </button>
-    </div>
-
-    <!-- Tira de Miniaturas (Thumbnails) -->
-    <div class="w-full mt-6">
-      <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Miniaturas</p>
-      <div id="thumbnailContainer" class="flex space-x-3 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-700">
-        <!-- Las miniaturas se cargan dinámicamente con JS -->
+    <!-- Capa con Título y Descripción -->
+    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent p-6 pt-20 pointer-events-none text-center sm:text-left">
+      <div class="max-w-5xl mx-auto">
+        <h2 id="photoTitle" class="text-xl sm:text-2xl font-bold text-white mb-1 drop-shadow"></h2>
+        <p id="photoDesc" class="text-sm text-slate-300 max-w-2xl drop-shadow-sm"></p>
       </div>
     </div>
 
+    <!-- Botón Anterior -->
+    <button id="prevBtn" onclick="changeSlide(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 bg-slate-900/80 hover:bg-cyan-500 hover:text-slate-950 text-white p-4 rounded-full backdrop-blur-md transition-all border border-slate-700/50 shadow-2xl group-hover:opacity-100 opacity-80">
+      <i class="fa-solid fa-chevron-left text-xl"></i>
+    </button>
+
+    <!-- Botón Siguiente -->
+    <button id="nextBtn" onclick="changeSlide(1)" class="absolute right-4 top-1/2 -translate-y-1/2 bg-slate-900/80 hover:bg-cyan-500 hover:text-slate-950 text-white p-4 rounded-full backdrop-blur-md transition-all border border-slate-700/50 shadow-2xl group-hover:opacity-100 opacity-80">
+      <i class="fa-solid fa-chevron-right text-xl"></i>
+    </button>
   </main>
 
-  <!-- Pie de Página -->
-  <footer class="border-t border-slate-800 py-4 text-center text-xs text-slate-500">
-    Feed <code class="text-cyan-400 font-mono"></code>
-  </footer>
-
   <script>
-    // =========================================================================
     // LISTA DE IMÁGENES EN TU CARPETA img/
-    // Agrega o cambia aquí los nombres de tus archivos dentro de img/
-    // =========================================================================
     const images = [
       {
         filename: 'stiker.jpg',
@@ -101,53 +77,15 @@
     const photoTitle = document.getElementById('photoTitle');
     const photoDesc = document.getElementById('photoDesc');
     const counterBadge = document.getElementById('counterBadge');
-    const thumbnailContainer = document.getElementById('thumbnailContainer');
 
-    // Inicializar galería
-    function initGallery() {
-      if (images.length === 0) return;
-
-      thumbnailContainer.innerHTML = '';
-
-      images.forEach((img, idx) => {
-        // Crear elemento miniatura
-        const thumb = document.createElement('button');
-        thumb.className = `relative flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden border-2 transition-all ${
-          idx === currentIndex ? 'border-cyan-400 scale-105 opacity-100' : 'border-slate-800 opacity-60 hover:opacity-100'
-        }`;
-        thumb.onclick = () => goToSlide(idx);
-
-        const thumbImg = document.createElement('img');
-        thumbImg.src = `img/${img.filename}`;
-        thumbImg.alt = img.title;
-        thumbImg.className = 'w-full h-full object-cover';
-
-        thumb.appendChild(thumbImg);
-        thumbnailContainer.appendChild(thumb);
-      });
-
-      updateSlide();
-    }
-
-    // Actualizar la vista de la foto actual
     function updateSlide() {
+      if (images.length === 0) return;
       const current = images[currentIndex];
       
-      // Asignar ruta de la carpeta img/
       mainImage.src = `img/${current.filename}`;
       photoTitle.textContent = current.title;
       photoDesc.textContent = current.desc;
-      counterBadge.textContent = `${currentIndex + 1} / ${images.length} Fotos`;
-
-      // Actualizar estados visuales de las miniaturas
-      const thumbs = thumbnailContainer.children;
-      Array.from(thumbs).forEach((thumb, idx) => {
-        if (idx === currentIndex) {
-          thumb.className = 'relative flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden border-2 border-cyan-400 scale-105 opacity-100 transition-all';
-        } else {
-          thumb.className = 'relative flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden border-2 border-slate-800 opacity-60 hover:opacity-100 transition-all';
-        }
-      });
+      counterBadge.textContent = `${currentIndex + 1} / ${images.length}`;
     }
 
     function changeSlide(direction) {
@@ -155,19 +93,14 @@
       updateSlide();
     }
 
-    function goToSlide(index) {
-      currentIndex = index;
-      updateSlide();
-    }
-
-    // Control mediante flechas del teclado
+    // Navegación con teclado
     document.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowLeft') changeSlide(-1);
       if (e.key === 'ArrowRight') changeSlide(1);
     });
 
     // Iniciar
-    initGallery();
+    updateSlide();
   </script>
 </body>
 </html>
