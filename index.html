@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visor 3D MEDALLA PAYNAL</title>
+  <title>Visor 3D - Medalla Conmemorativa</title>
   
   <!-- Evita el error 404 del favicon -->
   <link rel="icon" href="data:,">
@@ -33,27 +33,44 @@
       --poster-color: transparent;
     }
 
-    /* Título Superior PAYNAL */
-    .header-title {
+    /* Tarjeta superior con descripción elegante */
+    .header-card {
       position: absolute;
-      top: 24px;
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(0, 0, 0, 0.6);
       backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       color: #ffffff;
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      padding: 10px 24px;
-      border-radius: 20px;
+      text-align: center;
+      padding: 12px 24px;
+      border-radius: 16px;
       border: 1px solid rgba(255, 255, 255, 0.1);
       z-index: 10;
       pointer-events: none;
+      max-width: 90vw;
+      width: 480px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     }
 
-    /* Porcentaje de carga en color anaranjado */
+    .header-card h1 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #ff6b00;
+      margin-bottom: 4px;
+    }
+
+    .header-card p {
+      font-size: 12px;
+      line-height: 1.4;
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 400;
+    }
+
+    /* Porcentaje de carga posicionado en la parte inferior */
     .loading-percentage {
       position: absolute;
       bottom: 24px;
@@ -61,33 +78,39 @@
       transform: translateX(-50%);
       background: rgba(0, 0, 0, 0.6);
       backdrop-filter: blur(6px);
-      color: #ff6b00; /* Color anaranjado */
+      -webkit-backdrop-filter: blur(6px);
+      color: #ff6b00;
       font-size: 14px;
       font-weight: 600;
       letter-spacing: 0.5px;
-      padding: 6px 16px;
+      padding: 8px 20px;
       border-radius: 20px;
-      border: 1px solid rgba(255, 107, 0, 0.3); /* Borde anaranjado sutil */
+      border: 1px solid rgba(255, 107, 0, 0.3);
       z-index: 10;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
       pointer-events: none;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
     }
 
     .loading-percentage.hidden {
       opacity: 0;
+      visibility: hidden;
     }
   </style>
 </head>
 <body>
 
-  <!-- Título Superior -->
-  <div class="header-title">MEDALLA PAYNAL</div>
+  <!-- Encabezado con descripción de la medalla -->
+  <div class="header-card">
+    <h1>¿Podrás sostener la gloria en tus manos?</h1>
+    <p>Sabemos que cada kilómetro entrenado, cada sudor frío al amanecer y cada gota de esfuerzo merecen un símbolo a la altura de tu esfuerzo. Por eso, hemos diseñado una joya metálica única para esta edición... pero aún no podemos mostrarte todos los detalles.</p>
+  </div>
 
-  <!-- Visor 3D sin giro automático -->
+  <!-- Visor 3D interactivo -->
   <model-viewer 
     id="visor-3d"
     src="./modelo.glb" 
-    alt="Modelo 3D Interactivo" 
+    alt="Medalla Conmemorativa 3D" 
     camera-controls 
     shadow-intensity="1" 
     shadow-softness="0.8"
@@ -105,7 +128,7 @@
     const viewer = document.querySelector('#visor-3d');
     const progressText = document.querySelector('#progress-text');
 
-    // Actualiza el texto con el porcentaje exacto de descarga
+    // Actualiza el porcentaje de descarga del modelo en tiempo real
     viewer.addEventListener('progress', (event) => {
       const percentage = Math.round(event.detail.totalProgress * 100);
       if (progressText) {
@@ -113,7 +136,7 @@
       }
     });
 
-    // Oculta suavemente el texto de porcentaje cuando el modelo termina de renderizar
+    // Oculta suavemente el porcentaje al completar la carga
     viewer.addEventListener('load', () => {
       if (progressText) {
         progressText.classList.add('hidden');
