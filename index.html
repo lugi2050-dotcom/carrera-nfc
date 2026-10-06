@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visor 3D - Modelo GLB</title>
+  <title>Visor 3D - PAYNAL</title>
   
   <!-- Evita el error 404 del favicon -->
   <link rel="icon" href="data:,">
@@ -23,6 +23,7 @@
       height: 100%;
       overflow: hidden;
       background-color: #1a1a1a;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
     /* Visor 3D a pantalla completa */
@@ -32,59 +33,90 @@
       --poster-color: transparent;
     }
 
-    /* Indicador visual de carga centrado */
-    .progress-bar {
-      display: block;
-      width: 33%;
-      height: 10%;
-      max-height: 2px;
+    /* Título Superior PAYNAL */
+    .header-title {
       position: absolute;
+      top: 24px;
       left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      border-radius: 2px;
-      background-color: rgba(255, 255, 255, 0.2);
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(6px);
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 10px 24px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 10;
+      pointer-events: none;
     }
 
-    .update-bar {
-      background-color: #00e5ff;
-      width: 0%;
-      height: 100%;
-      border-radius: 2px;
-      transition: width 0.1s ease;
+    /* Porcentaje de carga en color anaranjado */
+    .loading-percentage {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(6px);
+      color: #ff6b00; /* Color anaranjado */
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 107, 0, 0.3); /* Borde anaranjado sutil */
+      z-index: 10;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+
+    .loading-percentage.hidden {
+      opacity: 0;
     }
   </style>
 </head>
 <body>
 
-  <!-- Visor 3D limpio sin interfaz de botones -->
+  <!-- Título Superior -->
+  <div class="header-title">paynal</div>
+
+  <!-- Visor 3D sin giro automático -->
   <model-viewer 
     id="visor-3d"
     src="./modelo.glb" 
     alt="Modelo 3D Interactivo" 
     camera-controls 
-    auto-rotate 
     shadow-intensity="1" 
     shadow-softness="0.8"
     exposure="1"
     environment-image="neutral"
     touch-action="pan-y">
     
-    <!-- Barra de progreso que aparece solo mientras carga -->
-    <div class="progress-bar" slot="progress-bar">
-      <div class="update-bar" id="update-bar"></div>
+    <!-- Elemento del porcentaje en la parte inferior -->
+    <div id="progress-text" class="loading-percentage" slot="progress-bar">
+      Cargando 0%
     </div>
   </model-viewer>
 
   <script>
     const viewer = document.querySelector('#visor-3d');
-    const updateBar = document.querySelector('#update-bar');
+    const progressText = document.querySelector('#progress-text');
 
-    // Actualiza la barra de progreso de carga
+    // Actualiza el texto con el porcentaje exacto de descarga
     viewer.addEventListener('progress', (event) => {
-      const progress = event.detail.totalProgress * 100;
-      if (updateBar) {
-        updateBar.style.width = `${progress}%`;
+      const percentage = Math.round(event.detail.totalProgress * 100);
+      if (progressText) {
+        progressText.textContent = `Cargando ${percentage}%`;
+      }
+    });
+
+    // Oculta suavemente el texto de porcentaje cuando el modelo termina de renderizar
+    viewer.addEventListener('load', () => {
+      if (progressText) {
+        progressText.classList.add('hidden');
       }
     });
   </script>
