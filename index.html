@@ -3,40 +3,119 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visor de Modelo 3D .GLB</title>
+  <title>WebAR - Selector de Modelos 3D</title>
 
-  <!-- Carga de la librería oficial model-viewer -->
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+  <!-- Evita el error 404 de favicon -->
+  <link rel="icon" href="data:,">
+
+  <!-- A-Frame y AR.js -->
+  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
   <style>
-    body {
-      margin: 0;
+    /* UI superpuesta sobre la cámara */
+    #ui-container {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 999;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px 18px;
+      border-radius: 25px;
       display: flex;
-      justify-content: center;
+      gap: 10px;
       align-items: center;
-      min-height: 100vh;
-      background-color: #f4f4f9;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
 
-    model-viewer {
-      width: 800px;
-      height: 600px;
-      background-color: #ffffff;
+    #ui-container label {
+      color: white;
+      font-family: sans-serif;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    #model-select {
+      background: #222;
+      color: #fff;
+      border: 1px solid #555;
+      padding: 8px 12px;
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      font-size: 14px;
+      outline: none;
+      cursor: pointer;
     }
   </style>
 </head>
-<body>
+<body style="margin: 0; overflow: hidden;">
 
-  <!-- Componente 3D -->
-  <model-viewer 
-    src="modelo.glb" 
-    alt="Modelo 3D interactivo" 
-    camera-controls 
-    auto-rotate 
-    shadow-intensity="1">
-  </model-viewer>
+  <!-- Interfaz de selección sobre la cámara -->
+  <div id="ui-container">
+    <label for="model-select">Modelo:</label>
+    <select id="model-select">
+      <option value="#modelo1" selected>Modelo 1 (Coche)</option>
+      <option value="#modelo2">Modelo 2 (Robot)</option>
+      <option value="#modelo3">Modelo 3 (Silla)</option>
+    </select>
+  </div>
+
+  <!-- Escena AR.js -->
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+
+    <!-- Carga previa de todos los modelos 3D del proyecto -->
+    <a-assets>
+      <a-asset-item id="modelo1" src="./modelo1.glb"></a-asset-item>
+      <a-asset-item id="modelo2" src="./modelo2.glb"></a-asset-item>
+      <a-asset-item id="modelo3" src="./modelo3.glb"></a-asset-item>
+    </a-assets>
+
+    <!-- Iluminación básica -->
+    <a-light type="ambient" intensity="1.5"></a-light>
+    <a-light type="directional" position="-1 2 1" intensity="1"></a-light>
+
+    <!-- Marcador Hiro -->
+    <a-marker preset="hiro">
+      <!-- Entidad contenedora donde cargará el modelo seleccionado -->
+      <a-entity 
+        id="ar-model-entity" 
+        gltf-model="#modelo1" 
+        scale="0.2 0.2 0.2" 
+        position="0 0 0" 
+        rotation="0 0 0">
+      </a-entity>
+    </a-marker>
+
+    <a-entity camera></a-entity>
+
+  </a-scene>
+
+  <script>
+    // Configuración de escalas/rotaciones individuales si los modelos tienen diferentes tamaños
+    const modelConfigs = {
+      "#modelo1": { scale: "0.2 0.2 0.2", rotation: "0 0 0" },
+      "#modelo2": { scale: "0.05 0.05 0.05", rotation: "0 180 0" },
+      "#modelo3": { scale: "0.5 0.5 0.5", rotation: "0 90 0" }
+    };
+
+    const selectElement = document.getElementById('model-select');
+    const modelEntity = document.getElementById('ar-model-entity');
+
+    // Escucha los cambios del desplegable y actualiza la entidad A-Frame
+    selectElement.addEventListener('change', (event) => {
+      const selectedAssetId = event.target.value;
+      const config = modelConfigs[selectedAssetId];
+
+      // Cambia el modelo 3D activo
+      modelEntity.setAttribute('gltf-model', selectedAssetId);
+
+      // Aplica escala y rotación específicas si están configuradas
+      if (config) {
+        modelEntity.setAttribute('scale', config.scale);
+        modelEntity.setAttribute('rotation', config.rotation);
+      }
+    });
+  </script>
 
 </body>
 </html>
