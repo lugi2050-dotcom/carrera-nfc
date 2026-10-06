@@ -47,11 +47,13 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
 
-    <!-- Header / Navbar con botones de navegación superior -->
+    <!-- ========================================================================= -->
+    <!-- HEADER / NAVBAR: ENLACES SUPERIORES A ARCHIVOS HTML SEPARADOS           -->
+    <!-- ========================================================================= -->
     <header class="sticky top-0 z-40 w-full glassmorphism">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
-                <!-- Logotipo / Título -->
+                <!-- Logotipo / Título Principal -->
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
                         <i class="fa-solid fa-shapes font-bold text-white text-xl"></i>
@@ -61,20 +63,31 @@
                     </span>
                 </div>
 
-                <!-- Botones de Navegación / Proyectos Superior -->
+                <!-- Botones de Navegación Superior -->
+                <!-- AQUÍ DEFINES LAS DIRECCIONES HTML DE CADA BOTÓN -->
                 <nav class="flex items-center gap-2 sm:gap-3">
-                    <a href="#galeria" class="px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-2 shadow">
+
+                    <!-- BOTÓN 1: GALERÍA DINÁMICA -->
+                    <!-- Reemplaza 'galeria.html' por la ruta o archivo que desees abrir -->
+                    <a href="galeria.html" class="px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-2 shadow">
                         <i class="fa-solid fa-images text-indigo-400"></i>
                         <span>Galería Dinámica</span>
                     </a>
-                    <a href="#visor3d" class="px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-2 shadow">
+
+                    <!-- BOTÓN 2: VISOR DE CASA EN 3D -->
+                    <!-- Reemplaza 'visor.html' por la ruta de tu archivo del visor 3D (ej. 'proyectos/visor3d.html') -->
+                    <a href="PAYNAL.html" class="px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-2 shadow">
                         <i class="fa-solid fa-house-laptop text-brand-400"></i>
-                        <span>Visor 3D</span>
+                        <span>PAYNAL DEMO</span>
                     </a>
-                    <a href="#cronometraje" class="px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-2 shadow">
+
+                    <!-- BOTÓN 3: RESULTADOS DE CRONOMETRAJES -->
+                    <!-- Reemplaza 'cronometraje.html' por la ruta de tu archivo de resultados de cronometraje -->
+                    <a href="cronometraje.html" class="px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs sm:text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-2 shadow">
                         <i class="fa-solid fa-stopwatch text-emerald-400"></i>
-                        <span>Cronometrajes</span>
+                        <span>index1</span>
                     </a>
+
                 </nav>
             </div>
         </div>
@@ -83,16 +96,16 @@
     <!-- Main Content Container -->
     <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
 
-        <!-- 1. DESCRIPCIÓN Y PRESENTACIÓN DEL PORTAFOLIO (SIN BOTONES) -->
+        <!-- 1. DESCRIPCIÓN DEL PORTAFOLIO (TEXTO EXPLICATIVO SIN BOTONES INTERNOS) -->
         <section class="relative bg-gradient-to-b from-slate-900/90 to-slate-900/40 rounded-3xl p-6 sm:p-10 border border-slate-800 shadow-2xl overflow-hidden">
-            <!-- Glow decorativo de fondo -->
+            <!-- Destellos decorativos de fondo -->
             <div class="absolute -top-24 -right-24 w-72 h-72 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
             <div class="relative z-10 max-w-4xl space-y-6">
                 <div>
                     <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-400 border border-brand-500/20 mb-3">
-                        <i class="fa-solid fa-layer-group"></i> Descripción del Portafolio
+                        <i class="fa-solid fa-layer-group"></i> Descripción General
                     </div>
                     <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
                         Exploración Visual & Soluciones Técnicas
@@ -100,41 +113,41 @@
                 </div>
 
                 <p class="text-slate-300 text-base sm:text-lg leading-relaxed">
-                    Esta plataforma reúne un conjunto de proyectos desarrollados para brindar experiencias interactivas y funcionales en la web, abarcando desde visualización tridimensional en tiempo real hasta el registro automatizado de métricas deportivas.
+                    Esta plataforma reúne un conjunto de proyectos desarrollados para brindar experiencias interactivas y funcionales en la web, abarcando desde la visualización tridimensional de arquitecturas en tiempo real hasta el registro y consulta automatizada de métricas deportivas.
                 </p>
 
-                <!-- Bloques puramente explicativos (sin interactividad/botones) -->
+                <!-- Bloques exclusivamente explicativos -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-slate-800/80">
-                    <!-- Detalle Visor 3D -->
-                    <div id="visor3d" class="space-y-2">
+                    <!-- Explicación Visor 3D -->
+                    <div class="space-y-2">
                         <div class="flex items-center gap-2.5 text-brand-400 font-bold text-base">
                             <i class="fa-solid fa-house-laptop"></i>
                             <h3>Visor de Modelos de Casa 3D</h3>
                         </div>
                         <p class="text-slate-400 text-sm leading-relaxed">
-                            Módulo de renderizado en Three.js / WebGL que permite inspeccionar modelos tridimensionales arquitectónicos mediante órbita interactiva de 360°, control de materiales, texturas y simulación de ciclos de iluminación solar.
+                            Módulo de renderizado interactivo en Three.js / WebGL que permite inspeccionar modelos tridimensionales arquitectónicos mediante órbita de 360°, control de materiales y simulación de fuentes de luz.
                         </p>
                     </div>
 
-                    <!-- Detalle Cronometrajes -->
-                    <div id="cronometraje" class="space-y-2">
+                    <!-- Explicación Cronometrajes -->
+                    <div class="space-y-2">
                         <div class="flex items-center gap-2.5 text-emerald-400 font-bold text-base">
                             <i class="fa-solid fa-stopwatch"></i>
                             <h3>Resultados de Cronometrajes</h3>
                         </div>
                         <p class="text-slate-400 text-sm leading-relaxed">
-                            Sistema interactivo diseñado para el monitoreo y seguimiento de marcas de tiempo en eventos deportivos, incorporando ordenamiento inteligente, filtros por categorías y simulación en tiempo real.
+                            Sistema interactivo diseñado para el monitoreo y seguimiento de marcas de tiempo en eventos deportivos, incorporando ordenamiento inteligente, búsqueda por atletas y simulación en vivo.
                         </p>
                     </div>
 
-                    <!-- Detalle Galería -->
+                    <!-- Explicación Galería -->
                     <div class="space-y-2">
                         <div class="flex items-center gap-2.5 text-indigo-400 font-bold text-base">
                             <i class="fa-solid fa-images"></i>
                             <h3>Galería Dinámica</h3>
                         </div>
                         <p class="text-slate-400 text-sm leading-relaxed">
-                            Muestrario fotográfico adaptable con reproducción automática, miniaturas interactivas, indicadores de posición y modo de visualización en pantalla completa para inspección en detalle.
+                            Muestrario fotográfico adaptable con reproducción automática, miniaturas interactivas, indicadores de posición y visor emergente a pantalla completa.
                         </p>
                     </div>
                 </div>
@@ -148,11 +161,11 @@
                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mb-2">
                         <i class="fa-solid fa-images"></i> Muestrario Visual
                     </div>
-                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Galería Dinámica de Proyectos</h2>
-                    <p class="text-slate-400 text-sm mt-1">Explora las imágenes en alta resolución con controles interactivos y pantalla completa.</p>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Galería Dinámica de Fotos</h2>
+                    <p class="text-slate-400 text-sm mt-1">Navega a través de las imágenes del proyecto interactivo.</p>
                 </div>
 
-                <!-- Controles Autoplay -->
+                <!-- Botón de Pausar / Iniciar Autoplay -->
                 <div class="flex items-center gap-2">
                     <button id="toggle-autoplay-btn" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-2 shadow">
                         <i id="autoplay-icon" class="fa-solid fa-pause text-brand-400"></i>
@@ -163,11 +176,11 @@
 
             <!-- Marco Principal del Carrusel -->
             <div class="relative bg-slate-950 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl group">
-                <!-- Marco de la foto -->
+                <!-- Visor de la foto -->
                 <div class="relative h-[320px] sm:h-[480px] md:h-[560px] w-full overflow-hidden flex items-center justify-center bg-slate-900">
                     <img id="carousel-img" src="" alt="Imagen de galería" class="w-full h-full object-cover transition-opacity duration-500 opacity-0 select-none">
                     
-                    <!-- Sombra gradiente con descripción de imagen -->
+                    <!-- Información en el pie de la imagen -->
                     <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent p-6 sm:p-8 flex flex-col justify-end">
                         <span id="carousel-badge" class="self-start text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-brand-500/20 text-brand-300 border border-brand-500/30 mb-2">
                             Proyecto Visual
@@ -176,7 +189,7 @@
                         <p id="carousel-desc" class="text-sm text-slate-300 max-w-2xl mt-1 drop-shadow leading-relaxed">...</p>
                     </div>
 
-                    <!-- Botón de Pantalla Completa (Lightbox) -->
+                    <!-- Botón de Pantalla Completa -->
                     <button id="fullscreen-btn" class="absolute top-4 right-4 p-3 rounded-2xl bg-slate-900/80 hover:bg-brand-600 text-white backdrop-blur-md border border-white/10 transition-all shadow-lg hover:scale-105" title="Ver en pantalla completa">
                         <i class="fa-solid fa-expand text-base"></i>
                     </button>
@@ -190,21 +203,21 @@
                     <i class="fa-solid fa-chevron-right text-base"></i>
                 </button>
 
-                <!-- Indicadores por Puntos -->
+                <!-- Puntos Indicadores -->
                 <div id="carousel-dots" class="absolute bottom-4 right-6 flex items-center gap-2 z-10 px-3 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/10">
-                    <!-- Generado dinámicamente -->
+                    <!-- Se generan automáticamente desde JS -->
                 </div>
             </div>
 
-            <!-- Carrusel de Miniaturas (Thumbnails) -->
+            <!-- Miniaturas (Thumbnails) -->
             <div id="thumbnails-container" class="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
-                <!-- Generado dinámicamente -->
+                <!-- Se generan automáticamente desde JS -->
             </div>
         </section>
 
     </main>
 
-    <!-- Lightbox Modal (Pantalla Completa) -->
+    <!-- Modal de Pantalla Completa (Lightbox) -->
     <div id="lightbox-modal" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-xl hidden flex flex-col items-center justify-center p-4 sm:p-8">
         <button id="close-lightbox-btn" class="absolute top-6 right-6 p-3 rounded-full bg-slate-800/80 hover:bg-slate-700 text-white transition-all">
             <i class="fa-solid fa-xmark text-2xl"></i>
@@ -227,32 +240,31 @@
         </div>
     </footer>
 
-    <!-- JavaScript logic -->
     <script>
-        // DATOS DE LA GALERÍA DINÁMICA
+        // DATOS DE LAS IMÁGENES DE LA GALERÍA
         const galleryData = [
             {
                 url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1400&q=80',
                 title: 'Modelado Arquitectónico 3D Residencial',
-                desc: 'Estructura minimalista renderizada con luces dinámicas y sombreado procedural en el visor 3D.',
+                desc: 'Estructura minimalista renderizada con luces dinámicas y sombreado procedural.',
                 badge: 'Visor 3D'
             },
             {
                 url: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=1400&q=80',
                 title: 'Panel de Control e Historial de Cronometraje',
-                desc: 'Interfaz de monitorización de tiempos en tiempo real para eventos y pruebas deportivas.',
+                desc: 'Interfaz para el registro de tiempos y velocidades en competiciones deportivas.',
                 badge: 'Cronometraje'
             },
             {
                 url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=80',
-                title: 'Diseño de Interiores & Iluminación Ambiental',
-                desc: 'Simulación de texturas y materiales interactivos con soporte para alternar entre iluminación de día y noche.',
+                title: 'Diseño de Interiores e Iluminación',
+                desc: 'Simulación de texturas y materiales interactivos en la casa tridimensional.',
                 badge: 'Visor 3D'
             },
             {
                 url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80',
-                title: 'Análisis de Métricas & Tiempos de Ejecución',
-                desc: 'Visualización de gráficos y precisión en latencia de datos durante simulaciones consecutivas.',
+                title: 'Análisis de Métricas Deportivas',
+                desc: 'Visualización de datos de tiempo y rendimiento técnico en tiempo real.',
                 badge: 'Cronometraje'
             }
         ];
@@ -261,7 +273,7 @@
         let autoplayInterval = null;
         let isAutoplayActive = true;
 
-        // ELEMENTOS DOM
+        // ELEMENTOS DEL DOM
         const carouselImg = document.getElementById('carousel-img');
         const carouselTitle = document.getElementById('carousel-title');
         const carouselDesc = document.getElementById('carousel-desc');
@@ -281,7 +293,7 @@
         const lightboxDesc = document.getElementById('lightbox-desc');
         const closeLightboxBtn = document.getElementById('close-lightbox-btn');
 
-        // INICIALIZAR LA GALERÍA
+        // INICIALIZACIÓN
         function initGallery() {
             renderDots();
             renderThumbnails();
@@ -289,12 +301,11 @@
             startAutoplay();
         }
 
-        // ACTUALIZAR SLIDE
+        // ACTUALIZAR VISTA DEL CARRUSEL
         function updateCarousel(index) {
             currentSlideIndex = index;
             const item = galleryData[currentSlideIndex];
 
-            // Animación de transición suave
             carouselImg.classList.add('opacity-0');
             setTimeout(() => {
                 carouselImg.src = item.url;
@@ -304,7 +315,7 @@
                 carouselImg.classList.remove('opacity-0');
             }, 200);
 
-            // Actualizar Puntos
+            // Actualizar estado de los puntos
             Array.from(dotsContainer.children).forEach((dot, idx) => {
                 if (idx === currentSlideIndex) {
                     dot.className = "w-6 h-2 rounded-full bg-brand-500 transition-all duration-300";
@@ -313,7 +324,7 @@
                 }
             });
 
-            // Actualizar Miniaturas
+            // Actualizar borde activo en miniaturas
             Array.from(thumbnailsContainer.children).forEach((thumb, idx) => {
                 if (idx === currentSlideIndex) {
                     thumb.classList.add('ring-2', 'ring-brand-500', 'scale-105', 'opacity-100');
@@ -325,12 +336,12 @@
             });
         }
 
-        // RENDERIZAR PUNTOS
+        // DIBUJAR PUNTOS NAVEGADORES
         function renderDots() {
             dotsContainer.innerHTML = '';
             galleryData.forEach((_, idx) => {
                 const dot = document.createElement('button');
-                dot.ariaLabel = `Ir al slide ${idx + 1}`;
+                dot.ariaLabel = `Slide ${idx + 1}`;
                 dot.addEventListener('click', () => {
                     updateCarousel(idx);
                     resetAutoplayTimer();
@@ -339,7 +350,7 @@
             });
         }
 
-        // RENDERIZAR MINIATURAS
+        // DIBUJAR MINIATURAS
         function renderThumbnails() {
             thumbnailsContainer.innerHTML = '';
             galleryData.forEach((item, idx) => {
@@ -355,7 +366,7 @@
             });
         }
 
-        // NAVEGACIÓN
+        // CONTROLES DE NAVEGACIÓN
         function nextSlide() {
             const newIndex = (currentSlideIndex + 1) % galleryData.length;
             updateCarousel(newIndex);
@@ -426,7 +437,7 @@
             }
         });
 
-        // INICIALIZACIÓN
+        // INICIAR EN CARGA DE PÁGINA
         window.onload = function() {
             initGallery();
         };
