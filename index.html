@@ -22,19 +22,17 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background-color: #1a1a1a;
-      color: #ffffff;
     }
 
-    /* Estilos del visor 3D ocupando toda la pantalla */
+    /* Visor 3D a pantalla completa */
     model-viewer {
       width: 100vw;
       height: 100vh;
       --poster-color: transparent;
     }
 
-    /* Indicador visual de carga mientras baja el .glb */
+    /* Indicador visual de carga centrado */
     .progress-bar {
       display: block;
       width: 33%;
@@ -55,48 +53,11 @@
       border-radius: 2px;
       transition: width 0.1s ease;
     }
-
-    /* Panel de controles sobrepuesto */
-    .controls-panel {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(8px);
-      padding: 10px 20px;
-      border-radius: 30px;
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      z-index: 10;
-    }
-
-    .btn {
-      background: #00e5ff;
-      color: #000;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.2s ease, transform 0.1s ease;
-    }
-
-    .btn:hover {
-      background: #80f3ff;
-    }
-
-    .btn:active {
-      transform: scale(0.96);
-    }
   </style>
 </head>
 <body>
 
-  <!-- Visor 3D principal -->
+  <!-- Visor 3D limpio sin interfaz de botones -->
   <model-viewer 
     id="visor-3d"
     src="./modelo.glb" 
@@ -109,46 +70,22 @@
     environment-image="neutral"
     touch-action="pan-y">
     
-    <!-- Barra de progreso de carga -->
+    <!-- Barra de progreso que aparece solo mientras carga -->
     <div class="progress-bar" slot="progress-bar">
       <div class="update-bar" id="update-bar"></div>
     </div>
   </model-viewer>
 
-  <!-- Panel flotante de botones -->
-  <div class="controls-panel">
-    <button class="btn" id="btn-reset">Restablecer Vista</button>
-    <button class="btn" id="btn-rotate">Pausar/Girar</button>
-  </div>
-
   <script>
     const viewer = document.querySelector('#visor-3d');
     const updateBar = document.querySelector('#update-bar');
-    const btnReset = document.querySelector('#btn-reset');
-    const btnRotate = document.querySelector('#btn-rotate');
 
-    // Actualiza la barra de progreso al descargar el archivo .glb
+    // Actualiza la barra de progreso de carga
     viewer.addEventListener('progress', (event) => {
       const progress = event.detail.totalProgress * 100;
       if (updateBar) {
         updateBar.style.width = `${progress}%`;
       }
-    });
-
-    // Oculta la barra al finalizar la carga
-    viewer.addEventListener('load', () => {
-      console.log('Modelo 3D cargado con éxito.');
-    });
-
-    // Botón para centrar y restablecer la cámara
-    btnReset.addEventListener('click', () => {
-      viewer.cameraTarget = 'auto auto auto';
-      viewer.cameraOrbit = '0deg 75deg 105%';
-    });
-
-    // Botón para alternar la rotación automática
-    btnRotate.addEventListener('click', () => {
-      viewer.autoRotate = !viewer.autoRotate;
     });
   </script>
 
