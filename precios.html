@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Ing</title>
+    <title>Precios y Servicios | El Ing</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -48,20 +48,20 @@
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
 
     <!-- ========================================================================= -->
-    <!-- HEADER / NAVBAR: MENÚ DESPLEGABLE (HAMBURGUESA)                          -->
+    <!-- HEADER / NAVBAR CON MENÚ DESPLEGABLE                                      -->
     <!-- ========================================================================= -->
     <header class="sticky top-0 z-40 w-full glassmorphism">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20 relative">
                 <!-- Logotipo / Título Principal -->
-                <div class="flex items-center gap-3">
+                <a href="index.html" class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
                         <i class="fa-solid fa-shapes font-bold text-white text-xl"></i>
                     </div>
                     <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-brand-400 bg-clip-text text-transparent">
                         EL ING VUELA
                     </span>
-                </div>
+                </a>
 
                 <!-- Botón Menú Hamburguesa -->
                 <button id="menu-toggle-btn" class="px-4 py-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white transition-all flex items-center gap-2.5 shadow focus:outline-none" aria-label="Abrir Menú">
@@ -71,16 +71,24 @@
 
                 <!-- Menú Desplegable -->
                 <nav id="dropdown-menu" class="hidden absolute top-full right-0 mt-2 w-64 bg-slate-900/95 border border-slate-800 rounded-2xl shadow-2xl p-3 backdrop-blur-xl flex flex-col gap-1 z-50">
+                    <a href="index.html" class="px-4 py-3 rounded-xl hover:bg-slate-800 text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-3">
+                        <i class="fa-solid fa-house text-brand-400 w-5"></i>
+                        <span>INICIO</span>
+                    </a>
                     <a href="galeria.html" class="px-4 py-3 rounded-xl hover:bg-slate-800 text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-3">
-                        <span>GALERIA</span>
+                        <i class="fa-solid fa-images text-indigo-400 w-5"></i>
+                        <span>GALERÍA</span>
                     </a>
                     <a href="PAYNAL.html" class="px-4 py-3 rounded-xl hover:bg-slate-800 text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-3">
+                        <i class="fa-solid fa-laptop-code text-cyan-400 w-5"></i>
                         <span>PAYNAL DEMO</span>
                     </a>
                     <a href="casa.html" class="px-4 py-3 rounded-xl hover:bg-slate-800 text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-3">
+                        <i class="fa-solid fa-cube text-emerald-400 w-5"></i>
                         <span>CASA 3D</span>
                     </a>
                     <a href="mmr.html" class="px-4 py-3 rounded-xl hover:bg-slate-800 text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-3">
+                        <i class="fa-solid fa-stopwatch text-amber-400 w-5"></i>
                         <span>TIEMPO MMR</span>
                     </a>
                 </nav>
@@ -88,76 +96,163 @@
         </div>
     </header>
 
-    <!-- Main Content Container -->
-    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <!-- Contenido Principal -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
 
-        <!-- 1. DESCRIPCIÓN DEL PORTAFOLIO -->
-        <section class="relative bg-gradient-to-b from-slate-900/90 to-slate-900/40 rounded-3xl p-6 sm:p-10 border border-slate-800 shadow-2xl overflow-hidden">
-            <div class="absolute -top-24 -right-24 w-72 h-72 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-            <div class="relative z-10 max-w-4xl space-y-6">
-                <div>
-                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
-                        SALUDOS!
-                    </h1>
-                </div>
-
-                <p class="text-slate-300 text-base sm:text-lg leading-relaxed">
-                    Esta plataforma reúne un conjunto de proyectos desarrollados para brindar experiencias interactivas y funcionales en la web, abarcando desde la visualización tridimensional de arquitecturas en tiempo real hasta el registro y consulta automatizada de métricas deportivas.
-                </p>
+        <!-- Encabezado de la Sección de Precios -->
+        <section class="text-center max-w-3xl mx-auto space-y-4">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-400 border border-brand-500/20">
+                <i class="fa-solid fa-tag"></i> Tarifas y Cotizaciones
             </div>
+            <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+                Planes y Precios de Servicios
+            </h1>
+            <p class="text-slate-400 text-base sm:text-lg">
+                Soluciones integrales para desarrollo de proyectos interactivos, renderizado 3D y sistemas de cronometraje deportivo.
+            </p>
         </section>
 
-        <!-- 2. GALERÍA DINÁMICA DE IMÁGENES / CARRUSEL -->
-        <section id="galeria" class="space-y-6">
-            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-                <div>
-                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Galería de Fotos</h2>
-                    <p class="text-slate-400 text-sm mt-1">Navega a través de las imágenes de algunos proyectos.</p>
+        <!-- ========================================================================= -->
+        <!-- SECCIÓN 1: SISTEMA DE CRONOMETRAJE DEPORTIVO                              -->
+        <!-- ========================================================================= -->
+        <section class="space-y-8">
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl font-bold">
+                    <i class="fa-solid fa-stopwatch"></i>
                 </div>
-                <!-- Botón de Pausar / Iniciar Autoplay -->
-                <div class="flex items-center gap-2">
-                    <button id="toggle-autoplay-btn" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-2 shadow">
-                        <i id="autoplay-icon" class="fa-solid fa-pause text-brand-400"></i>
-                        <span id="autoplay-text">Pausar Reproducción</span>
+                <div>
+                    <h2 class="text-2xl font-bold text-white">Cronometraje Deportivo</h2>
+                    <p class="text-xs sm:text-sm text-slate-400">Lectura RFID / QR, pantallas en vivo e impresos de resultados</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Plan Básico -->
+                <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between hover:border-slate-700 transition-all shadow-xl">
+                    <div class="space-y-4">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Evento Corto / Local</span>
+                        <h3 class="text-xl font-bold text-white">Básico QR</h3>
+                        <div class="text-3xl font-extrabold text-emerald-400">$2,500 <span class="text-xs font-normal text-slate-400">MXN / evento</span></div>
+                        <ul class="space-y-2.5 text-xs text-slate-300">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Hasta 150 participantes</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Escaneo mediante código QR / Manual</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Pantalla de llegada en tiempo real</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Reporte final en PDF y Excel</li>
+                        </ul>
+                    </div>
+                    <button class="mt-6 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition-colors">
+                        Solicitar Información
+                    </button>
+                </div>
+
+                <!-- Plan Profesional (Destacado) -->
+                <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-emerald-500/60 rounded-3xl p-6 flex flex-col justify-between relative shadow-2xl scale-105">
+                    <span class="absolute -top-3 right-6 bg-emerald-500 text-slate-950 font-bold text-[10px] uppercase px-3 py-1 rounded-full shadow">Recomendado</span>
+                    <div class="space-y-4">
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">RFID Automatizado</span>
+                        <h3 class="text-xl font-bold text-white">Pro RFID</h3>
+                        <div class="text-3xl font-extrabold text-emerald-400">$6,000 <span class="text-xs font-normal text-slate-400">MXN / evento</span></div>
+                        <ul class="space-y-2.5 text-xs text-slate-300">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Hasta 500 participantes</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Antenas RFID Chainway + Chips en dorsal</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Módulo web de consulta para corredores</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Generación automática de diplomas digitalizados</li>
+                        </ul>
+                    </div>
+                    <button class="mt-6 w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-colors shadow-lg">
+                        Cotizar Evento
+                    </button>
+                </div>
+
+                <!-- Plan A Medida -->
+                <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between hover:border-slate-700 transition-all shadow-xl">
+                    <div class="space-y-4">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Personalizado</span>
+                        <h3 class="text-xl font-bold text-white">Software a Medida</h3>
+                        <div class="text-3xl font-extrabold text-emerald-400">Cotización</div>
+                        <ul class="space-y-2.5 text-xs text-slate-300">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Desarrollo del sistema web para tu marca</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Integración NFC / RFID / WebSockets</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Base de datos alojada local o en la nube</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Soporte técnico presencial</li>
+                        </ul>
+                    </div>
+                    <button class="mt-6 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition-colors">
+                        Consultar Desarrollo
                     </button>
                 </div>
             </div>
+        </section>
 
-            <!-- Marco Principal del Carrusel -->
-            <div class="relative bg-slate-950 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl group">
-                <!-- Visor de la foto -->
-                <div class="relative h-[320px] sm:h-[480px] md:h-[560px] w-full overflow-hidden flex items-center justify-center bg-slate-900">
-                    <img id="carousel-img" src="" alt="Imagen de galería" class="w-full h-full object-cover transition-opacity duration-300 opacity-100 select-none">
-                    
-                    <!-- Información en el pie de la imagen -->
-                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent p-6 sm:p-8 flex flex-col justify-end">
-                        <span id="carousel-badge" class="self-start text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-brand-500/20 text-brand-300 border border-brand-500/30 mb-2">
-                            Proyecto Visual
-                        </span>
-                        <h3 id="carousel-title" class="text-xl sm:text-2xl font-bold text-white drop-shadow-md">Cargando...</h3>
-                        <p id="carousel-desc" class="text-sm text-slate-300 max-w-2xl mt-1 drop-shadow leading-relaxed">...</p>
-                    </div>
+        <!-- ========================================================================= -->
+        <!-- SECCIÓN 2: RENDERS Y MODELADO ARCHVIZ 3D                                  -->
+        <!-- ========================================================================= -->
+        <section class="space-y-8">
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
+                <div class="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 text-xl font-bold">
+                    <i class="fa-solid fa-cube"></i>
                 </div>
-
-                <!-- Botones de Navegación Lateral -->
-                <button id="prev-slide-btn" class="absolute left-4 top-1/2 -translate-y-1/2 p-3 sm:p-4 rounded-2xl bg-slate-900/80 hover:bg-brand-600 text-white backdrop-blur-md border border-white/10 transition-all hover:scale-110 focus:outline-none shadow-xl">
-                    <i class="fa-solid fa-chevron-left text-base"></i>
-                </button>
-                <button id="next-slide-btn" class="absolute right-4 top-1/2 -translate-y-1/2 p-3 sm:p-4 rounded-2xl bg-slate-900/80 hover:bg-brand-600 text-white backdrop-blur-md border border-white/10 transition-all hover:scale-110 focus:outline-none shadow-xl">
-                    <i class="fa-solid fa-chevron-right text-base"></i>
-                </button>
-
-                <!-- Puntos Indicadores -->
-                <div id="carousel-dots" class="absolute bottom-4 right-6 flex items-center gap-2 z-10 px-3 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/10">
-                    <!-- Se generan automáticamente desde JS -->
+                <div>
+                    <h2 class="text-2xl font-bold text-white">Renders y Modelos 3D</h2>
+                    <p class="text-xs sm:text-sm text-slate-400">Visualización interactiva WebGL, recorridos virtuales y renders fijos</p>
                 </div>
             </div>
 
-            <!-- Miniaturas (Thumbnails) -->
-            <div id="thumbnails-container" class="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
-                <!-- Se generan automáticamente desde JS -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Render Imagen Fija -->
+                <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between hover:border-slate-700 transition-all shadow-xl">
+                    <div class="space-y-4">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Fotorrealismo</span>
+                        <h3 class="text-xl font-bold text-white">Render Fijo HD</h3>
+                        <div class="text-3xl font-extrabold text-brand-400">$1,200 <span class="text-xs font-normal text-slate-400">MXN / vista</span></div>
+                        <ul class="space-y-2.5 text-xs text-slate-300">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Resolución 4K ultra nítida</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Iluminación y materiales hiperrealistas</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Postproducción y ambientación</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Entrega en WebP/PNG de alta definición</li>
+                        </ul>
+                    </div>
+                    <button class="mt-6 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition-colors">
+                        Solicitar Renders
+                    </button>
+                </div>
+
+                <!-- Modelo Web 3D Interactivo (Destacado) -->
+                <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-brand-500/60 rounded-3xl p-6 flex flex-col justify-between relative shadow-2xl scale-105">
+                    <span class="absolute -top-3 right-6 bg-brand-500 text-slate-950 font-bold text-[10px] uppercase px-3 py-1 rounded-full shadow">Popular</span>
+                    <div class="space-y-4">
+                        <span class="text-xs font-bold text-brand-400 uppercase tracking-wider">Interactividad Web</span>
+                        <h3 class="text-xl font-bold text-white">Visor Web 3D (.GLB)</h3>
+                        <div class="text-3xl font-extrabold text-brand-400">$3,500 <span class="text-xs font-normal text-slate-400">MXN / modelo</span></div>
+                        <ul class="space-y-2.5 text-xs text-slate-300">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Modelo WebGL interactivo 360°</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Cambios dinámicos de materiales/colores</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Control de sol, luz día/noche</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Integración directa en tu sitio web</li>
+                        </ul>
+                    </div>
+                    <button class="mt-6 w-full py-2.5 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-bold text-xs transition-colors shadow-lg">
+                        Cotizar Modelo 3D
+                    </button>
+                </div>
+
+                <!-- Recorrido Virtual / Arqui 3D -->
+                <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between hover:border-slate-700 transition-all shadow-xl">
+                    <div class="space-y-4">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Recorrido Completo</span>
+                        <h3 class="text-xl font-bold text-white">Proyecto Casa 3D</h3>
+                        <div class="text-3xl font-extrabold text-brand-400">Cotización</div>
+                        <ul class="space-y-2.5 text-xs text-slate-300">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Levantamiento desde planos 2D / CAD</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Diseño exterior e interior amueblado</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Video de recorrido animado Full HD</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Exportación a formatos GLTF, OBJ y FBX</li>
+                        </ul>
+                    </div>
+                    <button class="mt-6 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition-colors">
+                        Cotizar Proyecto
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -204,177 +299,6 @@
                 dropdownMenu.classList.add('hidden');
                 menuIcon.className = "fa-solid fa-bars text-lg text-brand-400";
             }
-        });
-
-        // DATOS DE LAS IMÁGENES DE LA GALERÍA
-        const galleryData = [
-            {
-                url: 'img/render2.jpeg',
-                title: 'Modelado Arquitectónico 3D Residencial',
-                desc: 'Estructura minimalista renderizada con luces dinámicas y sombreado procedural.',
-                badge: 'Visor 3D'
-            },
-            {
-                url: 'img/crono.png',
-                title: 'Historial de Cronometraje',
-                desc: 'Interfaz registro de tiempos en competiciones deportivas.',
-                badge: 'Cronometraje'
-            },
-            {
-                url: 'img/render1.jpeg',
-                title: 'Diseño de Interiores e Iluminación',
-                desc: 'Simulación de texturas y materiales interactivos en la casa tridimensional.',
-                badge: 'Visor 3D'
-            },
-            {
-                url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80',
-                title: 'Análisis de Métricas Deportivas',
-                desc: 'Visualización de datos de tiempo y rendimiento técnico en tiempo real.',
-                badge: 'Cronometraje'
-            }
-        ];
-
-        let currentSlideIndex = 0;
-        let autoplayInterval = null;
-        let isAutoplayActive = true;
-
-        // ELEMENTOS DEL DOM DE LA GALERÍA
-        const carouselImg = document.getElementById('carousel-img');
-        const carouselTitle = document.getElementById('carousel-title');
-        const carouselDesc = document.getElementById('carousel-desc');
-        const carouselBadge = document.getElementById('carousel-badge');
-        const prevBtn = document.getElementById('prev-slide-btn');
-        const nextBtn = document.getElementById('next-slide-btn');
-        const dotsContainer = document.getElementById('carousel-dots');
-        const thumbnailsContainer = document.getElementById('thumbnails-container');
-        const toggleAutoplayBtn = document.getElementById('toggle-autoplay-btn');
-        const autoplayIcon = document.getElementById('autoplay-icon');
-        const autoplayText = document.getElementById('autoplay-text');
-
-        // INICIALIZACIÓN
-        function initGallery() {
-            renderDots();
-            renderThumbnails();
-            updateCarousel(0);
-            startAutoplay();
-        }
-
-        // ACTUALIZAR VISTA DEL CARRUSEL
-        function updateCarousel(index) {
-            currentSlideIndex = index;
-            const item = galleryData[currentSlideIndex];
-
-            carouselImg.src = item.url;
-            carouselTitle.textContent = item.title;
-            carouselDesc.textContent = item.desc;
-            carouselBadge.textContent = item.badge;
-
-            // Actualizar estado de los puntos
-            Array.from(dotsContainer.children).forEach((dot, idx) => {
-                if (idx === currentSlideIndex) {
-                    dot.className = "w-6 h-2 rounded-full bg-brand-500 transition-all duration-300";
-                } else {
-                    dot.className = "w-2 h-2 rounded-full bg-slate-600 hover:bg-slate-400 transition-all duration-300 cursor-pointer";
-                }
-            });
-
-            // Actualizar borde activo en miniaturas
-            Array.from(thumbnailsContainer.children).forEach((thumb, idx) => {
-                if (idx === currentSlideIndex) {
-                    thumb.classList.add('ring-2', 'ring-brand-500', 'scale-105', 'opacity-100');
-                    thumb.classList.remove('opacity-40');
-                } else {
-                    thumb.classList.remove('ring-2', 'ring-brand-500', 'scale-105', 'opacity-100');
-                    thumb.classList.add('opacity-40');
-                }
-            });
-        }
-
-        // DIBUJAR PUNTOS NAVEGADORES
-        function renderDots() {
-            dotsContainer.innerHTML = '';
-            galleryData.forEach((_, idx) => {
-                const dot = document.createElement('button');
-                dot.ariaLabel = `Slide ${idx + 1}`;
-                dot.addEventListener('click', () => {
-                    updateCarousel(idx);
-                    resetAutoplayTimer();
-                });
-                dotsContainer.appendChild(dot);
-            });
-        }
-
-        // DIBUJAR MINIATURAS
-        function renderThumbnails() {
-            thumbnailsContainer.innerHTML = '';
-            galleryData.forEach((item, idx) => {
-                const thumb = document.createElement('img');
-                thumb.src = item.url;
-                thumb.alt = item.title;
-                thumb.className = 'w-20 h-14 sm:w-28 sm:h-20 object-cover rounded-xl cursor-pointer transition-all duration-300 flex-shrink-0 opacity-40 hover:opacity-100 border border-slate-800';
-                thumb.addEventListener('click', () => {
-                    updateCarousel(idx);
-                    resetAutoplayTimer();
-                });
-                thumbnailsContainer.appendChild(thumb);
-            });
-        }
-
-        // CONTROLES DE NAVEGACIÓN
-        function nextSlide() {
-            const newIndex = (currentSlideIndex + 1) % galleryData.length;
-            updateCarousel(newIndex);
-        }
-
-        function prevSlide() {
-            const newIndex = (currentSlideIndex - 1 + galleryData.length) % galleryData.length;
-            updateCarousel(newIndex);
-        }
-
-        prevBtn.addEventListener('click', () => {
-            prevSlide();
-            resetAutoplayTimer();
-        });
-
-        nextBtn.addEventListener('click', () => {
-            nextSlide();
-            resetAutoplayTimer();
-        });
-
-        // AUTOPLAY
-        function startAutoplay() {
-            if (autoplayInterval) clearInterval(autoplayInterval);
-            autoplayInterval = setInterval(nextSlide, 4500);
-            isAutoplayActive = true;
-            autoplayIcon.className = "fa-solid fa-pause text-brand-400";
-            autoplayText.textContent = "Pausar Reproducción";
-        }
-
-        function stopAutoplay() {
-            if (autoplayInterval) clearInterval(autoplayInterval);
-            autoplayInterval = null;
-            isAutoplayActive = false;
-            autoplayIcon.className = "fa-solid fa-play text-brand-400";
-            autoplayText.textContent = "Iniciar Autoplay";
-        }
-
-        function resetAutoplayTimer() {
-            if (isAutoplayActive) {
-                startAutoplay();
-            }
-        }
-
-        toggleAutoplayBtn.addEventListener('click', () => {
-            if (isAutoplayActive) {
-                stopAutoplay();
-            } else {
-                startAutoplay();
-            }
-        });
-
-        // INICIAR AL CARGAR
-        document.addEventListener('DOMContentLoaded', () => {
-            initGallery();
         });
     </script>
 </body>
