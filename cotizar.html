@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Cotizaciones</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --light-bg: #f8f9fa;
+            --border-color: #ddd;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 950px;
+            background: #fff;
+            margin: 0 auto;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Cabecera del Negocio */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .business-info input, .client-info input, .quote-meta input {
+            border: 1px dashed transparent;
+            padding: 4px;
+            font-family: inherit;
+            border-radius: 4px;
+        }
+
+        .business-info input:hover, .client-info input:hover, .quote-meta input:hover,
+        .business-info input:focus, .client-info input:focus, .quote-meta input:focus {
+            border-color: var(--secondary-color);
+            background: var(--light-bg);
+            outline: none;
+        }
+
+        .business-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            width: 100%;
+        }
+
+        .business-details, .client-info, .quote-meta {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .business-details input, .client-info input {
+            width: 100%;
+            margin-bottom: 4px;
+        }
+
+        /* Datos de Cliente y Folio */
+        .meta-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            background: var(--light-bg);
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .client-info h3, .quote-meta h3 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            color: var(--primary-color);
+        }
+
+        /* Tabla de Conceptos */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        td input, td select {
+            width: 100%;
+            border: 1px solid var(--border-color);
+            padding: 6px;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+            background-color: #fff;
+        }
+
+        .btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            padding: 6px 10px;
+        }
+
+        .btn-success {
+            background-color: #2ecc71;
+        }
+
+        /* Totales */
+        .totals-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .totals-box {
+            width: 320px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 15px;
+        }
+
+        .total-row.final {
+            font-size: 18px;
+            font-weight: bold;
+            border-top: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            margin-top: 5px;
+            padding-top: 10px;
+        }
+
+        /* Botones de Acción (No salen al imprimir) */
+        .actions-bar {
+            margin-top: 40px;
+            text-align: center;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            .actions-bar, .btn-danger, .no-print {
+                display: none !important;
+            }
+            input, select {
+                border: none !important;
+                background: transparent !important;
+                appearance: none;
+                -webkit-appearance: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Cabecera -->
+    <div class="header-section">
+        <div class="business-info" style="width: 50%;">
+            <input type="text" class="business-name" value="Nombre de tu Negocio" placeholder="Nombre de tu Negocio">
+            <div class="business-details">
+                <input type="text" value="Dirección del negocio, Ciudad" placeholder="Dirección">
+                <input type="text" value="Tel: 55 1234 5678" placeholder="Teléfono de contacto">
+                <input type="text" value="correo@empresa.com" placeholder="Correo electrónico">
+            </div>
+        </div>
+        <div class="quote-meta" style="text-align: right;">
+            <h2 style="margin: 0 0 10px 0; color: var(--primary-color);">COTIZACIÓN</h2>
+            <div>Folio: <input type="text" value="COT-001" style="width: 90px; text-align: right;"></div>
+            <div>Fecha: <input type="date" id="fecha-actual" style="width: 130px;"></div>
+        </div>
+    </div>
+
+    <!-- Datos del Cliente -->
+    <div class="meta-section">
+        <div class="client-info" style="width: 100%;">
+            <h3>Datos del Cliente:</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input type="text" value="Nombre del Cliente / Empresa" placeholder="Nombre del cliente">
+                <input type="text" value="Tel: 55 8765 4321" placeholder="Teléfono del cliente">
+                <input type="text" value="Correo del cliente" placeholder="Correo electrónico">
+                <input type="text" value="Dirección del cliente" placeholder="Dirección">
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Conceptos -->
+    <table id="tabla-conceptos">
+        <thead>
+            <tr>
+                <th style="width: 35%;">Servicio / Descripción</th>
+                <th style="width: 10%;">Cant.</th>
+                <th style="width: 15%;">Precio Unit.</th>
+                <th style="width: 13%;">Desc. ($)</th>
+                <th style="width: 17%;">Importe</th>
+                <th style="width: 5%;" class="no-print"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Las filas se cargan dinámicamente con JavaScript -->
+        </tbody>
+    </table>
+
+    <button class="btn btn-success no-print" onclick="agregarFila()">+ Agregar Concepto</button>
+
+    <!-- Totales -->
+    <div class="totals-section">
+        <div class="totals-box">
+            <div class="total-row">
+                <span>Subtotal:</span>
+                <span id="lbl-subtotal">$0.00</span>
+            </div>
+            <div class="total-row">
+                <span>Descuentos Totales:</span>
+                <span id="lbl-total-descuentos">-$0.00</span>
+            </div>
+            <div class="total-row final">
+                <span>Total Final:</span>
+                <span id="lbl-total">$0.00</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="actions-bar">
+        <button class="btn" onclick="window.print()">Imprimir / Guardar PDF</button>
+    </div>
+</div>
+
+<script>
+    // Catálogo de servicios predefinidos con sus precios por defecto
+    // Puedes modificar, agregar o quitar servicios en esta lista:
+    const catalogoServicios = [
+        { nombre: "Servicio Personalizado / Otro", precio: 0 },
+        { nombre: "Desarrollo y Configuración de Sistema", precio: 1500 },
+        { nombre: "Mantenimiento y Soporte Técnico", precio: 800 },
+        { nombre: "Consultoría Técnica / Asesoría", precio: 500 },
+        { nombre: "Instalación y Puesta en Marcha", precio: 1200 }
+    ];
+
+    // Asignar fecha actual por defecto
+    document.getElementById('fecha-actual').valueAsDate = new Date();
+
+    function construirSelectServicios() {
+        let options = '';
+        catalogoServicios.forEach((s, idx) => {
+            options += `<option value="${idx}">${s.nombre}</option>`;
+        });
+        return `<select onchange="seleccionarServicio(this)">${options}</select>`;
+    }
+
+    function seleccionarServicio(selectEl) {
+        const index = selectEl.value;
+        const precio = catalogoServicios[index].precio;
+        const fila = selectEl.closest('tr');
+        
+        // Asignar precio correspondiente
+        const inputPrecio = fila.querySelector('td:nth-child(3) input');
+        inputPrecio.value = precio;
+        
+        calcularTotales();
+    }
+
+    function agregarFila(servicioIdx = 0) {
+        const tbody = document.querySelector('#tabla-conceptos tbody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${construirSelectServicios()}</td>
+            <td><input type="number" value="1" min="1" oninput="calcularTotales()"></td>
+            <td><input type="number" value="${catalogoServicios[servicioIdx].precio}" min="0" step="0.01" oninput="calcularTotales()"></td>
+            <td><input type="number" value="0" min="0" step="0.01" oninput="calcularTotales()"></td>
+            <td class="importe-col">$0.00</td>
+            <td class="no-print"><button class="btn btn-danger" onclick="eliminarFila(this)">X</button></td>
+        `;
+        tbody.appendChild(tr);
+        calcularTotales();
+    }
+
+    function eliminarFila(btn) {
+        const row = btn.closest('tr');
+        if (document.querySelectorAll('#tabla-conceptos tbody tr').length > 1) {
+            row.remove();
+            calcularTotales();
+        } else {
+            alert("La cotización debe tener al menos un concepto.");
+        }
+    }
+
+    function calcularTotales() {
+        const filas = document.querySelectorAll('#tabla-conceptos tbody tr');
+        let subtotalSinDescuento = 0;
+        let totalDescuentosMonto = 0;
+
+        filas.forEach(fila => {
+            const cantidad = parseFloat(fila.querySelector('td:nth-child(2) input').value) || 0;
+            const precioUnitario = parseFloat(fila.querySelector('td:nth-child(3) input').value) || 0;
+            const descuentoMonto = parseFloat(fila.querySelector('td:nth-child(4) input').value) || 0;
+            
+            const subtotalFila = cantidad * precioUnitario;
+            // El importe final de la fila es el subtotal menos el descuento directo en monto ($)
+            const importeFinalFila = Math.max(0, subtotalFila - descuentoMonto);
+
+            subtotalSinDescuento += subtotalFila;
+            totalDescuentosMonto += descuentoMonto;
+            
+            fila.querySelector('.importe-col').textContent = `$${importeFinalFila.toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        });
+
+        const totalFinal = Math.max(0, subtotalSinDescuento - totalDescuentosMonto);
+
+        document.getElementById('lbl-subtotal').textContent = `$${subtotalSinDescuento.toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('lbl-total-descuentos').textContent = `-$${totalDescuentosMonto.toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('lbl-total').textContent = `$${totalFinal.toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    }
+
+    // Cargar 2 filas de inicio por defecto
+    agregarFila(1);
+    agregarFila(2);
+</script>
+
+</body>
+</html>
