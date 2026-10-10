@@ -101,11 +101,11 @@
 
         <!-- Encabezado de la Sección de Precios -->
         <section class="text-center max-w-3xl mx-auto space-y-4">
-            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-400 border border-brand-500/20">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 <i class="fa-solid fa-tag"></i> Tarifas y Cotizaciones
             </div>
             <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-                Planes y Precios de Servicios
+                Planes y Precios Especiales
             </h1>
             <p class="text-slate-400 text-base sm:text-lg">
                 Soluciones integrales para desarrollo de proyectos interactivos, renderizado 3D y sistemas de cronometraje deportivo.
@@ -126,14 +126,20 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Plan Básico -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Plan Básico (RESALTADO) -->
                 <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-emerald-500/60 rounded-3xl p-6 flex flex-col justify-between relative shadow-2xl scale-105">
-                    <span class="absolute -top-3 right-6 bg-brand-500 text-slate-950 font-bold text-[10px] uppercase px-3 py-1 rounded-full shadow">Popular</span>
+                    <span class="absolute -top-3 right-6 bg-emerald-500 text-slate-950 font-bold text-[10px] uppercase px-3 py-1 rounded-full shadow">¡Oferta!</span>
                     <div class="space-y-4">
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Evento Corto / Local</span>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Evento Corto</span>
+                            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded-full">Ahorra $500</span>
+                        </div>
                         <h3 class="text-xl font-bold text-white">Básico QR</h3>
-                        <div class="text-3xl font-extrabold text-emerald-400">$2,500 <span class="text-xs font-normal text-slate-400">MXN / evento</span></div>
+                        <div>
+                            <span class="text-xs text-slate-500 line-through mr-2">$3,000 MXN</span>
+                            <div class="text-3xl font-extrabold text-emerald-400">$2,500 <span class="text-xs font-normal text-slate-400">MXN</span></div>
+                        </div>
                         <ul class="space-y-2.5 text-xs text-slate-300">
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Hasta 150 participantes</li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Escaneo mediante código QR / Manual</li>
@@ -141,42 +147,46 @@
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Reporte final en PDF y Excel</li>
                         </ul>
                     </div>
-                    <a href="https://wa.me/5215618782196?text=Hola,%20me%20interesa%20información%20sobre%20el%20plan%20Básico%20QR%20de%20Cronometraje" target="_blank" class="mt-6 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-emerald-600 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-2 shadow">
-                        <i class="fa-brands fa-whatsapp text-sm text-emerald-400"></i> Solicitar Información
+                    <a href="https://wa.me/5215618782196?text=Hola,%20me%20interesa%20información%20sobre%20el%20plan%20Básico%20QR%20de%20Cronometraje" target="_blank" class="mt-6 w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-colors flex items-center justify-center gap-2 shadow-lg">
+                        <i class="fa-brands fa-whatsapp text-sm"></i> Solicitar Oferta
                     </a>
                 </div>
 
                 <!-- Plan Profesional -->
-                <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-emerald-500/60 rounded-3xl p-6 flex flex-col justify-between relative shadow-2xl scale-105">
+                <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-emerald-500/60 rounded-3xl p-6 flex flex-col justify-between relative shadow-2xl">
                     <div class="space-y-4">
                         <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">RFID Automatizado</span>
                         <h3 class="text-xl font-bold text-white">Pro RFID</h3>
-                        <div class="text-3xl font-extrabold text-emerald-400">$15,000 <span class="text-xs font-normal text-slate-400">MXN / evento</span></div>
+                        <div class="text-3xl font-extrabold text-emerald-400">$15,000 <span class="text-xs font-normal text-slate-400">MXN</span></div>
                         <ul class="space-y-2.5 text-xs text-slate-300">
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Hasta 500 participantes</li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Antenas RFID</li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Chips en dorsal</li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Pantalla de llegada en tiempo real</li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Reporte final en PDF y Excel</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Pantalla en tiempo real</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Reporte PDF y Excel</li>
                         </ul>
                     </div>
                     <a href="https://wa.me/5215618782196?text=Hola,%20me%20gustaría%20cotizar%20un%20evento%20con%20el%20plan%20Pro%20RFID%20de%20Cronometraje" target="_blank" class="mt-6 w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-colors flex items-center justify-center gap-2 shadow-lg">
                         <i class="fa-brands fa-whatsapp text-sm"></i> Cotizar Evento
                     </a>
                 </div>
-                <!-- Plan Web-->
-                <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-emerald-500/60 rounded-3xl p-6 flex flex-col justify-between relative shadow-2xl scale-105">
+
+                <!-- Plan Web -->
+                <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between hover:border-slate-700 transition-all shadow-xl">
                     <div class="space-y-4">
                         <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Web RESULTADOS</span>
-                        <h3 class="text-xl font-bold text-white">Pagina web y stiker</h3>
-                        <div class="text-3xl font-extrabold text-emerald-400">$1,500 <span class="text-xs font-normal text-slate-400">MXN / evento</span></div>
+                        <h3 class="text-xl font-bold text-white">Página web y Stiker</h3>
+                        <div class="text-3xl font-extrabold text-emerald-400">$1,500 <span class="text-xs font-normal text-slate-400">MXN</span></div>
                         <ul class="space-y-2.5 text-xs text-slate-300">
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Minimo 150 participantes/ $10 PP</li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> 3 meses en linea</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Mínimo 150 part. / $10 PP</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> 3 meses en línea</li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Consulta tiempo final</li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Descarga estiker personalizado</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Descarga stiker personalizado</li>
                         </ul>
                     </div>
+                    <a href="https://wa.me/5215618782196?text=Hola,%20me%20interesa%20el%20plan%20de%20Página%20Web%20y%20Stiker%20de%20Resultados" target="_blank" class="mt-6 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-emerald-600 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-2 shadow">
+                        <i class="fa-brands fa-whatsapp text-sm text-emerald-400"></i> Solicitar Plan
+                    </a>
                 </div>
 
                 <!-- Plan A Medida -->
@@ -186,9 +196,9 @@
                         <h3 class="text-xl font-bold text-white">Software a Medida</h3>
                         <div class="text-3xl font-extrabold text-emerald-400">Cotización</div>
                         <ul class="space-y-2.5 text-xs text-slate-300">
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Desarrollo del sistema web para tu marca</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Sistema web para tu marca</li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Integración NFC / RFID / WebSockets</li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Base de datos alojada local o en la nube</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Base de datos local o nube</li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Soporte técnico presencial</li>
                         </ul>
                     </div>
@@ -217,9 +227,15 @@
                 <!-- Render Imagen Fija -->
                 <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between hover:border-slate-700 transition-all shadow-xl">
                     <div class="space-y-4">
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Fotorrealismo</span>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-brand-400 uppercase tracking-wider">Fotorrealismo</span>
+                            <span class="text-[10px] bg-brand-500/25 text-brand-300 font-bold px-2 py-0.5 rounded-full">Ahorra $300</span>
+                        </div>
                         <h3 class="text-xl font-bold text-white">Render Fijo HD</h3>
-                        <div class="text-3xl font-extrabold text-brand-400">$1,200 <span class="text-xs font-normal text-slate-400">MXN / vista</span></div>
+                        <div>
+                            <span class="text-xs text-slate-500 line-through mr-2">$1,500 MXN</span>
+                            <div class="text-3xl font-extrabold text-brand-400">$1,200 <span class="text-xs font-normal text-slate-400">MXN / vista</span></div>
+                        </div>
                         <ul class="space-y-2.5 text-xs text-slate-300">
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Resolución 4K ultra nítida</li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Iluminación y materiales hiperrealistas</li>
@@ -227,18 +243,24 @@
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Entrega en WebP/PNG de alta definición</li>
                         </ul>
                     </div>
-                    <a href="https://wa.me/5215618782196?text=Hola,%20me%20interesa%20solicitar%20Renders%20Fijos%20HD" target="_blank" class="mt-6 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-brand-600 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-2 shadow">
+                    <a href="https://wa.me/5215618782196?text=Hola,%20me%20interesa%20solicitar%20Renders%20Fijos%20HD%20en%20promoción" target="_blank" class="mt-6 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-brand-600 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-2 shadow">
                         <i class="fa-brands fa-whatsapp text-sm text-brand-400"></i> Solicitar Renders
                     </a>
                 </div>
 
                 <!-- Modelo Web 3D Interactivo (Destacado) -->
                 <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-brand-500/60 rounded-3xl p-6 flex flex-col justify-between relative shadow-2xl scale-105">
-                    <span class="absolute -top-3 right-6 bg-brand-500 text-slate-950 font-bold text-[10px] uppercase px-3 py-1 rounded-full shadow">Popular</span>
+                    <span class="absolute -top-3 right-6 bg-brand-500 text-slate-950 font-bold text-[10px] uppercase px-3 py-1 rounded-full shadow">Precio Especial</span>
                     <div class="space-y-4">
-                        <span class="text-xs font-bold text-brand-400 uppercase tracking-wider">Interactividad Web</span>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-brand-400 uppercase tracking-wider">Interactividad Web</span>
+                            <span class="text-[10px] bg-brand-500/25 text-brand-300 font-bold px-2 py-0.5 rounded-full">Ahorra $1,000</span>
+                        </div>
                         <h3 class="text-xl font-bold text-white">Visor Web 3D (.GLB)</h3>
-                        <div class="text-3xl font-extrabold text-brand-400">$3,500 <span class="text-xs font-normal text-slate-400">MXN / modelo</span></div>
+                        <div>
+                            <span class="text-xs text-slate-500 line-through mr-2">$4,500 MXN</span>
+                            <div class="text-3xl font-extrabold text-brand-400">$3,500 <span class="text-xs font-normal text-slate-400">MXN / modelo</span></div>
+                        </div>
                         <ul class="space-y-2.5 text-xs text-slate-300">
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Modelo WebGL interactivo 360°</li>
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Cambios dinámicos de materiales/colores</li>
@@ -246,7 +268,7 @@
                             <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-400"></i> Integración directa en tu sitio web</li>
                         </ul>
                     </div>
-                    <a href="https://wa.me/5215618782196?text=Hola,%20quisiera%20cotizar%20un%20Visor%20Web%203D%20interactivo" target="_blank" class="mt-6 w-full py-2.5 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-bold text-xs transition-colors flex items-center justify-center gap-2 shadow-lg">
+                    <a href="https://wa.me/5215618782196?text=Hola,%20quisiera%20cotizar%20el%20Visor%20Web%203D%20con%20precio%20especial" target="_blank" class="mt-6 w-full py-2.5 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-bold text-xs transition-colors flex items-center justify-center gap-2 shadow-lg">
                         <i class="fa-brands fa-whatsapp text-sm"></i> Cotizar Modelo 3D
                     </a>
                 </div>
