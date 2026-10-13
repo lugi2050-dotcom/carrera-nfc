@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galería Automática - El Ing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .galeria {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .contenedor-foto {
+            position: relative;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .contenedor-foto:hover {
+            transform: translateY(-5px);
+        }
+
+        .contenedor-foto img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .marca-de-agua {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background-color: rgba(0, 0, 0, 0.75);
+            color: #ffffff;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            pointer-events: none;
+            user-select: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .cargando {
+            text-align: center;
+            grid-column: 1 / -1;
+            font-size: 18px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Galería Fotográfica</h1>
+    
+    <div id="galeria-drive" class="galeria">
+        <div class="cargando">Cargando fotos desde Google Drive...</div>
+    </div>
+
+    <script>
+        // ----------------------------------------------------
+        // PEGA AQUÍ LA URL DE TU APLICACIÓN WEB DE APPS SCRIPT
+        // ----------------------------------------------------
+        const urlAppsScript = "https://script.google.com/macros/s/AKfycbx3TzW77Za5038JxAZ8y_n9R_KA-NqtVXryrH8bDDTO6Wv8OpI_uEdS-ATAtCWS8Qavzg/exec";
+
+        async function cargarFotos() {
+            const galeriaContainer = document.getElementById('galeria-drive');
+            
+            try {
+                const respuesta = await fetch(urlAppsScript);
+                const idsFotos = await respuesta.json();
+
+                galeriaContainer.innerHTML = ""; // Limpiar el mensaje de carga
+
+                if (idsFotos.length === 0) {
+                    galeriaContainer.innerHTML = `<p class="cargando">No se encontraron imágenes en la carpeta.</p>`;
+                    return;
+                }
+
+                // Genera las imágenes de forma dinámica
+                idsFotos.forEach(id => {
+                    const div = document.createElement('div');
+                    div.className = 'contenedor-foto';
+
+                    div.innerHTML = `
+                        <img src="https://lh3.googleusercontent.com/d/${id}" alt="Foto de Google Drive" loading="lazy">
+                        <div class="marca-de-agua">El Ing</div>
+                    `;
+
+                    galeriaContainer.appendChild(div);
+                });
+
+            } catch (error) {
+                console.error("Error al cargar las fotos:", error);
+                galeriaContainer.innerHTML = `<p class="cargando" style="color: red;">Hubo un error al cargar las fotos.</p>`;
+            }
+        }
+
+        cargarFotos();
+    </script>
+
+</body>
+</html>
