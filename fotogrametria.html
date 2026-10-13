@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visor 3D casa</title>
+  
+  <!-- Evita el error 404 del favicon -->
+  <link rel="icon" href="data:,">
+
+  <!-- Carga del componente model-viewer de Google -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #1a1a1a;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* Visor 3D a pantalla completa */
+    model-viewer {
+      width: 100vw;
+      height: 100vh;
+      --poster-color: transparent;
+    }
+
+    /* Porcentaje de carga posicionado en la PARTE SUPERIOR IZQUIERDA */
+    .loading-percentage {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #ff6b00;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 107, 0, 0.4);
+      z-index: 30;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+      pointer-events: none;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .loading-percentage.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* Tarjeta superior central opcional */
+    .header-card {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #ffffff;
+      text-align: center;
+      padding: 12px 24px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 10;
+      pointer-events: none;
+      max-width: 85vw;
+      width: 440px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    .header-card h1 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #ff6b00;
+      margin-bottom: 4px;
+    }
+
+    .header-card p {
+      font-size: 12px;
+      line-height: 1.4;
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 400;
+    }
+
+    /* Panel Flotante de Controles Virtuales */
+    .controls-overlay {
+      position: absolute;
+      bottom: 24px;
+      left: 24px;
+      right: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    .control-group {
+      pointer-events: auto;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 107, 0, 0.3);
+      border-radius: 20px;
+      padding: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    /* D-Pad Direccional (Mover objetivo) */
+    .dpad-container {
+      display: grid;
+      grid-template-columns: repeat(3, 44px);
+      grid-template-rows: repeat(3, 44px);
+      gap: 6px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .ctrl-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+    }
+
+    .ctrl-btn:hover {
+      background: rgba(255, 107, 0, 0.3);
+      border-color: #ff6b00;
+      color: #ff6b00;
+    }
+
+    .ctrl-btn:active, .ctrl-btn.active {
+      background: #ff6b00;
+      color: #000000;
+      transform: scale(0.92);
+      box-shadow: 0 0 12px rgba(255, 107, 0, 0.8);
+    }
+
+    /* Panel de Altura y Rotación */
+    .action-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-tall {
+      width: 48px;
+      height: 48px;
+    }
+
+    .btn-reset {
+      grid-column: 2;
+      grid-row: 2;
+      font-size: 11px;
+      font-weight: 700;
+      color: #ff6b00;
+    }
+
+    /* Leyenda de Teclado flotante */
+    .keyboard-legend {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 8px 16px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 11px;
+      display: flex;
+      gap: 12px;
+      z-index: 15;
+      pointer-events: none;
+    }
+
+    .keyboard-legend span {
+      color: #ff6b00;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      .keyboard-legend {
+        display: none;
+      }
+      
+      .controls-overlay {
+        bottom: 16px;
+        left: 12px;
+        right: 12px;
+      }
+
+      .dpad-container {
+        grid-template-columns: repeat(3, 38px);
+        grid-template-rows: repeat(3, 38px);
+        gap: 4px;
+      }
+
+      .btn-tall {
+        width: 40px;
+        height: 40px;
+      }
+
+      .header-card {
+        top: 65px;
+        width: 90vw;
+        padding: 10px 16px;
+      }
+
+      .loading-percentage {
+        top: 15px;
+        left: 15px;
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Visor 3D interactivo -->
+  <model-viewer 
+    id="visor-3d"
+    src="./modelplano.glb" 
+    alt="Exploración 3D Casa" 
+    camera-controls 
+    shadow-intensity="1" 
+    shadow-softness="0.8"
+    exposure="1"
+    environment-image="neutral"
+    touch-action="pan-y">
+    
+    <!-- Porcentaje de carga en la parte superior izquierda -->
+    <div id="progress-text" class="loading-percentage" slot="progress-bar">
+      Cargando 0%
+    </div>
+  </model-viewer>
+
+  <!-- Panel de Controles Flotantes -->
+  <div class="controls-overlay">
+    
+    <!-- D-Pad Direccional (Mover Plano X/Z) -->
+    <div class="control-group dpad-container">
+      <div></div>
+      <button class="ctrl-btn" id="btn-up" title="Avanzar (W / Flecha Arriba)">▲</button>
+      <div></div>
+      <button class="ctrl-btn" id="btn-left" title="Desplazar Izquierda (A / Flecha Izquierda)">◄</button>
+      <button class="ctrl-btn btn-reset" id="btn-center" title="Centrar Cámara (R)">RST</button>
+      <button class="ctrl-btn" id="btn-right" title="Desplazar Derecha (D / Flecha Derecha)">►</button>
+      <div></div>
+      <button class="ctrl-btn" id="btn-down" title="Retroceder (S / Flecha Abajo)">▼</button>
+      <div></div>
+    </div>
+
+    <!-- Leyenda Teclado (Desktop) -->
+    <div class="keyboard-legend">
+      <div><span>WASD / Flechas:</span> Mover</div>
+      <div><span>Espacio / Shift:</span> Subir / Bajar</div>
+      <div><span>Q / E:</span> Rotar</div>
+    </div>
+
+    <!-- Controles de Altura (Y) y Giro -->
+    <div class="control-group action-controls">
+      <div class="action-row">
+        <button class="ctrl-btn btn-tall" id="btn-rot-left" title="Girar Izquierda (Q)">↺</button>
+        <button class="ctrl-btn btn-tall" id="btn-elevate" title="Subir Cámara (Espacio)">+</button>
+        <button class="ctrl-btn btn-tall" id="btn-rot-right" title="Girar Derecha (E)">↻</button>
+      </div>
+      <div class="action-row">
+        <div></div>
+        <button class="ctrl-btn btn-tall" id="btn-lower" title="Bajar Cámara (Shift)">-</button>
+        <div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const viewer = document.querySelector('#visor-3d');
+    const progressText = document.querySelector('#progress-text');
+
+    // Estado del Objetivo (camera-target) X, Y, Z en metros
+    let targetX = 0;
+    let targetY = 0;
+    let targetZ = 0;
+
+    // Estado de la Órbita (camera-orbit): theta (deg), phi (deg), radius (m)
+    let orbitTheta = 0; // Ángulo azimutal
+    let orbitPhi = 75;  // Ángulo de elevación
+    let orbitRadius = 5; // Distancia inicial
+
+    // Paso de velocidad de movimiento
+    const MOVE_STEP = 0.15;      // Metros por frame
+    const ROTATE_STEP = 2.0;     // Grados por frame
+    const ELEVATE_STEP = 0.12;   // Metros por frame
+
+    // Teclas o botones presionados activamente
+    const activeActions = new Set();
+
+    // Actualiza el porcentaje de carga
+    viewer.addEventListener('progress', (event) => {
+      const percentage = Math.round(event.detail.totalProgress * 100);
+      if (progressText) {
+        progressText.textContent = `Cargando ${percentage}%`;
+      }
+    });
+
+    // Oculta el porcentaje cuando el modelo está listo e inicializa coordenadas
+    viewer.addEventListener('load', () => {
+      if (progressText) {
+        progressText.classList.add('hidden');
+      }
+
+      // Obtener objetivo original del model-viewer o arrancar en el centro
+      const currentTarget = viewer.getCameraTarget();
+      targetX = currentTarget.x;
+      targetY = currentTarget.y;
+      targetZ = currentTarget.z;
+
+      const currentOrbit = viewer.getCameraOrbit();
+      orbitTheta = (currentOrbit.theta * 180) / Math.PI;
+      orbitPhi = (currentOrbit.phi * 180) / Math.PI;
+      orbitRadius = currentOrbit.radius;
+    });
+
+    // Bucle de animación continuo para movimientos suaves
+    function updateCameraMovement() {
+      if (activeActions.size > 0) {
+        // Convertir el ángulo de visión actual (orbitTheta) a radianes para mover relativo a donde mira la cámara
+        const thetaRad = (orbitTheta * Math.PI) / 180;
+        
+        // Vectores de dirección horizontal (Adelante/Derecha)
+        const forwardX = -Math.sin(thetaRad);
+        const forwardZ = -Math.cos(thetaRad);
+        const rightX = Math.cos(thetaRad);
+        const rightZ = -Math.sin(thetaRad);
+
+        // Mover Adelante / Atrás
+        if (activeActions.has('FORWARD')) {
+          targetX += forwardX * MOVE_STEP;
+          targetZ += forwardZ * MOVE_STEP;
+        }
+        if (activeActions.has('BACKWARD')) {
+          targetX -= forwardX * MOVE_STEP;
+          targetZ -= forwardZ * MOVE_STEP;
+        }
+
+        // Mover Izquierda / Derecha
+        if (activeActions.has('LEFT')) {
+          targetX -= rightX * MOVE_STEP;
+          targetZ -= rightZ * MOVE_STEP;
+        }
+        if (activeActions.has('RIGHT')) {
+          targetX += rightX * MOVE_STEP;
+          targetZ += rightZ * MOVE_STEP;
+        }
+
+        // Subir / Bajar Altura
+        if (activeActions.has('UP')) {
+          targetY += ELEVATE_STEP;
+        }
+        if (activeActions.has('DOWN')) {
+          targetY -= ELEVATE_STEP;
+        }
+
+        // Rotar Azimut (Q / E)
+        if (activeActions.has('ROT_LEFT')) {
+          orbitTheta -= ROTATE_STEP;
+        }
+        if (activeActions.has('ROT_RIGHT')) {
+          orbitTheta += ROTATE_STEP;
+        }
+
+        // Aplicar la nueva posición de camera-target y camera-orbit al model-viewer
+        viewer.cameraTarget = `${targetX.toFixed(3)}m ${targetY.toFixed(3)}m ${targetZ.toFixed(3)}m`;
+        viewer.cameraOrbit = `${orbitTheta.toFixed(1)}deg ${orbitPhi.toFixed(1)}deg ${orbitRadius.toFixed(2)}m`;
+      }
+
+      requestAnimationFrame(updateCameraMovement);
+    }
+
+    // Iniciar bucle de actualización
+    requestAnimationFrame(updateCameraMovement);
+
+    // Mapeo de botones de la interfaz a acciones
+    const buttonMappings = [
+      { id: 'btn-up', action: 'FORWARD' },
+      { id: 'btn-down', action: 'BACKWARD' },
+      { id: 'btn-left', action: 'LEFT' },
+      { id: 'btn-right', action: 'RIGHT' },
+      { id: 'btn-elevate', action: 'UP' },
+      { id: 'btn-lower', action: 'DOWN' },
+      { id: 'btn-rot-left', action: 'ROT_LEFT' },
+      { id: 'btn-rot-right', action: 'ROT_RIGHT' }
+    ];
+
+    buttonMappings.forEach(({ id, action }) => {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+
+      const startAction = (e) => {
+        e.preventDefault();
+        activeActions.add(action);
+        btn.classList.add('active');
+      };
+
+      const stopAction = (e) => {
+        e.preventDefault();
+        activeActions.delete(action);
+        btn.classList.remove('active');
+      };
+
+      btn.addEventListener('pointerdown', startAction);
+      btn.addEventListener('pointerup', stopAction);
+      btn.addEventListener('pointerleave', stopAction);
+      btn.addEventListener('pointercancel', stopAction);
+    });
+
+    // Botón para restablecer la vista al centro de la casa
+    document.getElementById('btn-center').addEventListener('click', () => {
+      targetX = 0;
+      targetY = 0;
+      targetZ = 0;
+      orbitTheta = 0;
+      orbitPhi = 75;
+      orbitRadius = 5;
+      viewer.cameraTarget = '0m 0m 0m';
+      viewer.cameraOrbit = '0deg 75deg 5m';
+    });
+
+    // Eventos de teclado (WASD / Flechas / Espacio / Shift / Q / E)
+    window.addEventListener('keydown', (e) => {
+      const key = e.key.toLowerCase();
+      
+      if (key === 'w' || key === 'arrowup') activeActions.add('FORWARD');
+      if (key === 's' || key === 'arrowdown') activeActions.add('BACKWARD');
+      if (key === 'a' || key === 'arrowleft') activeActions.add('LEFT');
+      if (key === 'd' || key === 'arrowright') activeActions.add('RIGHT');
+      if (key === ' ' || key === 'pageup') { e.preventDefault(); activeActions.add('UP'); }
+      if (key === 'shift' || key === 'pagedown') { e.preventDefault(); activeActions.add('DOWN'); }
+      if (key === 'q') activeActions.add('ROT_LEFT');
+      if (key === 'e') activeActions.add('ROT_RIGHT');
+      if (key === 'r') document.getElementById('btn-center').click();
+    });
+
+    window.addEventListener('keyup', (e) => {
+      const key = e.key.toLowerCase();
+
+      if (key === 'w' || key === 'arrowup') activeActions.delete('FORWARD');
+      if (key === 's' || key === 'arrowdown') activeActions.delete('BACKWARD');
+      if (key === 'a' || key === 'arrowleft') activeActions.delete('LEFT');
+      if (key === 'd' || key === 'arrowright') activeActions.delete('RIGHT');
+      if (key === ' ' || key === 'pageup') activeActions.delete('UP');
+      if (key === 'shift' || key === 'pagedown') activeActions.delete('DOWN');
+      if (key === 'q') activeActions.delete('ROT_LEFT');
+      if (key === 'e') activeActions.delete('ROT_RIGHT');
+    });
+  </script>
+
+</body>
+</html>
