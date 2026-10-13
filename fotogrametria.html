@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Visor 3D Casa</title>
-  
+
   <!-- Evita el error 404 del favicon -->
   <link rel="icon" href="data:,">
 
-  <!-- Carga del componente model-viewer de Google -->
+  <!-- Componente model-viewer de Google -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
   <style>
@@ -16,17 +16,15 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
     }
 
     body, html {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #121214;
+      background-color: #121212;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      color: #ffffff;
+      user-select: none;
     }
 
     /* Visor 3D a pantalla completa */
@@ -34,6 +32,7 @@
       width: 100vw;
       height: 100vh;
       --poster-color: transparent;
+      outline: none;
     }
 
     /* Porcentaje de carga posicionado en la PARTE SUPERIOR IZQUIERDA */
@@ -42,8 +41,8 @@
       top: 20px;
       left: 20px;
       background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       color: #ff6b00;
       font-size: 13px;
       font-weight: 700;
@@ -54,7 +53,7 @@
       z-index: 30;
       transition: opacity 0.4s ease, visibility 0.4s ease;
       pointer-events: none;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
 
     .loading-percentage.hidden {
@@ -62,387 +61,157 @@
       visibility: hidden;
     }
 
-    /* Header flotante minimalista */
-    .header-card {
+    /* Tarjeta superior con instrucciones de uso */
+    .info-card {
       position: absolute;
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(18, 18, 20, 0.75);
+      background: rgba(18, 18, 18, 0.75);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       color: #ffffff;
-      text-align: center;
-      padding: 10px 20px;
-      border-radius: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      z-index: 10;
-      pointer-events: none;
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-    }
-
-    .header-card h1 {
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: #ff6b00;
-    }
-
-    .header-card p {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.75);
-      margin-top: 2px;
-    }
-
-    /* Overlay general de Controles */
-    .ui-layer {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 20;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 20px;
-    }
-
-    /* Barra Superior de Vistas Rápidas (Presets) */
-    .presets-bar {
-      margin-top: 55px;
-      align-self: center;
-      display: flex;
-      gap: 8px;
-      background: rgba(18, 18, 20, 0.75);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      padding: 6px;
+      padding: 14px 24px;
       border-radius: 20px;
       border: 1px solid rgba(255, 255, 255, 0.12);
+      z-index: 20;
+      max-width: 90vw;
+      width: 620px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       pointer-events: auto;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-      overflow-x: auto;
-      max-width: 95vw;
     }
 
-    .preset-btn {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #ffffff;
-      padding: 8px 14px;
-      border-radius: 14px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-      transition: all 0.2s ease;
-    }
-
-    .preset-btn svg {
-      width: 16px;
-      height: 16px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .preset-btn:hover {
-      background: rgba(255, 107, 0, 0.25);
-      border-color: rgba(255, 107, 0, 0.6);
+    .info-card h1 {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
       color: #ff6b00;
+      text-align: center;
+      margin-bottom: 10px;
     }
 
-    .preset-btn:active, .preset-btn.active {
-      background: #ff6b00;
-      color: #000;
-      border-color: #ff6b00;
-      box-shadow: 0 0 12px rgba(255, 107, 0, 0.6);
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
     }
 
-    /* Zona de Controles Inferiores (Joystick + Altura) */
-    .bottom-controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      width: 100%;
-    }
-
-    /* Joystick Virtual */
-    .joystick-wrapper {
-      pointer-events: auto;
-      background: rgba(18, 18, 20, 0.75);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 107, 0, 0.3);
-      border-radius: 50%;
-      width: 120px;
-      height: 120px;
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
-      touch-action: none;
-    }
-
-    .joystick-thumb {
-      width: 46px;
-      height: 46px;
-      background: radial-gradient(circle at 30% 30%, #ff8c3b, #ff6b00);
-      border: 2px solid rgba(255, 255, 255, 0.8);
-      border-radius: 50%;
-      position: absolute;
-      box-shadow: 0 4px 12px rgba(255, 107, 0, 0.5);
-      transition: transform 0.05s linear;
-      cursor: grab;
-    }
-
-    .joystick-thumb:active {
-      cursor: grabbing;
-      box-shadow: 0 0 16px rgba(255, 107, 0, 0.9);
-    }
-
-    .joystick-label {
-      position: absolute;
-      bottom: -22px;
+    .info-section h2 {
       font-size: 11px;
       font-weight: 700;
       color: rgba(255, 255, 255, 0.6);
-      letter-spacing: 0.5px;
       text-transform: uppercase;
-      pointer-events: none;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 3px;
     }
 
-    /* Controles de Altura Vertical */
-    .elevation-controls {
-      pointer-events: auto;
-      background: rgba(18, 18, 20, 0.75);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 107, 0, 0.3);
-      border-radius: 24px;
-      padding: 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
-    }
-
-    .elev-btn {
-      width: 44px;
-      height: 44px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #fff;
-      border-radius: 18px;
-      font-size: 18px;
-      font-weight: bold;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      touch-action: manipulation;
-    }
-
-    .elev-btn:hover {
-      background: rgba(255, 107, 0, 0.3);
-      border-color: #ff6b00;
-      color: #ff6b00;
-    }
-
-    .elev-btn:active, .elev-btn.active {
-      background: #ff6b00;
-      color: #000;
-      transform: scale(0.92);
-      box-shadow: 0 0 12px rgba(255, 107, 0, 0.8);
-    }
-
-    /* Leyenda de Teclado flotante */
-    .keyboard-legend {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(18, 18, 20, 0.75);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 20px;
-      padding: 8px 16px;
-      color: rgba(255, 255, 255, 0.7);
+    .info-list {
+      list-style: none;
       font-size: 11px;
-      display: flex;
-      gap: 12px;
-      pointer-events: none;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.9);
     }
 
-    .keyboard-legend span {
-      color: #ff6b00;
-      font-weight: 700;
+    .info-list span.key {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-weight: 600;
     }
 
-    @media (max-width: 768px) {
-      .keyboard-legend {
-        display: none;
-      }
-      
-      .ui-layer {
-        padding: 12px;
-      }
-
-      .presets-bar {
-        margin-top: 48px;
-        max-width: 100vw;
+    /* Adaptación para pantallas pequeñas (Móviles) */
+    @media (max-width: 600px) {
+      .info-card {
+        top: 65px;
+        width: 92vw;
+        padding: 12px 16px;
       }
 
-      .preset-btn {
-        padding: 6px 10px;
-        font-size: 11px;
-      }
-
-      .joystick-wrapper {
-        width: 100px;
-        height: 100px;
-      }
-
-      .joystick-thumb {
-        width: 40px;
-        height: 40px;
-      }
-
-      .elev-btn {
-        width: 38px;
-        height: 38px;
-        font-size: 16px;
-      }
-
-      .header-card {
-        top: 12px;
-        padding: 6px 14px;
+      .info-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
       }
 
       .loading-percentage {
-        top: 12px;
-        left: 12px;
+        top: 15px;
+        left: 15px;
         padding: 6px 12px;
-        font-size: 11px;
+        font-size: 12px;
       }
     }
   </style>
 </head>
 <body>
 
+  <!-- Porcentaje de carga en la parte superior izquierda -->
+  <div id="progress-text" class="loading-percentage">
+    Cargando 0%
+  </div>
+
+  <!-- Tarjeta informativa de controles -->
+  <div class="info-card">
+    <h1>Guía de Navegación 3D</h1>
+    <div class="info-grid">
+      
+      <!-- Controles para Computadora -->
+      <div class="info-section">
+        <h2>Computadora (Teclado y Mouse)</h2>
+        <ul class="info-list">
+          <li><span class="key">WASD</span> / <span class="key">Flechas</span> : Desplazarse</li>
+          <li><span class="key">Clic Izq + Arrastrar</span> : Rotar vista</li>
+          <li><span class="key">Clic Der + Arrastrar</span> : Desplazar centro</li>
+          <li><span class="key">Rueda del Mouse</span> : Acercar / Alejar</li>
+          <li><span class="key">Espacio</span> / <span class="key">Shift</span> : Subir / Bajar</li>
+          <li><span class="key">Q</span> / <span class="key">E</span> : Girar cámara</li>
+          <li><span class="key">R</span> : Restablecer vista</li>
+        </ul>
+      </div>
+
+      <!-- Controles para Pantalla Táctil -->
+      <div class="info-section">
+        <h2>Móvil / Pantalla Táctil</h2>
+        <ul class="info-list">
+          <li><strong>1 Dedo (Arrastrar)</strong> : Girar alrededor</li>
+          <li><strong>2 Dedos (Arrastrar)</strong> : Mover de posición</li>
+          <li><strong>Pellizcar (Pinch)</strong> : Zoom (Acercar/Alejar)</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Visor 3D interactivo -->
   <model-viewer 
     id="visor-3d"
     src="./modelplano.glb" 
-    alt="Exploración 3D Casa" 
+    alt="Modelo 3D Casa" 
     camera-controls 
     shadow-intensity="1" 
     shadow-softness="0.8"
     exposure="1"
     environment-image="neutral"
     touch-action="pan-y">
-    
-    <!-- Porcentaje de carga en la parte superior izquierda -->
-    <div id="progress-text" class="loading-percentage" slot="progress-bar">
-      Cargando 0%
-    </div>
   </model-viewer>
-
-  <div class="ui-layer">
-    
-    <!-- Header flotante -->
-    <div class="header-card">
-      <h1>Recorrido Interactivo</h1>
-      <p>Navega con joystick, teclado o presiona una vista</p>
-    </div>
-
-    <!-- Barra de Vistas Rápidas / Presets -->
-    <div class="presets-bar">
-      <button class="preset-btn" id="btn-enter" title="Entrar / Vista cercana">
-        <svg viewBox="0 0 24 24"><path d="M15 3h6v6M10 14L21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-        Entrar
-      </button>
-      <button class="preset-btn" id="btn-top" title="Vista desde el techo">
-        <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-        Ver Techo
-      </button>
-      <button class="preset-btn" id="btn-front" title="Vista frontal">
-        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Vista Frontal
-      </button>
-      <button class="preset-btn" id="btn-auto-rotate" title="Girar 360 grados de forma continua">
-        <svg viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-        Girar 360°
-      </button>
-      <button class="preset-btn" id="btn-reset" title="Restablecer vista original">
-        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-        Restablecer
-      </button>
-    </div>
-
-    <!-- Controles Inferiores (Joystick y Altura) -->
-    <div class="bottom-controls">
-      
-      <!-- Joystick Táctil 360° -->
-      <div class="joystick-wrapper" id="joystick-zone">
-        <div class="joystick-thumb" id="joystick-thumb"></div>
-        <span class="joystick-label">Mover</span>
-      </div>
-
-      <!-- Leyenda para Escritorio -->
-      <div class="keyboard-legend">
-        <div><span>WASD / Flechas:</span> Mover</div>
-        <div><span>Espacio / Shift:</span> Altura</div>
-        <div><span>Q / E:</span> Rotar</div>
-      </div>
-
-      <!-- Controles de Altura (Y) -->
-      <div class="elevation-controls">
-        <button class="elev-btn" id="btn-up" title="Subir Cámara (Espacio)">+</button>
-        <button class="elev-btn" id="btn-down" title="Bajar Cámara (Shift)">-</button>
-      </div>
-
-    </div>
-
-  </div>
 
   <script>
     const viewer = document.querySelector('#visor-3d');
     const progressText = document.querySelector('#progress-text');
 
-    // Estado objetivo deseado de la cámara (Camera Target X, Y, Z en metros)
-    let targetX = 0, targetY = 0, targetZ = 0;
-    // Estado actual suavemente interpolado (LERP)
-    let currentX = 0, currentY = 0, currentZ = 0;
+    // Estado inicial de la cámara
+    const defaultTarget = { x: 0, y: 1.2, z: 0 };
+    const defaultOrbit = { theta: 0, phi: 75, radius: 8 };
 
-    // Estado de la Órbita (camera-orbit): theta (deg), phi (deg), radius (m)
-    let orbitTheta = 0; 
-    let orbitPhi = 75;  
-    let orbitRadius = 5;
+    let target = { ...defaultTarget };
+    let orbit = { ...defaultOrbit };
 
-    let targetOrbitTheta = 0;
-    let targetOrbitPhi = 75;
-    let targetOrbitRadius = 5;
-
-    // Control de rotación automática
-    let isAutoRotating = false;
-
-    // Velocidad de movimiento
-    const MOVE_SPEED = 0.12;
-    const ELEVATE_SPEED = 0.08;
-
-    // Vector de Entrada del Joystick (-1 a +1 en X e Y)
-    let joystickInput = { x: 0, y: 0 };
-    const activeActions = new Set();
+    const keysPressed = {};
+    const MOVE_SPEED = 0.15;
+    const ROTATE_SPEED = 2;
 
     // Actualiza el porcentaje de carga
     viewer.addEventListener('progress', (event) => {
@@ -452,203 +221,96 @@
       }
     });
 
-    // Oculta el porcentaje cuando el modelo está listo
+    // Oculta el porcentaje cuando se completa la descarga
     viewer.addEventListener('load', () => {
       if (progressText) {
         progressText.classList.add('hidden');
       }
-
-      // Obtener objetivo inicial del model-viewer
-      const cTarget = viewer.getCameraTarget();
-      targetX = currentX = cTarget.x;
-      targetY = currentY = cTarget.y;
-      targetZ = currentZ = cTarget.z;
-
-      const cOrbit = viewer.getCameraOrbit();
-      targetOrbitTheta = orbitTheta = (cOrbit.theta * 180) / Math.PI;
-      targetOrbitPhi = orbitPhi = (cOrbit.phi * 180) / Math.PI;
-      targetOrbitRadius = orbitRadius = cOrbit.radius;
     });
 
-    // --- BUCLE DE ANIMACIÓN Y NAVEGACIÓN SUAVE (LERP) ---
-    function updateFrame() {
-      // 1. Procesar Joystick si está en uso
-      if (Math.abs(joystickInput.x) > 0.05 || Math.abs(joystickInput.y) > 0.05) {
-        const thetaRad = (orbitTheta * Math.PI) / 180;
-        
-        // Direcciones relativas a la cámara actual
-        const forwardX = -Math.sin(thetaRad);
-        const forwardZ = -Math.cos(thetaRad);
-        const rightX = Math.cos(thetaRad);
-        const rightZ = -Math.sin(thetaRad);
-
-        // Joystick Y = Adelante/Atrás, Joystick X = Izquierda/Derecha
-        targetX += (forwardX * (-joystickInput.y) + rightX * joystickInput.x) * MOVE_SPEED;
-        targetZ += (forwardZ * (-joystickInput.y) + rightZ * joystickInput.x) * MOVE_SPEED;
-      }
-
-      // 2. Procesar Teclado y Botones
-      if (activeActions.size > 0) {
-        const thetaRad = (orbitTheta * Math.PI) / 180;
-        const forwardX = -Math.sin(thetaRad);
-        const forwardZ = -Math.cos(thetaRad);
-        const rightX = Math.cos(thetaRad);
-        const rightZ = -Math.sin(thetaRad);
-
-        if (activeActions.has('FORWARD')) { targetX += forwardX * MOVE_SPEED; targetZ += forwardZ * MOVE_SPEED; }
-        if (activeActions.has('BACKWARD')) { targetX -= forwardX * MOVE_SPEED; targetZ -= forwardZ * MOVE_SPEED; }
-        if (activeActions.has('LEFT')) { targetX -= rightX * MOVE_SPEED; targetZ -= rightZ * MOVE_SPEED; }
-        if (activeActions.has('RIGHT')) { targetX += rightX * MOVE_SPEED; targetZ += rightZ * MOVE_SPEED; }
-        if (activeActions.has('UP')) { targetY += ELEVATE_SPEED; }
-        if (activeActions.has('DOWN')) { targetY -= ELEVATE_SPEED; }
-        if (activeActions.has('ROT_LEFT')) { targetOrbitTheta -= 1.8; }
-        if (activeActions.has('ROT_RIGHT')) { targetOrbitTheta += 1.8; }
-      }
-
-      // 3. Auto-rotación 360 suave si está activa
-      if (isAutoRotating) {
-        targetOrbitTheta += 0.4;
-      }
-
-      // 4. Interpolación Suave (LERP) para un efecto fluido y profesional
-      currentX += (targetX - currentX) * 0.15;
-      currentY += (targetY - currentY) * 0.15;
-      currentZ += (targetZ - currentZ) * 0.15;
-
-      orbitTheta += (targetOrbitTheta - orbitTheta) * 0.12;
-      orbitPhi += (targetOrbitPhi - orbitPhi) * 0.12;
-      orbitRadius += (targetOrbitRadius - orbitRadius) * 0.12;
-
-      // Aplicar al model-viewer
-      viewer.cameraTarget = `${currentX.toFixed(3)}m ${currentY.toFixed(3)}m ${currentZ.toFixed(3)}m`;
-      viewer.cameraOrbit = `${orbitTheta.toFixed(1)}deg ${orbitPhi.toFixed(1)}deg ${orbitRadius.toFixed(2)}m`;
-
-      requestAnimationFrame(updateFrame);
-    }
-
-    requestAnimationFrame(updateFrame);
-
-    // --- LÓGICA DEL JOYSTICK VIRTUAL ---
-    const joystickZone = document.getElementById('joystick-zone');
-    const joystickThumb = document.getElementById('joystick-thumb');
-    let isDraggingJoystick = false;
-    let joystickCenter = { x: 0, y: 0 };
-    const maxRadius = 38; // Límite de desplazamiento del thumb
-
-    function handleJoystickStart(e) {
-      isDraggingJoystick = true;
-      const rect = joystickZone.getBoundingClientRect();
-      joystickCenter = {
-        x: rect.left + rect.width / 2,
-        y: rect.top + rect.height / 2
-      };
-      handleJoystickMove(e);
-    }
-
-    function handleJoystickMove(e) {
-      if (!isDraggingJoystick) return;
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-      let deltaX = clientX - joystickCenter.x;
-      let deltaY = clientY - joystickCenter.y;
-      let distance = Math.hypot(deltaX, deltaY);
-
-      if (distance > maxRadius) {
-        deltaX = (deltaX / distance) * maxRadius;
-        deltaY = (deltaY / distance) * maxRadius;
-      }
-
-      joystickThumb.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-
-      // Normalizar vector (-1 a +1)
-      joystickInput.x = deltaX / maxRadius;
-      joystickInput.y = deltaY / maxRadius;
-    }
-
-    function handleJoystickEnd() {
-      if (!isDraggingJoystick) return;
-      isDraggingJoystick = false;
-      joystickThumb.style.transform = 'translate(0px, 0px)';
-      joystickInput = { x: 0, y: 0 };
-    }
-
-    joystickZone.addEventListener('pointerdown', handleJoystickStart);
-    window.addEventListener('pointermove', handleJoystickMove);
-    window.addEventListener('pointerup', handleJoystickEnd);
-    window.addEventListener('pointercancel', handleJoystickEnd);
-
-    // --- PRESETS / VISTAS RÁPIDAS ---
-    document.getElementById('btn-enter').addEventListener('click', () => {
-      targetX = 0; targetY = 1.2; targetZ = 0.5;
-      targetOrbitTheta = 0; targetOrbitPhi = 85; targetOrbitRadius = 2.0;
-    });
-
-    document.getElementById('btn-top').addEventListener('click', () => {
-      targetX = 0; targetY = 0; targetZ = 0;
-      targetOrbitTheta = 0; targetOrbitPhi = 10; targetOrbitRadius = 12.0;
-    });
-
-    document.getElementById('btn-front').addEventListener('click', () => {
-      targetX = 0; targetY = 1.0; targetZ = 0;
-      targetOrbitTheta = 0; targetOrbitPhi = 80; targetOrbitRadius = 6.0;
-    });
-
-    const btnAutoRotate = document.getElementById('btn-auto-rotate');
-    btnAutoRotate.addEventListener('click', () => {
-      isAutoRotating = !isAutoRotating;
-      btnAutoRotate.classList.toggle('active', isAutoRotating);
-    });
-
-    document.getElementById('btn-reset').addEventListener('click', () => {
-      targetX = 0; targetY = 0; targetZ = 0;
-      targetOrbitTheta = 0; targetOrbitPhi = 75; targetOrbitRadius = 5.0;
-      isAutoRotating = false;
-      btnAutoRotate.classList.remove('active');
-    });
-
-    // --- BOTONES DE ELEVACIÓN Y TECLADO ---
-    function bindButton(id, action) {
-      const btn = document.getElementById(id);
-      if (!btn) return;
-
-      const start = (e) => { e.preventDefault(); activeActions.add(action); btn.classList.add('active'); };
-      const stop = (e) => { e.preventDefault(); activeActions.delete(action); btn.classList.remove('active'); };
-
-      btn.addEventListener('pointerdown', start);
-      btn.addEventListener('pointerup', stop);
-      btn.addEventListener('pointerleave', stop);
-      btn.addEventListener('pointercancel', stop);
-    }
-
-    bindButton('btn-up', 'UP');
-    bindButton('btn-down', 'DOWN');
-
-    // Mapeo de teclas de escritorio
+    // Eventos de teclado
     window.addEventListener('keydown', (e) => {
-      const key = e.key.toLowerCase();
-      if (key === 'w' || key === 'arrowup') activeActions.add('FORWARD');
-      if (key === 's' || key === 'arrowdown') activeActions.add('BACKWARD');
-      if (key === 'a' || key === 'arrowleft') activeActions.add('LEFT');
-      if (key === 'd' || key === 'arrowright') activeActions.add('RIGHT');
-      if (key === ' ' || key === 'pageup') { e.preventDefault(); activeActions.add('UP'); }
-      if (key === 'shift' || key === 'pagedown') { e.preventDefault(); activeActions.add('DOWN'); }
-      if (key === 'q') activeActions.add('ROT_LEFT');
-      if (key === 'e') activeActions.add('ROT_RIGHT');
-      if (key === 'r') document.getElementById('btn-reset').click();
+      keysPressed[e.code] = true;
+      if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+        if (document.activeElement === document.body || document.activeElement === viewer) {
+          e.preventDefault();
+        }
+      }
     });
 
     window.addEventListener('keyup', (e) => {
-      const key = e.key.toLowerCase();
-      if (key === 'w' || key === 'arrowup') activeActions.delete('FORWARD');
-      if (key === 's' || key === 'arrowdown') activeActions.delete('BACKWARD');
-      if (key === 'a' || key === 'arrowleft') activeActions.delete('LEFT');
-      if (key === 'd' || key === 'arrowright') activeActions.delete('RIGHT');
-      if (key === ' ' || key === 'pageup') activeActions.delete('UP');
-      if (key === 'shift' || key === 'pagedown') activeActions.delete('DOWN');
-      if (key === 'q') activeActions.delete('ROT_LEFT');
-      if (key === 'e') activeActions.delete('ROT_RIGHT');
+      keysPressed[e.code] = false;
     });
+
+    // Bucle de actualización continua para la navegación fluida por teclado
+    function updateMovement() {
+      let moved = false;
+
+      // Obtener el ángulo horizontal actual de la cámara (convertido a radianes)
+      let currentThetaRad = (orbit.theta * Math.PI) / 180;
+
+      // Movimiento hacia adelante / atrás (W / S / Flecha Arriba / Flecha Abajo)
+      if (keysPressed['KeyW'] || keysPressed['ArrowUp']) {
+        target.x -= Math.sin(currentThetaRad) * MOVE_SPEED;
+        target.z -= Math.cos(currentThetaRad) * MOVE_SPEED;
+        moved = true;
+      }
+      if (keysPressed['KeyS'] || keysPressed['ArrowDown']) {
+        target.x += Math.sin(currentThetaRad) * MOVE_SPEED;
+        target.z += Math.cos(currentThetaRad) * MOVE_SPEED;
+        moved = true;
+      }
+
+      // Movimiento lateral (A / D / Flecha Izquierda / Flecha Derecha)
+      if (keysPressed['KeyA'] || keysPressed['ArrowLeft']) {
+        target.x -= Math.cos(currentThetaRad) * MOVE_SPEED;
+        target.z += Math.sin(currentThetaRad) * MOVE_SPEED;
+        moved = true;
+      }
+      if (keysPressed['KeyD'] || keysPressed['ArrowRight']) {
+        target.x += Math.cos(currentThetaRad) * MOVE_SPEED;
+        target.z -= Math.sin(currentThetaRad) * MOVE_SPEED;
+        moved = true;
+      }
+
+      // Control de altura (Espacio para subir / Shift para bajar)
+      if (keysPressed['Space']) {
+        target.y += MOVE_SPEED;
+        moved = true;
+      }
+      if (keysPressed['ShiftLeft'] || keysPressed['ShiftRight']) {
+        target.y = Math.max(0, target.y - MOVE_SPEED);
+        moved = true;
+      }
+
+      // Rotación de cámara por teclado (Q / E)
+      if (keysPressed['KeyQ']) {
+        orbit.theta -= ROTATE_SPEED;
+        moved = true;
+      }
+      if (keysPressed['KeyE']) {
+        orbit.theta += ROTATE_SPEED;
+        moved = true;
+      }
+
+      // Restablecer posición (Tecla R)
+      if (keysPressed['KeyR']) {
+        target = { ...defaultTarget };
+        orbit = { ...defaultOrbit };
+        moved = true;
+      }
+
+      // Aplicar cambios al visor si se presionó alguna tecla
+      if (moved) {
+        viewer.cameraTarget = `${target.x.toFixed(2)}m ${target.y.toFixed(2)}m ${target.z.toFixed(2)}m`;
+        viewer.cameraOrbit = `${orbit.theta.toFixed(1)}deg ${orbit.phi.toFixed(1)}deg ${orbit.radius.toFixed(1)}m`;
+      }
+
+      requestAnimationFrame(updateMovement);
+    }
+
+    // Iniciar animación de controles
+    requestAnimationFrame(updateMovement);
   </script>
 
 </body>
