@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rompecabezas</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        p.subtitle {
+            color: #7f8c8d;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 650px;
+            width: 100%;
+            text-align: center;
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .control-group {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 400px;
+            align-items: center;
+        }
+        .control-group label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .custom-file-upload {
+            border: 2px dashed #3498db;
+            display: inline-block;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 6px;
+            color: #3498db;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .custom-file-upload:hover {
+            background-color: #ecf0f1;
+        }
+        button {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+            max-width: 400px;
+            margin-top: 5px;
+        }
+        button:hover {
+            background-color: #27ae60;
+        }
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background-color: #3498db;
+        }
+        .btn-secondary:hover {
+            background-color: #2980b9;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 15px;
+            background: #fafafa;
+        }
+        .info {
+            font-size: 13px;
+            color: #e74c3c;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Dibujo sorpresa</h1>
+        <div class="controls">
+            <label class="custom-file-upload">
+                <input type="file" id="imageLoader" accept="image/*" />
+                Seleccionar Imagen
+            </label>
+
+            <div class="control-group">
+                <label for="sectors">Partes:</label>
+                <input type="number" id="sectors" value="12" min="4" max="36" style="width: 60px; padding: 5px; text-align: center;">
+            </div>
+
+            <button id="shuffleBtn" class="btn-secondary" disabled>Mezclar</button>
+            <button id="downloadBtn" disabled>Descargar Rompecabezas</button>
+        </div>
+
+        <canvas id="puzzleCanvas" width="700" height="700"></canvas>
+        <div id="stats" class="info"></div>
+    </div>
+
+    <script>
+        const imageLoader = document.getElementById('imageLoader');
+        const canvas = document.getElementById('puzzleCanvas');
+        const ctx = canvas.getContext('2d');
+        const sectorsInput = document.getElementById('sectors');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const statsDiv = document.getElementById('stats');
+
+        let img = new Image();
+        let imageLoaded = false;
+        let mapping = [];
+
+        imageLoader.addEventListener('change', (e) => {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                img.onload = function () {
+                    imageLoaded = true;
+                    downloadBtn.disabled = false;
+                    shuffleBtn.disabled = false;
+                    prepareNewPuzzle();
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        });
+
+        sectorsInput.addEventListener('input', () => { 
+            if (imageLoaded) prepareNewPuzzle(); 
+        });
+
+        shuffleBtn.addEventListener('click', () => {
+            if (imageLoaded) prepareNewPuzzle();
+        });
+
+        function prepareNewPuzzle() {
+            const sectors = parseInt(sectorsInput.value);
+            
+            let originalIndices = [];
+            for (let i = 0; i < sectors; i++) {
+                originalIndices.push(i);
+            }
+
+            do {
+                for (let i = originalIndices.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [originalIndices[i], originalIndices[j]] = [originalIndices[j], originalIndices[i]];
+                }
+            } while (sectors > 2 && originalIndices.every((val, idx) => val === idx)); 
+
+            mapping = originalIndices;
+            generatePuzzle();
+        }
+
+        function generatePuzzle() {
+            if (!imageLoaded) return;
+
+            const sectors = parseInt(sectorsInput.value);
+            statsDiv.innerText = `Círculo unido con ${sectors} cuñas mezcladas y numeradas`;
+
+            const size = 700;
+            canvas.width = size;
+            canvas.height = size;
+
+            // Fondo blanco para impresión nítida
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, size, size);
+
+            const cx = size / 2;
+            const cy = size / 2;
+            const maxRadius = 250;
+
+            const scale = Math.max((maxRadius * 2) / img.width, (maxRadius * 2) / img.height);
+            const w = img.width * scale;
+            const h = img.height * scale;
+            const x = cx - (w / 2);
+            const y = cy - (h / 2);
+
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = size;
+            tempCanvas.height = size;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(img, x, y, w, h);
+
+            for (let i = 0; i < sectors; i++) {
+                let physAngleStart = (i * 2 * Math.PI) / sectors;
+                let physAngleEnd = ((i + 1) * 2 * Math.PI) / sectors;
+
+                let origIndex = mapping[i];
+                let origAngleStart = (origIndex * 2 * Math.PI) / sectors;
+                let origAngleEnd = ((origIndex + 1) * 2 * Math.PI) / sectors;
+
+                ctx.save();
+
+                // 1. Recortar ranura física
+                ctx.beginPath();
+                ctx.arc(cx, cy, maxRadius, physAngleStart, physAngleEnd, false);
+                ctx.lineTo(cx, cy);
+                ctx.closePath();
+                ctx.clip();
+
+                // 2. Dibujar imagen rotada de la cuña correspondiente
+                ctx.save();
+                let angleDiff = physAngleStart - origAngleStart;
+                ctx.translate(cx, cy);
+                ctx.rotate(angleDiff);
+                ctx.translate(-cx, -cy);
+
+                ctx.drawImage(tempCanvas, 0, 0);
+                ctx.restore();
+
+                // 3. Dibujar líneas de corte
+                ctx.beginPath();
+                ctx.arc(cx, cy, maxRadius, physAngleStart, physAngleEnd, false);
+                ctx.lineTo(cx, cy);
+                ctx.closePath();
+                ctx.strokeStyle = '#2c3e50';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                ctx.restore();
+
+                // 4. Agregar número de pieza en el borde exterior
+                const midAngle = (physAngleStart + physAngleEnd) / 2;
+                const textRadius = maxRadius + 18; // Ligeramente por fuera del borde
+                const textX = cx + Math.cos(midAngle) * textRadius;
+                const textY = cy + Math.sin(midAngle) * textRadius;
+
+                ctx.save();
+                ctx.font = 'bold 13px sans-serif';
+                ctx.fillStyle = '#e74c3c';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                // Mostramos el número de orden de la pieza (i + 1)
+                ctx.fillText((i + 1).toString(), textX, textY);
+                ctx.restore();
+            }
+
+            // Círculo exterior decorativo
+            ctx.beginPath();
+            ctx.arc(cx, cy, maxRadius, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#1abc9c';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            if (!imageLoaded) return;
+            const link = document.createElement('a');
+            link.download = 'rompecabezas-circular-numerado.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    </script>
+</body>
+</html>
