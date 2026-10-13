@@ -6,8 +6,8 @@
     <title>Rompecabezas</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
             color: #333;
             margin: 0;
             padding: 20px;
@@ -27,8 +27,8 @@
         .container {
             background: white;
             padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             max-width: 650px;
             width: 100%;
             text-align: center;
@@ -48,7 +48,7 @@
             align-items: center;
         }
         .control-group label {
-            font-weight: 600;
+            font-weight: bold;
             font-size: 14px;
         }
         input[type="file"] {
@@ -59,10 +59,9 @@
             display: inline-block;
             padding: 10px 20px;
             cursor: pointer;
-            border-radius: 6px;
+            border-radius: 4px;
             color: #3498db;
             font-weight: bold;
-            transition: all 0.3s;
             width: 100%;
             box-sizing: border-box;
         }
@@ -76,12 +75,10 @@
             padding: 12px 25px;
             font-size: 16px;
             font-weight: bold;
-            border-radius: 6px;
+            border-radius: 4px;
             cursor: pointer;
-            transition: background 0.3s;
             width: 100%;
             max-width: 400px;
-            margin-top: 5px;
         }
         button:hover {
             background-color: #27ae60;
@@ -100,13 +97,13 @@
             max-width: 100%;
             height: auto;
             border: 1px solid #ddd;
-            border-radius: 8px;
+            border-radius: 4px;
             margin-top: 15px;
-            background: #fafafa;
+            background: #ffffff;
         }
         .info {
             font-size: 13px;
-            color: #e74c3c;
+            color: #c0392b;
             margin-top: 10px;
         }
     </style>
@@ -114,7 +111,7 @@
 <body>
 
     <div class="container">
-        <h1>Dibujo sorpresa</h1>
+        <h1>Rompecabezas</h1>
         <div class="controls">
             <label class="custom-file-upload">
                 <input type="file" id="imageLoader" accept="image/*" />
@@ -122,12 +119,12 @@
             </label>
 
             <div class="control-group">
-                <label for="sectors">Partes:</label>
+                <label for="sectors">Numero de piezas:</label>
                 <input type="number" id="sectors" value="12" min="4" max="36" style="width: 60px; padding: 5px; text-align: center;">
             </div>
 
             <button id="shuffleBtn" class="btn-secondary" disabled>Mezclar</button>
-            <button id="downloadBtn" disabled>Descargar Rompecabezas</button>
+            <button id="downloadBtn" disabled>Descargar</button>
         </div>
 
         <canvas id="puzzleCanvas" width="700" height="700"></canvas>
@@ -192,13 +189,12 @@
             if (!imageLoaded) return;
 
             const sectors = parseInt(sectorsInput.value);
-            statsDiv.innerText = `Círculo unido con ${sectors} cuñas mezcladas y numeradas`;
+            statsDiv.innerText = "Circulo unido con " + sectors + " cunas mezcladas y numeradas";
 
             const size = 700;
             canvas.width = size;
             canvas.height = size;
 
-            // Fondo blanco para impresión nítida
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, size, size);
 
@@ -228,14 +224,12 @@
 
                 ctx.save();
 
-                // 1. Recortar ranura física
                 ctx.beginPath();
                 ctx.arc(cx, cy, maxRadius, physAngleStart, physAngleEnd, false);
                 ctx.lineTo(cx, cy);
                 ctx.closePath();
                 ctx.clip();
 
-                // 2. Dibujar imagen rotada de la cuña correspondiente
                 ctx.save();
                 let angleDiff = physAngleStart - origAngleStart;
                 ctx.translate(cx, cy);
@@ -245,7 +239,6 @@
                 ctx.drawImage(tempCanvas, 0, 0);
                 ctx.restore();
 
-                // 3. Dibujar líneas de corte
                 ctx.beginPath();
                 ctx.arc(cx, cy, maxRadius, physAngleStart, physAngleEnd, false);
                 ctx.lineTo(cx, cy);
@@ -256,26 +249,23 @@
 
                 ctx.restore();
 
-                // 4. Agregar número de pieza en el borde exterior
                 const midAngle = (physAngleStart + physAngleEnd) / 2;
-                const textRadius = maxRadius + 18; // Ligeramente por fuera del borde
+                const textRadius = maxRadius + 18;
                 const textX = cx + Math.cos(midAngle) * textRadius;
                 const textY = cy + Math.sin(midAngle) * textRadius;
 
                 ctx.save();
-                ctx.font = 'bold 13px sans-serif';
-                ctx.fillStyle = '#e74c3c';
+                ctx.font = 'bold 13px Arial, sans-serif';
+                ctx.fillStyle = '#c0392b';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                // Mostramos el número de orden de la pieza (i + 1)
-                ctx.fillText((i + 1).toString(), textX, textY);
+                ctx.fillText((origIndex + 1).toString(), textX, textY);
                 ctx.restore();
             }
 
-            // Círculo exterior decorativo
             ctx.beginPath();
             ctx.arc(cx, cy, maxRadius, 0, 2 * Math.PI);
-            ctx.strokeStyle = '#1abc9c';
+            ctx.strokeStyle = '#16a085';
             ctx.lineWidth = 3;
             ctx.stroke();
         }
@@ -283,7 +273,7 @@
         downloadBtn.addEventListener('click', () => {
             if (!imageLoaded) return;
             const link = document.createElement('a');
-            link.download = 'rompecabezas-circular-numerado.png';
+            link.download = 'rompecabezas-circular.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
         });
