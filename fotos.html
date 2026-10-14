@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galería</title>
+    <title>Galería Automática - El Ing</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -62,7 +62,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        .cargando {
+        .mensaje {
             text-align: center;
             grid-column: 1 / -1;
             font-size: 18px;
@@ -75,30 +75,34 @@
     <h1>Galería Fotográfica</h1>
     
     <div id="galeria-drive" class="galeria">
-        <div class="cargando">Cargando fotos desde Google Drive...</div>
+        <div class="mensaje" id="texto-estado">Cargando fotos desde Google Drive...</div>
     </div>
 
     <script>
-        // ----------------------------------------------------
         // PEGA AQUÍ LA URL DE TU APLICACIÓN WEB DE APPS SCRIPT
-        // ----------------------------------------------------
         const urlAppsScript = "https://script.google.com/macros/s/AKfycbx3TzW77Za5038JxAZ8y_n9R_KA-NqtVXryrH8bDDTO6Wv8OpI_uEdS-ATAtCWS8Qavzg/exec";
 
         async function cargarFotos() {
             const galeriaContainer = document.getElementById('galeria-drive');
+            const textoEstado = document.getElementById('texto-estado');
             
             try {
                 const respuesta = await fetch(urlAppsScript);
+                
+                if (!respuesta.ok) {
+                    throw new Error(`Error HTTP: ${respuesta.status}`);
+                }
+
                 const idsFotos = await respuesta.json();
 
-                galeriaContainer.innerHTML = ""; // Limpiar el mensaje de carga
+                galeriaContainer.innerHTML = ""; // Limpiar estado de carga
 
-                if (idsFotos.length === 0) {
-                    galeriaContainer.innerHTML = `<p class="cargando">No se encontraron imágenes en la carpeta.</p>`;
+                if (!Array.isArray(idsFotos) || idsFotos.length === 0) {
+                    galeriaContainer.innerHTML = `<p class="mensaje">No se encontraron imágenes o la carpeta está vacía.</p>`;
                     return;
                 }
 
-                // Genera las imágenes de forma dinámica
+                // Genera las imágenes dinámicamente con su marca de agua
                 idsFotos.forEach(id => {
                     const div = document.createElement('div');
                     div.className = 'contenedor-foto';
@@ -112,8 +116,8 @@
                 });
 
             } catch (error) {
-                console.error("Error al cargar las fotos:", error);
-                galeriaContainer.innerHTML = `<p class="cargando" style="color: red;">Hubo un error al cargar las fotos.</p>`;
+                console.error("Detalle del error:", error);
+                galeriaContainer.innerHTML = `<p class="mensaje" style="color: red;">Error al cargar las fotos. Revisa la consola del navegador (F12) para más detalles.</p>`;
             }
         }
 
