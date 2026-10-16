@@ -340,7 +340,7 @@
             if (!rId) return;
 
             try {
-                const res = await fetch('./cronometros/datos/data');
+                const res = await fetch('./cronometros/datos/data.json');
                 const dbData = await res.json();
 
                 const corredor = (dbData.corredores || []).find(r => String(r.id) === rId);
