@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visor 3D Casa</title>
+  <title>Visor 3D Casa con Galería</title>
 
   <!-- Evita el error 404 del favicon -->
   <link rel="icon" href="data:,">
@@ -35,12 +35,12 @@
       outline: none;
     }
 
-    /* Porcentaje de carga posicionado en la PARTE SUPERIOR IZQUIERDA */
+    /* Indicador de porcentaje de carga en esquina superior izquierda */
     .loading-percentage {
       position: absolute;
       top: 20px;
       left: 20px;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.4);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       color: #ff6b00;
@@ -53,7 +53,7 @@
       z-index: 30;
       transition: opacity 0.4s ease, visibility 0.4s ease;
       pointer-events: none;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
     }
 
     .loading-percentage.hidden {
@@ -61,7 +61,7 @@
       visibility: hidden;
     }
 
-    /* Tarjeta superior con instrucciones de uso */
+    /* Tarjeta superior con instrucciones */
     .info-card {
       position: absolute;
       top: 20px;
@@ -71,102 +71,241 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       color: #ffffff;
-      padding: 14px 24px;
+      padding: 10px 20px;
       border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       z-index: 20;
       max-width: 90vw;
-      width: 620px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      pointer-events: auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     }
 
-    .info-card h1 {
-      font-size: 14px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #ff6b00;
+    .info-section {
       text-align: center;
-      margin-bottom: 10px;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .info-section h2 {
-      font-size: 11px;
-      font-weight: 700;
-      color: rgba(255, 255, 255, 0.6);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding-bottom: 3px;
     }
 
     .info-list {
       list-style: none;
       font-size: 11px;
       line-height: 1.6;
-      color: rgba(255, 255, 255, 0.9);
+      color: #ffffff;
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
     }
 
-    .info-list span.key {
-      background: rgba(255, 255, 255, 0.15);
+    /* Botón flotante para abrir el Pop-up de Fotos */
+    .btn-gallery {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(18, 18, 18, 0.65);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #ffffff;
+      border: 1px solid rgba(255, 107, 0, 0.5);
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .btn-gallery:hover {
+      background: rgba(255, 107, 0, 0.9);
+      color: #000;
+      border-color: #ff6b00;
+      transform: scale(1.04);
+    }
+
+    .btn-gallery:active {
+      transform: scale(0.96);
+    }
+
+    /* MODAL POP-UP GALERÍA */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-container {
+      background: rgba(24, 24, 24, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      width: 90vw;
+      max-width: 800px;
+      padding: 24px;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
       color: #fff;
-      padding: 1px 5px;
-      border-radius: 4px;
-      font-family: monospace;
-      font-weight: 600;
+      font-size: 20px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease;
     }
 
-    /* Adaptación para pantallas pequeñas (Móviles) */
+    .modal-close:hover {
+      background: #ff6b00;
+      color: #000;
+    }
+
+    .modal-title {
+      color: #ff6b00;
+      font-size: 16px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    /* Visor de imágenes dentro del Pop-up */
+    .gallery-viewer {
+      width: 100%;
+      height: 420px;
+      max-height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #000;
+    }
+
+    .gallery-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    /* Botones de navegación de fotos */
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 20px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover {
+      background: #ff6b00;
+      color: #000;
+      border-color: #ff6b00;
+    }
+
+    .nav-btn.prev { left: 12px; }
+    .nav-btn.next { right: 12px; }
+
+    .gallery-caption {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    /* Adaptación móvil */
     @media (max-width: 600px) {
       .info-card {
         top: 65px;
         width: 92vw;
-        padding: 12px 16px;
       }
 
-      .info-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
+      .btn-gallery {
+        top: 15px;
+        right: 15px;
+        padding: 8px 12px;
+        font-size: 12px;
       }
 
       .loading-percentage {
         top: 15px;
         left: 15px;
-        padding: 6px 12px;
-        font-size: 12px;
+      }
+
+      .gallery-viewer {
+        height: 280px;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Porcentaje de carga en la parte superior izquierda 
+  <!-- Porcentaje de carga -->
   <div id="progress-text" class="loading-percentage">
     Cargando 0%
   </div>
--->
+
+  <!-- Botón Flotante para Abrir Galería -->
+  <button id="btn-open-gallery" class="btn-gallery">
+    📷 Ver Fotos
+  </button>
+
   <!-- Tarjeta informativa de controles -->
-      <!-- Controles para Pantalla Táctil -->
-      <div class="info-section">
-        <ul class="info-list">
-          <li><strong>2 Dedos (Arrastrar)</strong> : Mover de posición</li>
-          <li><strong>1 Dedo (Arrastrar)</strong> : Girar alrededor</li>
-          <li><strong>Pellizcar (Pinch)</strong> : Zoom (Acercar/Alejar)</li>
-        </ul>
-      </div>
+  <div class="info-card">
+    <div class="info-section">
+      <ul class="info-list">
+        <li><strong>1 Dedo (Arrastrar)</strong> : Girar alrededor</li>
+        <li><strong>2 Dedos (Arrastrar)</strong> : Mover de posición</li>
+        <li><strong>Pellizcar (Pinch)</strong> : Zoom (Acercar/Alejar)</li>
+      </ul>
+    </div>
+  </div>
 
   <!-- Visor 3D interactivo -->
   <model-viewer 
     id="visor-3d"
-    src="./modelo1.glb" 
+    src="./Modelos3d/modelos/planoceci2.glb" 
     alt="Modelo 3D Casa" 
     camera-controls 
     shadow-intensity="1" 
@@ -176,22 +315,87 @@
     touch-action="pan-y">
   </model-viewer>
 
+  <!-- POP-UP / MODAL DE GALERÍA DE FOTOS -->
+  <div id="modal-gallery" class="modal-overlay">
+    <div class="modal-container">
+      <button id="btn-close-gallery" class="modal-close">✕</button>
+      <div class="modal-title">Galería Fotográfica</div>
+      
+      <div class="gallery-viewer">
+        <button id="btn-prev-photo" class="nav-btn prev">❮</button>
+        <img id="gallery-img" class="gallery-image" src="" alt="Fotografía de la casa">
+        <button id="btn-next-photo" class="nav-btn next">❯</button>
+      </div>
+
+      <div id="gallery-caption" class="gallery-caption">Cargando foto...</div>
+    </div>
+  </div>
+
   <script>
     const viewer = document.querySelector('#visor-3d');
     const progressText = document.querySelector('#progress-text');
 
-    // Estado inicial de la cámara
-    const defaultTarget = { x: 0, y: 1.2, z: 0 };
-    const defaultOrbit = { theta: 0, phi: 75, radius: 8 };
+    // --- LISTA DE FOTOS PARA LA GALERÍA ---
+    // Reemplaza estas URLs o nombres por tus archivos de foto locales (ej: './foto1.jpg')
+    const photos = [
+      {
+        url: "./Modelos3d/fotos/tokio1.jpeg",
+        caption: "Vista Frontal y Fachada Principal"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80",
+        caption: "Diseño Interior y Sala de Estar"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80",
+        caption: "Patio Trasero y Áreas Verdes"
+      }
+    ];
 
-    let target = { ...defaultTarget };
-    let orbit = { ...defaultOrbit };
+    let currentPhotoIndex = 0;
 
-    const keysPressed = {};
-    const MOVE_SPEED = 0.15;
-    const ROTATE_SPEED = 2;
+    // Elementos del Modal
+    const modal = document.getElementById('modal-gallery');
+    const btnOpen = document.getElementById('btn-open-gallery');
+    const btnClose = document.getElementById('btn-close-gallery');
+    const btnPrev = document.getElementById('btn-prev-photo');
+    const btnNext = document.getElementById('btn-next-photo');
+    const galleryImg = document.getElementById('gallery-img');
+    const galleryCaption = document.getElementById('gallery-caption');
 
-    // Actualiza el porcentaje de carga
+    function updateGalleryPhoto() {
+      const photo = photos[currentPhotoIndex];
+      galleryImg.src = photo.url;
+      galleryCaption.textContent = `Foto ${currentPhotoIndex + 1} de ${photos.length} — ${photo.caption}`;
+    }
+
+    function openModal() {
+      updateGalleryPhoto();
+      modal.classList.add('active');
+    }
+
+    function closeModal() {
+      modal.classList.remove('active');
+    }
+
+    btnOpen.addEventListener('click', openModal);
+    btnClose.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    btnPrev.addEventListener('click', () => {
+      currentPhotoIndex = (currentPhotoIndex - 1 + photos.length) % photos.length;
+      updateGalleryPhoto();
+    });
+
+    btnNext.addEventListener('click', () => {
+      currentPhotoIndex = (currentPhotoIndex + 1) % photos.length;
+      updateGalleryPhoto();
+    });
+
+    // Control del porcentaje de carga
     viewer.addEventListener('progress', (event) => {
       const percentage = Math.round(event.detail.totalProgress * 100);
       if (progressText) {
@@ -199,96 +403,20 @@
       }
     });
 
-    // Oculta el porcentaje cuando se completa la descarga
     viewer.addEventListener('load', () => {
       if (progressText) {
         progressText.classList.add('hidden');
       }
     });
 
-    // Eventos de teclado
+    // Atajos de teclado
     window.addEventListener('keydown', (e) => {
-      keysPressed[e.code] = true;
-      if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
-        if (document.activeElement === document.body || document.activeElement === viewer) {
-          e.preventDefault();
-        }
+      if (e.key === 'Escape') closeModal();
+      if (modal.classList.contains('active')) {
+        if (e.key === 'ArrowLeft') btnPrev.click();
+        if (e.key === 'ArrowRight') btnNext.click();
       }
     });
-
-    window.addEventListener('keyup', (e) => {
-      keysPressed[e.code] = false;
-    });
-
-    // Bucle de actualización continua para la navegación fluida por teclado
-    function updateMovement() {
-      let moved = false;
-
-      // Obtener el ángulo horizontal actual de la cámara (convertido a radianes)
-      let currentThetaRad = (orbit.theta * Math.PI) / 180;
-
-      // Movimiento hacia adelante / atrás (W / S / Flecha Arriba / Flecha Abajo)
-      if (keysPressed['KeyW'] || keysPressed['ArrowUp']) {
-        target.x -= Math.sin(currentThetaRad) * MOVE_SPEED;
-        target.z -= Math.cos(currentThetaRad) * MOVE_SPEED;
-        moved = true;
-      }
-      if (keysPressed['KeyS'] || keysPressed['ArrowDown']) {
-        target.x += Math.sin(currentThetaRad) * MOVE_SPEED;
-        target.z += Math.cos(currentThetaRad) * MOVE_SPEED;
-        moved = true;
-      }
-
-      // Movimiento lateral (A / D / Flecha Izquierda / Flecha Derecha)
-      if (keysPressed['KeyA'] || keysPressed['ArrowLeft']) {
-        target.x -= Math.cos(currentThetaRad) * MOVE_SPEED;
-        target.z += Math.sin(currentThetaRad) * MOVE_SPEED;
-        moved = true;
-      }
-      if (keysPressed['KeyD'] || keysPressed['ArrowRight']) {
-        target.x += Math.cos(currentThetaRad) * MOVE_SPEED;
-        target.z -= Math.sin(currentThetaRad) * MOVE_SPEED;
-        moved = true;
-      }
-
-      // Control de altura (Espacio para subir / Shift para bajar)
-      if (keysPressed['Space']) {
-        target.y += MOVE_SPEED;
-        moved = true;
-      }
-      if (keysPressed['ShiftLeft'] || keysPressed['ShiftRight']) {
-        target.y = Math.max(0, target.y - MOVE_SPEED);
-        moved = true;
-      }
-
-      // Rotación de cámara por teclado (Q / E)
-      if (keysPressed['KeyQ']) {
-        orbit.theta -= ROTATE_SPEED;
-        moved = true;
-      }
-      if (keysPressed['KeyE']) {
-        orbit.theta += ROTATE_SPEED;
-        moved = true;
-      }
-
-      // Restablecer posición (Tecla R)
-      if (keysPressed['KeyR']) {
-        target = { ...defaultTarget };
-        orbit = { ...defaultOrbit };
-        moved = true;
-      }
-
-      // Aplicar cambios al visor si se presionó alguna tecla
-      if (moved) {
-        viewer.cameraTarget = `${target.x.toFixed(2)}m ${target.y.toFixed(2)}m ${target.z.toFixed(2)}m`;
-        viewer.cameraOrbit = `${orbit.theta.toFixed(1)}deg ${orbit.phi.toFixed(1)}deg ${orbit.radius.toFixed(1)}m`;
-      }
-
-      requestAnimationFrame(updateMovement);
-    }
-
-    // Iniciar animación de controles
-    requestAnimationFrame(updateMovement);
   </script>
 
 </body>
