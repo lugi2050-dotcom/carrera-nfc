@@ -15,6 +15,8 @@
             --danger: #ef4444;
             --text-light: #f8fafc;
             --border-color: #27272a;
+            --facebook: #1877f2;
+            --facebook-hover: #166fe5;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -142,6 +144,34 @@
 
         .btn-photos:active { transform: scale(0.98); }
 
+        /* Botón de Facebook */
+        .btn-facebook {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            background: var(--facebook);
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            text-decoration: none;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-facebook:hover {
+            background: var(--facebook-hover);
+            box-shadow: 0 0 12px rgba(24, 119, 242, 0.4);
+        }
+
+        .btn-facebook:active { transform: scale(0.98); }
+
         .btn-sticker {
             background: var(--primary);
             color: #000000;
@@ -257,6 +287,11 @@
 
         <a href="fotoscarrera.html" class="btn-photos">
             📸 Ver Fotos de Carrera
+        </a>
+
+        <!-- Reemplaza el atributo href con la URL oficial de tu página de Facebook -->
+        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="btn-facebook">
+            📘 Visitar Facebook
         </a>
 
         <div id="error-box" class="error-msg" style="margin-top: 15px;"></div>
@@ -439,13 +474,12 @@
             if (nombreText.length > 22) nombreText = nombreText.substring(0, 22) + '...';
             ctx.fillText(nombreText, 20, 50);
 
-            // Número de Dorsal (Con tamaño dinámico para evitar solapamientos)
+            // Número de Dorsal
             ctx.fillStyle = '#f97316';
             ctx.font = 'bold 55px "Segoe UI", Arial, sans-serif';
-            const dorsalStr = `DORSAL: ${currentRunnerData.id}`;
+            const dorsalStr = `DORSAL ${currentRunnerData.id}`;
             ctx.fillText(dorsalStr, 20, 115);
 
-            // Calcular ancho ocupado por el Dorsal para separar la Categoría correctamente
             const dorsalWidth = ctx.measureText(dorsalStr).width;
             const categoryX = Math.max(20 + dorsalWidth + 30, 380);
 
@@ -484,7 +518,7 @@
 
             // Descargar la imagen PNG
             const link = document.createElement('a');
-            link.download = `paynal-race-dorsal-${currentRunnerData.id}.png`;
+            link.download = `paynal-race-stiker-${currentRunnerData.id}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
         }
