@@ -75,17 +75,25 @@
                         <i class="fa-solid fa-house text-brand-400 w-5"></i>
                         <span>INICIO</span>
                     </a>
+                    <a href="galeriafotos.html" class="px-4 py-3 rounded-xl hover:bg-slate-800 text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-3">
+                        <i class="fa-solid fa-images text-indigo-400 w-5"></i>
+                        <span>GALERÍA</span>
+                    </a>
                     <a href="precios.html" class="px-4 py-3 rounded-xl hover:bg-slate-800 text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-3">
                         <i class="fa-solid fa-tag text-emerald-400 w-5"></i>
                         <span>PRECIOS</span>
                     </a>
-                    <a href="carreras.html" class="px-4 py-3 rounded-xl hover:bg-slate-800 text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-3">
+                    <a href="PAYNAL.html" class="px-4 py-3 rounded-xl hover:bg-slate-800 text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-3">
                         <i class="fa-solid fa-laptop-code text-cyan-400 w-5"></i>
-                        <span>CARRERAS</span>
+                        <span>PAYNAL DEMO</span>
                     </a>
                     <a href="casa.html" class="px-4 py-3 rounded-xl hover:bg-slate-800 text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-3">
                         <i class="fa-solid fa-cube text-emerald-400 w-5"></i>
                         <span>CASA 3D</span>
+                    </a>
+                    <a href="mmr.html" class="px-4 py-3 rounded-xl hover:bg-slate-800 text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-3">
+                        <i class="fa-solid fa-stopwatch text-amber-400 w-5"></i>
+                        <span>TIEMPO MMR</span>
                     </a>
                 </nav>
             </div>
@@ -97,16 +105,22 @@
 
         <!-- Encabezado de la Sección -->
         <section class="text-center max-w-3xl mx-auto space-y-4">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                <i class="fa-solid fa-images"></i> Muestrario Visual
+            </div>
             <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-                TRABAJOS REALIZADOS
+                Galería Dinámica
             </h1>
+            <p class="text-slate-400 text-base sm:text-lg">
+                Fotografías cargadas directamente desde Google Drive con el nombre del archivo integrado en la imagen.
+            </p>
         </section>
 
         <!-- Contenedor de la Galería -->
         <section id="galeria-drive" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             <div class="text-center col-span-full py-16 text-slate-400 text-sm" id="texto-estado">
                 <i class="fa-solid fa-spinner fa-spin text-brand-400 text-2xl mb-3 block"></i>
-                Cargando imagenes...
+                Cargando fotos desde Google Drive...
             </div>
         </section>
 
@@ -169,25 +183,25 @@
                     throw new Error(`Error HTTP: ${respuesta.status}`);
                 }
 
-                const idsFotos = await respuesta.json();
+                const fotos = await respuesta.json();
 
                 galeriaContainer.innerHTML = ""; // Limpiar estado de carga
 
-                if (!Array.isArray(idsFotos) || idsFotos.length === 0) {
+                if (!Array.isArray(fotos) || fotos.length === 0) {
                     galeriaContainer.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 text-sm">No se encontraron imágenes o la carpeta está vacía.</div>`;
                     return;
                 }
 
-                // Genera las imágenes dinámicamente con su marca de agua y estilos de tarjeta oscuros
-                idsFotos.forEach(id => {
+                // Genera las imágenes dinámicamente mostrando el nombre de la foto dentro de la imagen
+                fotos.forEach(foto => {
                     const div = document.createElement('div');
-                    div.className = 'relative bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl transition-all duration-300 hover:scale-[1.02] group';
+                    div.className = 'bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl transition-all duration-300 hover:scale-[1.02] relative group';
 
                     div.innerHTML = `
                         <div class="relative h-64 w-full overflow-hidden bg-slate-950">
-                            <img src="https://lh3.googleusercontent.com/d/${id}" alt="Foto de Google Drive" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            <div class="absolute bottom-3 right-3 bg-slate-950/80 backdrop-blur-md text-brand-300 border border-white/10 px-3 py-1 text-xs font-bold tracking-wider rounded-xl shadow-lg pointer-events-none select-none">
-                                El Ing
+                            <img src="https://lh3.googleusercontent.com/d/${foto.id}" alt="${foto.name}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute bottom-3 left-3 right-3 bg-slate-950/80 backdrop-blur-md text-slate-100 border border-white/10 px-3 py-1.5 text-xs font-semibold tracking-wider rounded-xl shadow-lg truncate pointer-events-none select-none text-center" title="${foto.name}">
+                                ${foto.name}
                             </div>
                         </div>
                     `;
@@ -197,7 +211,7 @@
 
             } catch (error) {
                 console.error("Detalle del error:", error);
-                galeriaContainer.innerHTML = `<div class="col-span-full text-center py-12 text-rose-400 text-sm">Error al cargar las fotos. Revisa la consola del navegador (F12) para más detalles.</div>`;
+                galeriaContainer.innerHTML = `<div class="col-span-full text-center py-10 text-rose-400 text-sm">Error al cargar las fotos. Revisa la consola del navegador (F12) para más detalles.</div>`;
             }
         }
 
