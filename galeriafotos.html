@@ -1,90 +1,172 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galería El Ing</title>
+    <title>Galería de Fotos | El Ing</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 20px;
+        body { font-family: 'Inter', sans-serif; }
+        .glassmorphism {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
-
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-        }
-
-        .galeria {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .contenedor-foto {
-            position: relative;
-            background: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease;
-        }
-
-        .contenedor-foto:hover {
-            transform: translateY(-5px);
-        }
-
-        .contenedor-foto img {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            display: block;
-        }
-
-        .marca-de-agua {
-            position: absolute;
-            bottom: 15px;
-            right: 15px;
-            background-color: rgba(0, 0, 0, 0.75);
-            color: #ffffff;
-            padding: 6px 12px;
-            font-size: 13px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            border-radius: 4px;
-            pointer-events: none;
-            user-select: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .mensaje {
-            text-align: center;
-            grid-column: 1 / -1;
-            font-size: 18px;
-            color: #666;
-        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(14, 165, 233, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(14, 165, 233, 0.8); }
     </style>
 </head>
-<body>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
 
-    <h1>Galería</h1>
-    
-    <div id="galeria-drive" class="galeria">
-        <div class="mensaje" id="texto-estado">Cargando fotos desde Google Drive...</div>
-    </div>
+    <!-- ========================================================================= -->
+    <!-- HEADER / NAVBAR CON MENÚ DESPLEGABLE                                      -->
+    <!-- ========================================================================= -->
+    <header class="sticky top-0 z-40 w-full glassmorphism">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20 relative">
+                <!-- Logotipo / Título Principal -->
+                <a href="index.html" class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                        <i class="fa-solid fa-shapes font-bold text-white text-xl"></i>
+                    </div>
+                    <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-brand-400 bg-clip-text text-transparent">
+                        EL ING VUELA
+                    </span>
+                </a>
 
+                <!-- Botón Menú Hamburguesa -->
+                <button id="menu-toggle-btn" class="px-4 py-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white transition-all flex items-center gap-2.5 shadow focus:outline-none" aria-label="Abrir Menú">
+                    <i id="menu-icon" class="fa-solid fa-bars text-lg text-brand-400"></i>
+                    <span class="text-sm font-semibold">Menú</span>
+                </button>
+
+                <!-- Menú Desplegable -->
+                <nav id="dropdown-menu" class="hidden absolute top-full right-0 mt-2 w-64 bg-slate-900/95 border border-slate-800 rounded-2xl shadow-2xl p-3 backdrop-blur-xl flex flex-col gap-1 z-50">
+                    <a href="index.html" class="px-4 py-3 rounded-xl hover:bg-slate-800 text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-3">
+                        <i class="fa-solid fa-house text-brand-400 w-5"></i>
+                        <span>INICIO</span>
+                    </a>
+                    <a href="precios.html" class="px-4 py-3 rounded-xl hover:bg-slate-800 text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-3">
+                        <i class="fa-solid fa-tag text-emerald-400 w-5"></i>
+                        <span>PRECIOS</span>
+                    </a>
+                    <a href="carreras.html" class="px-4 py-3 rounded-xl hover:bg-slate-800 text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-3">
+                        <i class="fa-solid fa-laptop-code text-cyan-400 w-5"></i>
+                        <span>CARRERAS</span>
+                    </a>
+                    <a href="casa.html" class="px-4 py-3 rounded-xl hover:bg-slate-800 text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-3">
+                        <i class="fa-solid fa-cube text-emerald-400 w-5"></i>
+                        <span>CASA 3D</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+
+        <!-- Encabezado de la Sección -->
+        <section class="text-center max-w-3xl mx-auto space-y-4">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                <i class="fa-solid fa-images"></i> Muestrario Visual
+            </div>
+            <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+                Galería Dinámica
+            </h1>
+            <p class="text-slate-400 text-base sm:text-lg">
+                Fotografías cargadas directamente desde Google Drive con marca de agua institucional.
+            </p>
+        </section>
+
+        <!-- Contenedor de la Galería -->
+        <section id="galeria-drive" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div class="text-center col-span-full py-16 text-slate-400 text-sm" id="texto-estado">
+                <i class="fa-solid fa-spinner fa-spin text-brand-400 text-2xl mb-3 block"></i>
+                Cargando fotos desde Google Drive...
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-900 bg-slate-950 py-8 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 text-center text-xs text-slate-500">
+            <p>2026 Portafolio de Proyectos. 5618782196</p>
+        </div>
+    </footer>
+
+    <!-- Scripts de Funcionalidad y Galería -->
     <script>
-        // PEGA AQUÍ LA URL DE TU APLICACIÓN WEB DE APPS SCRIPT
+        // LÓGICA DEL MENÚ DESPLEGABLE
+        const menuToggleBtn = document.getElementById('menu-toggle-btn');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+        const menuIcon = document.getElementById('menu-icon');
+
+        function toggleMenu() {
+            const isHidden = dropdownMenu.classList.contains('hidden');
+            if (isHidden) {
+                dropdownMenu.classList.remove('hidden');
+                menuIcon.className = "fa-solid fa-xmark text-lg text-brand-400";
+            } else {
+                dropdownMenu.classList.add('hidden');
+                menuIcon.className = "fa-solid fa-bars text-lg text-brand-400";
+            }
+        }
+
+        menuToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMenu();
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!dropdownMenu.contains(e.target) && !menuToggleBtn.contains(e.target)) {
+                dropdownMenu.classList.add('hidden');
+                menuIcon.className = "fa-solid fa-bars text-lg text-brand-400";
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                dropdownMenu.classList.add('hidden');
+                menuIcon.className = "fa-solid fa-bars text-lg text-brand-400";
+            }
+        });
+
+        // CARGA DE FOTOS DESDE GOOGLE DRIVE (APPS SCRIPT)
         const urlAppsScript = "https://script.google.com/macros/s/AKfycbx3TzW77Za5038JxAZ8y_n9R_KA-NqtVXryrH8bDDTO6Wv8OpI_uEdS-ATAtCWS8Qavzg/exec";
 
         async function cargarFotos() {
             const galeriaContainer = document.getElementById('galeria-drive');
-            const textoEstado = document.getElementById('texto-estado');
             
             try {
                 const respuesta = await fetch(urlAppsScript);
@@ -98,18 +180,22 @@
                 galeriaContainer.innerHTML = ""; // Limpiar estado de carga
 
                 if (!Array.isArray(idsFotos) || idsFotos.length === 0) {
-                    galeriaContainer.innerHTML = `<p class="mensaje">No se encontraron imágenes o la carpeta está vacía.</p>`;
+                    galeriaContainer.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 text-sm">No se encontraron imágenes o la carpeta está vacía.</div>`;
                     return;
                 }
 
-                // Genera las imágenes dinámicamente con su marca de agua
+                // Genera las imágenes dinámicamente con su marca de agua y estilos de tarjeta oscuros
                 idsFotos.forEach(id => {
                     const div = document.createElement('div');
-                    div.className = 'contenedor-foto';
+                    div.className = 'relative bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl transition-all duration-300 hover:scale-[1.02] group';
 
                     div.innerHTML = `
-                        <img src="https://lh3.googleusercontent.com/d/${id}" alt="Foto de Google Drive" loading="lazy">
-                        <div class="marca-de-agua">El Ing</div>
+                        <div class="relative h-64 w-full overflow-hidden bg-slate-950">
+                            <img src="https://lh3.googleusercontent.com/d/${id}" alt="Foto de Google Drive" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute bottom-3 right-3 bg-slate-950/80 backdrop-blur-md text-brand-300 border border-white/10 px-3 py-1 text-xs font-bold tracking-wider rounded-xl shadow-lg pointer-events-none select-none">
+                                El Ing
+                            </div>
+                        </div>
                     `;
 
                     galeriaContainer.appendChild(div);
@@ -117,7 +203,7 @@
 
             } catch (error) {
                 console.error("Detalle del error:", error);
-                galeriaContainer.innerHTML = `<p class="mensaje" style="color: red;">Error al cargar las fotos. Revisa la consola del navegador (F12) para más detalles.</p>`;
+                galeriaContainer.innerHTML = `<div class="col-span-full text-center py-12 text-rose-400 text-sm">Error al cargar las fotos. Revisa la consola del navegador (F12) para más detalles.</div>`;
             }
         }
 
