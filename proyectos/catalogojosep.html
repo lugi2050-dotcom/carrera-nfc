@@ -11,90 +11,12 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
 
-    <!-- POP-UP / MODAL DE BIENVENIDA -->
-    <div id="welcomeModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center transform transition-all">
-            <!-- LOGO: Cambia "tu-logo.png" por la ruta o enlace de tu imagen de logo -->
-            <div class="mx-auto w-24 h-24 mb-4 flex items-center justify-center">
-                <img src="tu-logo.png" alt="Logo" class="max-h-full max-w-full object-contain" onerror="this.src='https://via.placeholder.com/100?text=Mi+Logo'">
-            </div>
-            
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">¡Bienvenido a nuestro Catálogo!</h2>
-            <p class="text-gray-600 text-sm mb-6 leading-relaxed">
-                Explora todos nuestros productos disponibles. Si deseas información o realizar un pedido, haz clic en el botón <strong>"Cotizar"</strong> para atenderte directamente por WhatsApp.
-            </p>
-            
-            <button onclick="closeModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-xl transition duration-200 shadow-md cursor-pointer">
-                Ver Catálogo
-            </button>
-        </div>
-    </div>
-
-    <!-- ENCABEZADO -->
-    <header class="bg-white shadow-sm sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <i class="fa-solid fa-store text-indigo-600"></i> Catálogo de Productos
-            </h1>
-            <span class="text-xs font-semibold bg-emerald-100 text-emerald-800 py-1.5 px-3 rounded-full border border-emerald-200 flex items-center gap-1.5">
-                <i class="fa-brands fa-whatsapp"></i> Cotizaciones en línea
-            </span>
-        </div>
-    </header>
-
-    <!-- CONTENEDOR DEL CATÁLOGO -->
-    <main class="max-w-7xl mx-auto px-4 py-8">
-        <div id="catalogo-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <p class="col-span-full text-center text-gray-500 py-10">Cargando productos...</p>
-        </div>
-    </main>
-
-    <!-- LÓGICA Y SCRIPTS -->
-    <script>
-        // CONFIGURACIÓN: Ingresa tu número de WhatsApp con código de país (Ej: 521XXXXXXXXXX)
-        const NUMERO_WHATSAPP = "5215500000000";
-
-        // Función para cerrar el pop-up
-        function closeModal() {
-            const modal = document.getElementById('welcomeModal');
-            modal.classList.add('opacity-0', 'pointer-events-none');
-            setTimeout(() => modal.style.display = 'none', 300);
-        }
-
-        // Función para limpiar el nombre de la imagen (Ej: "250_Camara_Seguridad.png" -> Precio: $250, Nombre: Camara Seguridad)
-        function parseNombreImagen(nombreArchivo) {
-            // 1. Quitar extensión (.png, .jpg, etc.)
-            let sinExt = nombreArchivo.substring(0, nombreArchivo.lastIndexOf('.')) || nombreArchivo;
-            
-            // 2. Separar precio y nombre usando el primer guion bajo (_)
-            let indiceGuion = sinExt.indexOf('_');
-            let precio = "";
-            let nombre = "";
-
-            if (indiceGuion !== -1) {
-                precio = sinExt.substring(0, indiceGuion).trim();
-                nombre = sinExt.substring(indiceGuion + 1).replace(/Aquí tienes el **HTML completo y listo para usar**. Solo debes reemplazar la URL de tu `fetch` en la línea indicadora y asegurarte de mapear correctamente las propiedades de tu JSON (`nombre` y `url`).
-
-```html
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo de Productos</title>
-    <!-- Tailwind CSS para diseño moderno -->
-    <script src="[https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4](https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4)"></script>
-    <!-- FontAwesome para íconos -->
-    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
-</head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased">
-
     <!-- POP-UP DE BIENVENIDA / MODAL -->
     <div id="welcomeModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center transform transition-all">
             <!-- LOGO: Reemplaza src por la ruta de tu logo -->
             <div class="mx-auto w-24 h-24 mb-4 flex items-center justify-center">
-                <img src="tu-logo.png" alt="Logo" class="max-h-full max-w-full object-contain" onerror="this.src='[https://via.placeholder.com/100?text=Mi+Logo](https://via.placeholder.com/100?text=Mi+Logo)'">
+                <img src="tu-logo.png" alt="Logo" class="max-h-full max-w-full object-contain" onerror="this.src='https://via.placeholder.com/100?text=Mi+Logo'">
             </div>
             
             <h2 class="text-2xl font-bold text-gray-900 mb-2">¡Bienvenido a nuestro Catálogo!</h2>
@@ -135,11 +57,12 @@
         // CONFIGURA TU NÚMERO DE WHATSAPP AQUÍ (Código de país + Número, Ej: 5215500000000)
         const NUMERO_WHATSAPP = "5215500000000";
 
-        // Función para cerrar el pop-up
+        // Función corregida para cerrar el pop-up de forma segura
         function closeModal() {
             const modal = document.getElementById('welcomeModal');
-            modal.classList.add('opacity-0', 'pointer-events-none');
-            setTimeout(() => modal.style.display = 'none', 300);
+            if (modal) {
+                modal.style.display = 'none';
+            }
         }
 
         // Función para separar Precio y Nombre del archivo (Formato esperado: Precio_Nombre.png)
@@ -172,7 +95,7 @@
         // Función para redirigir a WhatsApp con el mensaje prellenado
         function cotizarPorWhatsApp(producto, precio) {
             const mensaje = `Hola, me interesa cotizar el siguiente producto:\n\n📌 *${producto}*\n💰 Precio: ${precio}\n\n¿Tienen disponibilidad?`;
-            const url = `[https://wa.me/$](https://wa.me/$){NUMERO_WHATSAPP}?text=${encodeURIComponent(mensaje)}`;
+            const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(mensaje)}`;
             window.open(url, '_blank');
         }
 
