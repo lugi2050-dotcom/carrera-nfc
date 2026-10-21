@@ -7,6 +7,9 @@
     <style>
         :root {
             --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --whatsapp-color: #25d366;
+            --whatsapp-hover: #1da851;
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #1e293b;
@@ -36,6 +39,10 @@
 
         .search-container {
             margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         #searchInput {
@@ -55,11 +62,30 @@
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
         }
 
+        .btn-info-header {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 10px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-info-header:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 20px;
         }
 
@@ -81,7 +107,7 @@
 
         .image-wrapper {
             width: 100%;
-            height: 200px;
+            height: 220px;
             background-color: #f1f5f9;
             display: flex;
             align-items: center;
@@ -102,20 +128,46 @@
         }
 
         .card-content {
-            padding: 15px;
-            text-align: center;
-            flex-grow: 1;
+            padding: 16px;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
         }
 
         .product-name {
-            font-size: 1rem;
-            font-weight: 500;
+            font-size: 1.05rem;
+            font-weight: 600;
             color: var(--text-main);
             margin: 0;
             word-break: break-word;
+        }
+
+        .product-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .btn-whatsapp {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: var(--whatsapp-color);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-top: auto;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-whatsapp:hover {
+            background-color: var(--whatsapp-hover);
         }
 
         .loading, .error {
@@ -130,8 +182,8 @@
             color: #dc2626;
         }
 
-        /* Modal para ver imagen ampliada */
-        .modal {
+        /* --- MODALES --- */
+        .modal-overlay {
             display: none;
             position: fixed;
             z-index: 1000;
@@ -139,28 +191,129 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(4px);
             align-items: center;
             justify-content: center;
             padding: 20px;
             box-sizing: border-box;
+            animation: fadeIn 0.25s ease-out;
         }
 
-        .modal img {
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Modal para ver la imagen ampliada */
+        .modal-image img {
             max-width: 90%;
-            max-height: 90%;
+            max-height: 90vh;
             border-radius: 8px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .modal span {
+        /* Pop-up de Información Inicial */
+        .info-card {
+            background-color: #ffffff;
+            border-radius: 16px;
+            max-width: 480px;
+            width: 100%;
+            padding: 28px;
+            position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-btn {
             position: absolute;
-            top: 20px;
-            right: 30px;
-            color: #fff;
-            font-size: 2rem;
+            top: 16px;
+            right: 20px;
+            font-size: 1.8rem;
+            color: var(--text-muted);
             cursor: pointer;
-            font-weight: bold;
+            border: none;
+            background: none;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: var(--text-main);
+        }
+
+        .info-card h2 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .info-card p {
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 18px;
+            font-size: 0.95rem;
+        }
+
+        .info-section {
+            background-color: var(--bg-color);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .info-section h3 {
+            margin: 0 0 6px 0;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-section p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .btn-action {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-action:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-map {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .btn-map:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -170,21 +323,49 @@
         <h1>Catálogo de Productos</h1>
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="Buscar producto por nombre..." onkeyup="filterProducts()">
+            <button class="btn-info-header" onclick="openWelcomeModal()">
+                ℹ️ Ubicación e Info
+            </button>
         </div>
     </header>
 
     <main class="container" id="catalogContainer">
-        <div class="loading">Cargando productos desde Google Drive...</div>
+        <div class="loading">Cargando productos...</div>
     </main>
 
-    <!-- Modal de Imagen -->
-    <div id="imageModal" class="modal" onclick="closeModal()">
-        <span onclick="closeModal()">&times;</span>
-        <img id="modalImg" src="" alt="Vista ampliada">
+    <!-- POP-UP / MODAL INFORMATIVO INICIAL -->
+    <div id="welcomeModal" class="modal-overlay" onclick="closeOnOutsideClick(event, 'welcomeModal')">
+        <div class="info-card">
+            <button class="close-btn" onclick="closeWelcomeModal()">&times;</button>
+            <h2>¡Bienvenidos a Nuestro Catálogo! 👋</h2>
+            <p>Consulta nuestros productos disponibles. Puedes cotizar o solicitar cualquier artículo de forma directa por WhatsApp.</p>
+
+            <div class="info-section">
+                <h3>📍 Ubicación</h3>
+                <p>Av. Principal #123, Colonia Centro.</p>
+                <a href="https://maps.app.goo.gl/i64xAzmmrGJBdSwF9" target="_blank" class="btn-map">
+                    🗺️ Abrir en Google Maps
+                </a>
+            </div>
+
+            <div class="info-section">
+                <h3>🕒 Horario de Atención</h3>
+                <p>Lunes a Viernes: 9:00 AM - 6:00 PM<br>Sábados: 10:00 AM - 2:00 PM</p>
+            </div>
+
+            <button class="btn-action" onclick="closeWelcomeModal()">
+                Explorar Catálogo
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL PARA VISUALIZAR IMAGEN AMPLIADA -->
+    <div id="imageModal" class="modal-overlay modal-image" onclick="closeModal()">
+        <img id="modalImg" src="" alt="Vista ampliada" referrerpolicy="no-referrer">
     </div>
 
     <script>
-        // ⚠️ PEGA AQUÍ LA URL DE TU WEB APP DE GOOGLE APPS SCRIPT
+        const WHATSAPP_NUMBER = "5215618782196";
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx3TzW77Za5038JxAZ8y_n9R_KA-NqtVXryrH8bDDTO6Wv8OpI_uEdS-ATAtCWS8Qavzg/exec';
 
         let allProducts = [];
@@ -192,43 +373,74 @@
         async function fetchCatalog() {
             const container = document.getElementById('catalogContainer');
             try {
-                const response = await fetch(WEB_APP_URL);
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'GET',
+                    redirect: 'follow'
+                });
+
                 if (!response.ok) throw new Error('Error al conectar con el servidor.');
-                
+
                 const data = await response.json();
-                allProducts = data;
-                
+
+                // Separar el precio del nombre con formato precio_nombre
+                allProducts = data.map(item => {
+                    const rawName = item.name || '';
+                    let price = '';
+                    let name = rawName;
+
+                    if (rawName.includes('_')) {
+                        const parts = rawName.split('_');
+                        price = parts[0].trim();
+                        name = parts.slice(1).join('_').trim();
+                    }
+
+                    return {
+                        id: item.id,
+                        name: name,
+                        price: price,
+                        url: `https://drive.google.com/thumbnail?id=${item.id}&sz=w1000`
+                    };
+                });
+
                 renderProducts(allProducts);
+
             } catch (error) {
                 console.error(error);
-                container.innerHTML = `<div class="error">No se pudieron cargar los productos. Verifica la URL de tu Web App o los permisos del Script.</div>`;
+                container.innerHTML = `<div class="error">No se pudieron cargar los productos. Verifica la URL de tu Web App.</div>`;
             }
         }
 
         function renderProducts(products) {
-    const container = document.getElementById('catalogContainer');
-    
-    if (products.length === 0) {
-        container.innerHTML = `<div class="loading">No se encontraron productos.</div>`;
-        return;
-    }
+            const container = document.getElementById('catalogContainer');
 
-    container.innerHTML = products.map(product => {
-        // Construimos la URL usando el id que devuelve tu script
-        const imageUrl = `https://drive.google.com/thumbnail?id=${product.id}&sz=w1000`;
-        
-        return `
-            <div class="card">
-                <div class="image-wrapper" onclick="openModal('${imageUrl}', '${escapeHtml(product.name)}')">
-                    <img src="${imageUrl}" alt="${escapeHtml(product.name)}" referrerpolicy="no-referrer" loading="lazy">
-                </div>
-                <div class="card-content">
-                    <h3 class="product-name">${escapeHtml(product.name)}</h3>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
+            if (!products || products.length === 0) {
+                container.innerHTML = `<div class="loading">No se encontraron productos.</div>`;
+                return;
+            }
+
+            container.innerHTML = products.map(product => {
+                const textMessage = encodeURIComponent(`Hola, me interesa cotizar el producto: *${product.name}*` + (product.price ? ` (Precio: $${product.price})` : ''));
+                const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${textMessage}`;
+
+                return `
+                    <div class="card">
+                        <div class="image-wrapper" onclick="openModal('${product.url}')">
+                            <img src="${product.url}" alt="${escapeHtml(product.name)}" referrerpolicy="no-referrer" loading="lazy">
+                        </div>
+                        <div class="card-content">
+                            <h3 class="product-name">${escapeHtml(product.name)}</h3>
+                            ${product.price ? `<p class="product-price">$${escapeHtml(product.price)}</p>` : ''}
+                            <a href="${whatsappUrl}" target="_blank" class="btn-whatsapp">
+                                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                                </svg>
+                                Cotizar por WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
 
         function filterProducts() {
             const query = document.getElementById('searchInput').value.toLowerCase();
@@ -236,7 +448,16 @@
             renderProducts(filtered);
         }
 
-        function openModal(url, name) {
+        /* --- MANEJO DE MODALES --- */
+        function openWelcomeModal() {
+            document.getElementById('welcomeModal').style.display = 'flex';
+        }
+
+        function closeWelcomeModal() {
+            document.getElementById('welcomeModal').style.display = 'none';
+        }
+
+        function openModal(url) {
             const modal = document.getElementById('imageModal');
             const modalImg = document.getElementById('modalImg');
             modalImg.src = url;
@@ -247,17 +468,26 @@
             document.getElementById('imageModal').style.display = 'none';
         }
 
+        function closeOnOutsideClick(event, modalId) {
+            if (event.target.id === modalId) {
+                document.getElementById(modalId).style.display = 'none';
+            }
+        }
+
         function escapeHtml(text) {
-            return text
+            return String(text || '')
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
-                .replace(>g, "&gt;")
+                .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
         }
 
-        // Cargar al iniciar
-        fetchCatalog();
+        // Se ejecuta automáticamente al cargar la página
+        window.addEventListener('DOMContentLoaded', () => {
+            openWelcomeModal();
+            fetchCatalog();
+        });
     </script>
 </body>
 </html>
