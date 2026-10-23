@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbería LN | Citas</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            400: '#F3C649',
+                            500: '#D4AF37',
+                            600: '#B8952B',
+                        },
+                        roseGold: {
+                            400: '#F4A261',
+                            500: '#E76F51',
+                        },
+                        brandDark: {
+                            800: '#161E2E',
+                            900: '#0F172A',
+                            950: '#080C14',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #080C14;
+            color: #F8FAFC;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0F172A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D4AF37;
+        }
+
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        @keyframes badgePop {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.25); }
+            100% { transform: scale(1); }
+        }
+        .animate-pop {
+            animation: badgePop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-gold-500 selection:text-slate-950">
+
+    <!-- ENCABEZADO / NAVBAR -->
+    <header class="sticky top-0 z-30 bg-brandDark-900/90 backdrop-blur-md border-b border-slate-800/80 shadow-2xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- LOGO / NOMBRE DEL ESTUDIO -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-gold-400 via-amber-500 to-roseGold-500 flex items-center justify-center font-black text-slate-950 text-xl shadow-lg shadow-gold-500/20">
+                    ✦
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-black tracking-wide bg-gradient-to-r from-amber-200 via-gold-400 to-rose-300 bg-clip-text text-transparent">
+                        BARBERIA LN
+                    </h1>
+                    <p class="text-xs text-slate-400 font-medium">Barbería • Lashista • Uñas</p>
+                </div>
+            </div>
+
+            <!-- BOTONES DE ACCIÓN EN CABECERA -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Información del Local -->
+                <button onclick="openModal('infoModal')" title="Ver ubicación y contacto" class="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs sm:text-sm font-semibold bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700/80 hover:border-gold-500/50 transition shadow-sm">
+                    <span class="text-base">📍</span>
+                    <span class="hidden md:inline">Ubicación</span>
+                </button>
+
+                <!-- Carrito de Citas -->
+                <button onclick="toggleCartDrawer(true)" class="relative flex items-center gap-2.5 px-4 py-2 rounded-full font-bold bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-600 hover:to-amber-700 text-slate-950 shadow-lg shadow-gold-500/15 transition transform active:scale-95">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
+                    <span class="hidden sm:inline">Ver Cita</span>
+                    <span id="cartCountBadge" class="inline-flex items-center justify-center w-5 h-5 text-xs font-black text-white bg-rose-600 rounded-full shadow-md">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        
+        <!-- SECCIÓN BÚSQUEDA Y FILTROS -->
+        <section class="mb-10 space-y-6">
+            <div class="text-center max-w-2xl mx-auto space-y-2">
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-100 tracking-tight">Menú de Servicios</h2>
+                <p class="text-sm sm:text-base text-slate-400">Selecciona los servicios que deseas recibir y programa tu cita de forma rápida por WhatsApp.</p>
+            </div>
+
+            <!-- Barra de Búsqueda -->
+            <div class="max-w-lg mx-auto relative">
+                <input type="text" id="searchInput" onkeyup="filterServices()" placeholder="Buscar servicio (ej. Corte, Volumetría, Uñas Acrílicas)..." 
+                    class="w-full pl-11 pr-10 py-3.5 rounded-full bg-slate-900/90 border border-slate-700 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500 transition shadow-inner text-sm">
+                <svg class="w-5 h-5 text-slate-500 absolute left-4 top-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <button onclick="clearSearch()" id="clearSearchBtn" class="hidden absolute right-4 top-3.5 text-slate-500 hover:text-slate-300 text-sm font-bold">✕</button>
+            </div>
+
+            <!-- Pestañas de Categoría Dinámicas -->
+            <div id="categoryTabsContainer" class="flex items-center justify-center gap-2 flex-wrap text-sm font-semibold">
+                <button onclick="setCategory('all')" id="btn-cat-all" class="cat-btn px-5 py-2.5 rounded-full border border-gold-500 bg-gold-500 text-slate-950 font-bold transition shadow-sm">
+                    ✨ Todos
+                </button>
+                <button onclick="setCategory('barberia')" id="btn-cat-barberia" class="cat-btn px-5 py-2.5 rounded-full border border-slate-800 bg-slate-900/80 text-slate-300 hover:border-slate-700 transition">
+                    💈 Barbería
+                </button>
+                <button onclick="setCategory('lashista')" id="btn-cat-lashista" class="cat-btn px-5 py-2.5 rounded-full border border-slate-800 bg-slate-900/80 text-slate-300 hover:border-slate-700 transition">
+                    👁️ Lashista
+                </button>
+                <button onclick="setCategory('unas')" id="btn-cat-unas" class="cat-btn px-5 py-2.5 rounded-full border border-slate-800 bg-slate-900/80 text-slate-300 hover:border-slate-700 transition">
+                    💅 Uñas
+                </button>
+            </div>
+        </section>
+
+        <!-- CONTENEDOR DE TARJETAS DE SERVICIO -->
+        <section id="servicesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div class="col-span-full text-center py-20 text-slate-400 font-medium space-y-4">
+                <div class="w-12 h-12 border-4 border-gold-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p class="text-base text-slate-300">Procesando catálogo...</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- DRAWER / PANEL LATERAL DEL CARRITO -->
+    <div id="cartDrawerBackdrop" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden transition-opacity duration-300" onclick="toggleCartDrawer(false)"></div>
+    
+    <aside id="cartDrawer" class="fixed top-0 right-0 h-full w-full sm:w-[480px] bg-slate-900 border-l border-slate-800 z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col shadow-2xl">
+        <!-- Header Drawer -->
+        <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950/70">
+            <div class="flex items-center gap-2.5">
+                <span class="text-2xl">📅</span>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-100">Resumen de tu Cita</h3>
+                    <p class="text-xs text-slate-400">Servicios seleccionados</p>
+                </div>
+            </div>
+            <button onclick="toggleCartDrawer(false)" class="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition">
+                ✕
+            </button>
+        </div>
+
+        <!-- Lista de Servicios Agregados -->
+        <div id="cartItemsContainer" class="flex-grow p-5 overflow-y-auto space-y-3">
+            <!-- Inyección dinámica -->
+        </div>
+
+        <!-- Footer: Datos del cliente y confirmación -->
+        <div class="p-5 border-t border-slate-800 bg-slate-950/90 space-y-4">
+            <!-- Total -->
+            <div class="flex items-center justify-between text-base font-bold border-b border-slate-800 pb-3">
+                <span class="text-slate-300">Total Estimado:</span>
+                <span id="cartTotalText" class="text-gold-400 text-2xl font-black">$0.00</span>
+            </div>
+
+            <!-- Formulario de Datos para la Cita -->
+            <form id="appointmentForm" onsubmit="handleScheduleAppointment(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Nombre Completo *</label>
+                    <input type="text" id="clientName" required placeholder="Ej. Camila Morales" 
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-gold-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Fecha Deseada *</label>
+                        <input type="date" id="appointmentDate" required 
+                            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-gold-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Hora Preferida *</label>
+                        <input type="time" id="appointmentTime" required 
+                            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-gold-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Notas o Detalles Adicionales</label>
+                    <textarea id="appointmentNotes" rows="2" placeholder="Ej. Primera vez agendando, prefiero tono de uñas nude..." 
+                        class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 text-xs focus:outline-none focus:border-gold-500 resize-none"></textarea>
+                </div>
+
+                <button type="submit" id="btnSubmitAppointment" disabled
+                    class="w-full py-3.5 px-4 rounded-xl font-extrabold bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-500/20 active:scale-95 text-sm">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                    </svg>
+                    Confirmar y Agendar por WhatsApp
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- MODAL 1: INFORMACIÓN DEL ESTUDIO / POP-UP INICIAL -->
+    <div id="infoModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 sm:p-7 relative shadow-2xl space-y-6">
+            <button onclick="closeModal('infoModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-full hover:bg-slate-800 transition">✕</button>
+            
+            <div class="text-center space-y-2">
+                <div class="w-14 h-14 bg-gradient-to-tr from-gold-500 to-roseGold-500 rounded-2xl flex items-center justify-center text-3xl mx-auto shadow-lg shadow-gold-500/20 text-slate-950">
+                    ✦
+                </div>
+                <h3 class="text-2xl font-extrabold text-slate-100">BARBERIA LN</h3>
+                <p class="text-xs text-slate-400 font-medium">Barbería Profesional • Lashista • Uñas</p>
+            </div>
+
+            <div class="space-y-3 text-sm">
+                <!-- Ubicación -->
+                <div class="bg-slate-950/60 p-4 rounded-2xl border border-slate-800 space-y-1">
+                    <span class="font-bold text-gold-400 flex items-center gap-2">📍 Dirección</span>
+                    <p class="text-slate-300 text-xs sm:text-sm">C. Juárez Manzana, San Bernardo Tlalmimilolpan</p>
+                    <a href="https://maps.app.goo.gl/qaWsC2NWcDqFdL6r8" target="_blank" class="text-xs text-amber-400 hover:underline font-semibold inline-flex items-center gap-1 mt-1">
+                        🗺️ Ver en Google Maps
+                    </a>
+                </div>
+
+                <!-- Horario -->
+                <div class="bg-slate-950/60 p-4 rounded-2xl border border-slate-800 space-y-1">
+                    <span class="font-bold text-gold-400 flex items-center gap-2">🕒 Horario de Atención</span>
+                    <p class="text-slate-300 text-xs">Martes a Domingo: 10:00 AM – 8:00 PM</p>
+                    <p class="text-slate-400 text-xs">Domingos: Citas agendadas con anticipación</p>
+                </div>
+
+                <!-- Teléfono -->
+                <div class="bg-slate-950/60 p-4 rounded-2xl border border-slate-800 space-y-1">
+                    <span class="font-bold text-gold-400 flex items-center gap-2">📞 Contacto / WhatsApp</span>
+                    <p class="text-slate-300 text-xs">55 1256 9953 - 56 3034 3355</p>
+                </div>
+            </div>
+
+            <button onclick="closeModal('infoModal')" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-600 hover:to-amber-700 text-slate-950 font-extrabold transition shadow-lg">
+                Explorar Servicios & Agendar
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL 2: VISOR AMPLIADO DE IMÁGENES -->
+    <div id="imageModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden items-center justify-center p-4" onclick="closeModal('imageModal')">
+        <div class="relative max-w-3xl w-full flex flex-col items-center" onclick="event.stopPropagation()">
+            <button onclick="closeModal('imageModal')" class="absolute -top-10 right-0 text-white text-2xl font-bold p-2">✕</button>
+            <img id="modalImageTarget" src="" alt="Vista ampliada" class="max-h-[80vh] w-auto rounded-2xl object-contain shadow-2xl border border-slate-800" referrerpolicy="no-referrer">
+            <p id="modalImageCaption" class="mt-3 text-sm font-bold text-slate-300 text-center"></p>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800/80 bg-slate-950 py-6 text-center text-xs text-slate-500">
+    </footer>
+
+    <!-- LÓGICA JAVASCRIPT -->
+    <script>
+        // =========================================================================
+        // CONFIGURACIÓN GLOBAL
+        // =========================================================================
+        
+        // URL provista de Google Apps Script
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx3TzW77Za5038JxAZ8y_n9R_KA-NqtVXryrH8bDDTO6Wv8OpI_uEdS-ATAtCWS8Qavzg/exec";
+        
+        // Número de WhatsApp para recibir solicitudes de cita
+        const WHATSAPP_NUMBER = "5215500000000";
+
+        // =========================================================================
+        // ESTADO GLOBAL
+        // =========================================================================
+        let allServices = [];
+        let currentCategory = 'all';
+        let cart = [];
+
+        // =========================================================================
+        // INICIALIZACIÓN
+        // =========================================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            // Establecer fecha mínima en el input de fecha (Hoy)
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('appointmentDate').min = today;
+
+            // Abrir pop-up inicial
+            openModal('infoModal');
+
+            // Cargar datos
+            fetchServices();
+        });
+
+        // =========================================================================
+        // FETCH Y PARSER DE ESTRUCTURA: Precio_Categoria_Servicio
+        // =========================================================================
+        async function fetchServices() {
+            const grid = document.getElementById('servicesGrid');
+            try {
+                const response = await fetch(WEB_APP_URL, { method: 'GET', redirect: 'follow' });
+                
+                if (!response.ok) throw new Error('Error de conexión con el servidor Apps Script');
+
+                const data = await response.json();
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    grid.innerHTML = `
+                        <div class="col-span-full text-center py-16 text-slate-500 space-y-2">
+                            <span class="text-4xl block opacity-40">📁</span>
+                            <p class="font-medium text-slate-300">No se encontraron imágenes en la carpeta de Google Drive.</p>
+                        </div>`;
+                    return;
+                }
+
+                // PARSER: Precio_Categoria_Servicio
+                allServices = data.map((item, index) => {
+                    const rawName = item.name || '';
+                    
+                    // Remover extensión (.jpg, .png, .gif, etc.)
+                    const cleanFileName = rawName.replace(/\.[^/.]+$/, "");
+
+                    let price = 0;
+                    let category = 'Servicios';
+                    let serviceName = cleanFileName;
+
+                    // Separar por guión bajo '_'
+                    const parts = cleanFileName.split('_');
+
+                    if (parts.length >= 3) {
+                        // Formato: [0]=Precio, [1]=Categoría, [2+]=Nombre del Servicio
+                        price = parseFloat(parts[0].replace(/[^0-9.]/g, '')) || 0;
+                        category = parts[1].trim();
+                        serviceName = parts.slice(2).join(' ').trim();
+                    } else if (parts.length === 2) {
+                        // Formato alternativo: [0]=Precio, [1]=Servicio
+                        price = parseFloat(parts[0].replace(/[^0-9.]/g, '')) || 0;
+                        serviceName = parts[1].trim();
+                    }
+
+                    // Determinar URL
+                    const imageUrl = item.url || `https://drive.google.com/thumbnail?id=${item.id}&sz=w1000`;
+
+                    return {
+                        id: item.id || `srv-${index}`,
+                        price: price,
+                        category: category,
+                        categoryNormalized: normalizeText(category),
+                        name: serviceName,
+                        url: imageUrl
+                    };
+                });
+
+                renderDynamicCategoryTabs();
+                renderServices(allServices);
+
+            } catch (error) {
+                console.error("Error cargando los servicios:", error);
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-rose-400 space-y-2">
+                        <p class="font-bold text-lg">⚠️ Ocurrió un error al cargar las imágenes desde Google Drive.</p>
+                        <p class="text-xs text-slate-400">Asegúrate de que la aplicación web de Apps Script tenga acceso público.</p>
+                    </div>`;
+            }
+        }
+
+        // Genera los botones de categoría según las categorías presentes en Drive
+        function renderDynamicCategoryTabs() {
+            const container = document.getElementById('categoryTabsContainer');
+            
+            // Extraer categorías únicas
+            const categoriesSet = new Set(allServices.map(s => s.category));
+            const uniqueCategories = Array.from(categoriesSet);
+
+            let html = `
+                <button onclick="setCategory('all')" id="btn-cat-all" class="cat-btn px-5 py-2.5 rounded-full border border-gold-500 bg-gold-500 text-slate-950 font-bold transition shadow-sm">
+                    ✨ Todos
+                </button>
+            `;
+
+            uniqueCategories.forEach(cat => {
+                const normCat = normalizeText(cat);
+                let icon = '✦';
+                if (normCat.includes('barber')) icon = '💈';
+                else if (normCat.includes('lash')) icon = '👁️';
+                else if (normCat.includes('una')) icon = '💅';
+
+                html += `
+                    <button onclick="setCategory('${escapeHtml(normCat)}')" id="btn-cat-${escapeHtml(normCat)}" class="cat-btn px-5 py-2.5 rounded-full border border-slate-800 bg-slate-900/80 text-slate-300 hover:border-slate-700 transition">
+                        ${icon} ${escapeHtml(cat)}
+                    </button>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // =========================================================================
+        // RENDERIZADO DE TARJETAS
+        // =========================================================================
+        function renderServices(services) {
+            const grid = document.getElementById('servicesGrid');
+
+            if (!services || services.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-16 text-slate-500 space-y-2">
+                        <span class="text-4xl block opacity-40">🔍</span>
+                        <p class="font-medium">No se encontraron servicios que coincidan con la búsqueda.</p>
+                    </div>`;
+                return;
+            }
+
+            grid.innerHTML = services.map(service => `
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden hover:border-gold-500/50 transition duration-300 flex flex-col justify-between group shadow-xl hover:shadow-2xl hover:shadow-gold-500/5">
+                    
+                    <!-- Imagen con Zoom -->
+                    <div class="relative h-56 w-full overflow-hidden bg-slate-950 cursor-pointer" onclick="zoomImage('${service.url}', '${escapeHtml(service.name)}')">
+                        <img src="${service.url}" alt="${escapeHtml(service.name)}" 
+                            class="w-full h-full object-cover group-hover:scale-105 transition duration-500" 
+                            referrerpolicy="no-referrer" loading="lazy"
+                            onerror="this.onerror=null; this.src='https://placehold.co/500x400/0f172a/d4af37?text=Servicio';">
+                        
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80"></div>
+                        
+                        <!-- Badge Categoría -->
+                        <span class="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-md text-[10px] font-extrabold px-3 py-1 rounded-full text-gold-400 border border-amber-500/20 uppercase tracking-widest">
+                            ${escapeHtml(service.category)}
+                        </span>
+                    </div>
+
+                    <!-- Detalles del Servicio -->
+                    <div class="p-5 flex-grow flex flex-col justify-between space-y-4">
+                        <div>
+                            <h3 class="font-bold text-slate-100 text-lg group-hover:text-amber-300 transition line-clamp-2">${escapeHtml(service.name)}</h3>
+                            <p class="text-2xl font-black text-gold-400 mt-2">$${service.price.toFixed(2)}</p>
+                        </div>
+
+                        <!-- Botón Agregar -->
+                        <button onclick="addToCart('${service.id}')" 
+                            class="w-full py-3 px-4 rounded-xl font-extrabold bg-slate-800 hover:bg-gold-500 hover:text-slate-950 text-slate-200 border border-slate-700/80 hover:border-gold-500 transition duration-200 flex items-center justify-center gap-2 text-xs uppercase tracking-wider shadow-md active:scale-95">
+                            <span>➕ Agregar a la Cita</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // =========================================================================
+        // FILTROS Y BÚSQUEDA
+        // =========================================================================
+        function setCategory(category) {
+            currentCategory = category;
+            
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.className = 'cat-btn px-5 py-2.5 rounded-full border border-slate-800 bg-slate-900/80 text-slate-300 hover:border-slate-700 transition';
+            });
+
+            const activeBtn = document.getElementById(`btn-cat-${category}`);
+            if (activeBtn) {
+                activeBtn.className = 'cat-btn px-5 py-2.5 rounded-full border border-gold-500 bg-gold-500 text-slate-950 font-bold transition shadow-sm';
+            }
+
+            filterServices();
+        }
+
+        function filterServices() {
+            const query = normalizeText(document.getElementById('searchInput').value);
+            const clearBtn = document.getElementById('clearSearchBtn');
+            
+            clearBtn.classList.toggle('hidden', query.length === 0);
+
+            const filtered = allServices.filter(s => {
+                const matchesSearch = normalizeText(s.name).includes(query) || s.categoryNormalized.includes(query);
+                
+                let matchesCategory = true;
+                if (currentCategory !== 'all') {
+                    matchesCategory = s.categoryNormalized.includes(normalizeText(currentCategory));
+                }
+
+                return matchesSearch && matchesCategory;
+            });
+
+            renderServices(filtered);
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            filterServices();
+        }
+
+        function normalizeText(text) {
+            return String(text || '')
+                .toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        }
+
+        // =========================================================================
+        // LÓGICA DE CARRITO Y AGENDAMIENTO
+        // =========================================================================
+        function addToCart(serviceId) {
+            const service = allServices.find(s => s.id === serviceId);
+            if (!service) return;
+
+            const existing = cart.find(item => item.id === serviceId);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...service, qty: 1 });
+            }
+
+            updateCartUI();
+            
+            // Animación en el badge
+            const badge = document.getElementById('cartCountBadge');
+            badge.classList.remove('animate-pop');
+            void badge.offsetWidth; // Reflow
+            badge.classList.add('animate-pop');
+
+            toggleCartDrawer(true);
+        }
+
+        function updateQuantity(serviceId, delta) {
+            const item = cart.find(i => i.id === serviceId);
+            if (!item) return;
+
+            item.qty += delta;
+            if (item.qty <= 0) {
+                cart = cart.filter(i => i.id !== serviceId);
+            }
+
+            updateCartUI();
+        }
+
+        function removeFromCart(serviceId) {
+            cart = cart.filter(i => i.id !== serviceId);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
+            document.getElementById('cartCountBadge').textContent = totalItems;
+
+            const grandTotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            document.getElementById('cartTotalText').textContent = `$${grandTotal.toFixed(2)}`;
+
+            document.getElementById('btnSubmitAppointment').disabled = cart.length === 0;
+
+            const container = document.getElementById('cartItemsContainer');
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16 text-slate-500 space-y-2">
+                        <span class="text-5xl block opacity-30">🛍️</span>
+                        <p class="font-medium text-sm text-slate-400">Aún no has agregado servicios a tu cita.</p>
+                        <p class="text-xs text-slate-600">Explora el catálogo y presiona "Agregar a la cita".</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = cart.map(item => `
+                <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between gap-3 shadow-md">
+                    <img src="${item.url}" alt="${escapeHtml(item.name)}" class="w-12 h-12 rounded-xl object-cover bg-slate-900" referrerpolicy="no-referrer">
+                    
+                    <div class="flex-grow min-w-0">
+                        <h4 class="text-xs sm:text-sm font-semibold text-slate-200 truncate">${escapeHtml(item.name)}</h4>
+                        <p class="text-xs text-gold-400 font-bold">$${(item.price * item.qty).toFixed(2)}</p>
+                    </div>
+
+                    <!-- Botones Cantidad -->
+                    <div class="flex items-center gap-2 bg-slate-900 px-2 py-1 rounded-xl border border-slate-800">
+                        <button onclick="updateQuantity('${item.id}', -1)" class="text-slate-400 hover:text-white px-1 text-sm font-bold">-</button>
+                        <span class="text-xs font-bold text-slate-200">${item.qty}</span>
+                        <button onclick="updateQuantity('${item.id}', 1)" class="text-slate-400 hover:text-white px-1 text-sm font-bold">+</button>
+                    </div>
+
+                    <button onclick="removeFromCart('${item.id}')" class="text-slate-500 hover:text-rose-400 text-xs p-1">
+                        ✕
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function toggleCartDrawer(open) {
+            const drawer = document.getElementById('cartDrawer');
+            const backdrop = document.getElementById('cartDrawerBackdrop');
+
+            if (open) {
+                backdrop.classList.remove('hidden');
+                drawer.classList.remove('translate-x-full');
+            } else {
+                drawer.classList.add('translate-x-full');
+                setTimeout(() => backdrop.classList.add('hidden'), 300);
+            }
+        }
+
+        // =========================================================================
+        // AGENDAMIENTO WHATSAPP
+        // =========================================================================
+        function handleScheduleAppointment(event) {
+            event.preventDefault();
+
+            if (cart.length === 0) return;
+
+            const name = document.getElementById('clientName').value.trim();
+            const date = document.getElementById('appointmentDate').value;
+            const time = document.getElementById('appointmentTime').value;
+            const notes = document.getElementById('appointmentNotes').value.trim();
+
+            const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+
+            // Armar mensaje WhatsApp
+            let message = `✨ *SOLICITUD DE CITA - GLAM & BARBER* ✨\n`;
+            message += `----------------------------------------\n`;
+            message += `👤 *Cliente:* ${name}\n`;
+            message += `📅 *Fecha:* ${date}\n`;
+            message += `⏰ *Hora preferida:* ${time} hrs\n`;
+            if (notes) {
+                message += `📝 *Notas:* ${notes}\n`;
+            }
+            message += `\n💈 *Servicios solicitados:*\n`;
+
+            cart.forEach(item => {
+                message += ` • ${item.name} (x${item.qty}) - $${(item.price * item.qty).toFixed(2)}\n`;
+            });
+
+            message += `\n💰 *Total Estimado:* $${total.toFixed(2)}\n`;
+            message += `----------------------------------------\n`;
+            message += `¿Tienen disponibilidad para esta fecha y hora? Quedo al pendiente.`;
+
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // =========================================================================
+        // UTILERÍAS Y MODALES
+        // =========================================================================
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+            document.getElementById(id).classList.add('flex');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+
+        function zoomImage(url, caption) {
+            document.getElementById('modalImageTarget').src = url;
+            document.getElementById('modalImageCaption').textContent = caption;
+            openModal('imageModal');
+        }
+
+        function escapeHtml(text) {
+            return String(text || '')
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
