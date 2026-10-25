@@ -310,7 +310,7 @@
         const CONFIG_GITHUB = {
             user: lugi2050-dotcom,
             repo: carrera-nfc,
-            token: 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
+            token: lugi2050-dotcom
         };
 
         let personas = [];
@@ -357,9 +357,19 @@
                 const data = await response.json();
                 fileSha = data.sha;
 
-                const decodedContent = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-                personas = decodedContent.personas || [];
-                idCounter = decodedContent.idCounter || 1;
+                // Limpiar saltos de linea y decodificar caracteres UTF-8 de forma segura
+                const cleanBase64 = data.content.replace(/\s/g, '');
+                const jsonString = new TextDecoder().decode(Uint8Array.from(atob(cleanBase64), c => c.charCodeAt(0)));
+                const parsedData = JSON.parse(jsonString);
+
+                // Soporte para formato de objeto o lista directa en datos.json
+                if (Array.isArray(parsedData)) {
+                    personas = parsedData;
+                    idCounter = personas.length > 0 ? Math.max(...personas.map(p => p.id)) + 1 : 1;
+                } else {
+                    personas = parsedData.personas || [];
+                    idCounter = parsedData.idCounter || (personas.length > 0 ? Math.max(...personas.map(p => p.id)) + 1 : 1);
+                }
 
                 actualizarSelectorPadres();
                 renderizarArbol();
