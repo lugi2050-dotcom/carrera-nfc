@@ -226,24 +226,6 @@
 <body>
 
     <div class="sidebar">
-        <!-- Configuracion de GitHub -->
-        <section>
-            <h2>Conexion con GitHub</h2>
-            <div class="form-group" style="margin-top: 8px;">
-                <label for="gh-user">lugi2050-dotcom</label>
-                <input type="text" id="gh-user" placeholder="Ej. tu-usuario">
-            </div>
-            <div class="form-group">
-                <label for="gh-repo">carrera-nfc</label>
-                <input type="text" id="gh-repo" placeholder="Ej. arbol-genealogico">
-            </div>
-            <div class="form-group">
-                <label for="gh-token">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</label>
-                <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx">
-            </div>
-            <button class="btn-success" onclick="guardarConfiguracionGitHub()">Guardar Credenciales y Sincronizar</button>
-        </section>
-
         <!-- Busqueda -->
         <section>
             <h2>Buscar en el Arbol</h2>
@@ -311,11 +293,18 @@
     <div class="main-content">
         <div id="tree-container"></div>
         <div class="instructions">
-            Nota: Al ingresar tus credenciales una vez, se quedan guardadas en este dispositivo para futuras sesiones.
+            Nota: Los datos se sincronizan automaticamente con el repositorio de GitHub configurado.
         </div>
     </div>
 
     <script>
+        // CONFIGURACION DE GITHUB (Escribe tus credenciales aqui)
+        const CONFIG_GITHUB = {
+            user: "lugi2050-dotcom",
+            repo: "carrera-nfc",
+            token: "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"
+        };
+
         let personas = [];
         let idCounter = 1;
         let selectedNodeId = null;
@@ -333,43 +322,12 @@
         const g = svg.append("g").attr("transform", "translate(80,0)");
         const treeLayout = d3.tree().nodeSize([85, 230]);
 
-        // Cargar credenciales guardadas y rellenar los inputs automaticamente
-        function cargarCredenciales() {
-            const user = localStorage.getItem('gh_user') || '';
-            const repo = localStorage.getItem('gh_repo') || '';
-            const token = localStorage.getItem('gh_token') || '';
-
-            document.getElementById('gh-user').value = user;
-            document.getElementById('gh-repo').value = repo;
-            document.getElementById('gh-token').value = token;
-
-            return { user, repo, token };
-        }
-
-        function guardarConfiguracionGitHub() {
-            const user = document.getElementById('gh-user').value.trim();
-            const repo = document.getElementById('gh-repo').value.trim();
-            const token = document.getElementById('gh-token').value.trim();
-
-            if (!user || !repo || !token) {
-                alert("Por favor completa todos los campos de configuracion de GitHub.");
-                return;
-            }
-
-            localStorage.setItem('gh_user', user);
-            localStorage.setItem('gh_repo', repo);
-            localStorage.setItem('gh_token', token);
-
-            alert("Credenciales guardadas con exito. Sincronizando...");
-            cargarDatosDesdeGitHub();
-        }
-
         // Cargar datos desde el archivo datos.json en GitHub
         async function cargarDatosDesdeGitHub() {
-            const { user, repo, token } = cargarCredenciales();
+            const { user, repo, token } = CONFIG_GITHUB;
 
-            if (!user || !repo || !token) {
-                // Datos de prueba si aun no se configuran las credenciales
+            if (!user || user === "TU_USUARIO_AQUI" || !repo || !token) {
+                // Datos de prueba si no se han configurado las credenciales en el codigo
                 personas = [
                     { id: 1, nombre: "Roberto Gomez", fechaNacimiento: "1950-05-20", telefono: "555-123-4567", pareja: "Elena Ramos", padreId: null },
                     { id: 2, nombre: "Carlos Gomez", fechaNacimiento: "1978-11-12", telefono: "555-987-6543", pareja: "Laura Torres", padreId: 1 }
@@ -401,16 +359,16 @@
                 renderizarArbol();
             } catch (error) {
                 console.error(error);
-                alert("Error al cargar datos desde GitHub. Verifica tus credenciales y que el archivo datos.json exista.");
+                alert("Error al cargar datos desde GitHub. Verifica las credenciales en el codigo y que el archivo datos.json exista.");
             }
         }
 
         // Guardar cambios directamente en el archivo datos.json en GitHub
         async function persistirDatosEnGitHub() {
-            const { user, repo, token } = cargarCredenciales();
+            const { user, repo, token } = CONFIG_GITHUB;
 
-            if (!user || !repo || !token) {
-                alert("Faltan las credenciales de GitHub para guardar los cambios en la nube.");
+            if (!user || user === "TU_USUARIO_AQUI" || !repo || !token) {
+                alert("Faltan configurar las credenciales de GitHub en el codigo fuente.");
                 return;
             }
 
@@ -711,9 +669,8 @@
             });
         }
 
-        // Al iniciar la pagina, carga automaticamente credenciales y sincroniza el arbol
+        // Al iniciar la pagina, carga automaticamente los datos usando las credenciales internas
         window.onload = () => {
-            cargarCredenciales();
             cargarDatosDesdeGitHub();
         };
     </script>
