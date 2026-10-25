@@ -334,13 +334,7 @@
             const { user, repo, token } = CONFIG_GITHUB;
 
             if (!user || user === "TU_USUARIO_AQUI" || !repo || !token) {
-                personas = [
-                    { id: 1, nombre: "Roberto Gomez", fechaNacimiento: "1950-05-20", telefono: "555-123-4567", pareja: "Elena Ramos", padreId: null },
-                    { id: 2, nombre: "Carlos Gomez", fechaNacimiento: "1978-11-12", telefono: "555-987-6543", pareja: "Laura Torres", padreId: 1 }
-                ];
-                idCounter = 3;
-                actualizarSelectorPadres();
-                renderizarArbol();
+                cargarDatosLocalesPrueba();
                 return;
             }
 
@@ -352,17 +346,21 @@
                     }
                 });
 
+                // Si el archivo datos.json no existe aun en el repositorio, lo creamos automaticamente
+                if (response.status === 404) {
+                    await inicializarArchivoEnGitHub(user, repo, token);
+                    return;
+                }
+
                 if (!response.ok) throw new Error("No se pudo obtener el archivo datos.json del repositorio.");
 
                 const data = await response.json();
                 fileSha = data.sha;
 
-                // Limpiar saltos de linea y decodificar caracteres UTF-8 de forma segura
                 const cleanBase64 = data.content.replace(/\s/g, '');
                 const jsonString = new TextDecoder().decode(Uint8Array.from(atob(cleanBase64), c => c.charCodeAt(0)));
                 const parsedData = JSON.parse(jsonString);
 
-                // Soporte para formato de objeto o lista directa en datos.json
                 if (Array.isArray(parsedData)) {
                     personas = parsedData;
                     idCounter = personas.length > 0 ? Math.max(...personas.map(p => p.id)) + 1 : 1;
@@ -375,8 +373,55 @@
                 renderizarArbol();
             } catch (error) {
                 console.error(error);
-                alert("Error al cargar datos desde GitHub. Verifica las credenciales en el codigo y que el archivo datos.json exista.");
+                alert("Error al conectar con GitHub. Se cargaran datos locales de prueba.");
+                cargarDatosLocalesPrueba();
             }
+        }
+
+        async function inicializarArchivoEnGitHub(user, repo, token) {
+            personas = [
+                { id: 1, nombre: "Roberto Gomez", fechaNacimiento: "1950-05-20", telefono: "555-123-4567", pareja: "Elena Ramos", padreId: null },
+                { id: 2, nombre: "Carlos Gomez", fechaNacimiento: "1978-11-12", telefono: "555-987-6543", pareja: "Laura Torres", padreId: 1 }
+            ];
+            idCounter = 3;
+
+            const contenidoObjeto = { personas, idCounter };
+            const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(contenidoObjeto, null, 4))));
+
+            try {
+                const response = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/datos.json`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: "Creacion inicial automatica de datos.json",
+                        content: contentEncoded
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    fileSha = data.content.sha;
+                }
+            } catch (e) {
+                console.error("Error al inicializar el archivo en GitHub:", e);
+            }
+
+            actualizarSelectorPadres();
+            renderizarArbol();
+        }
+
+        function cargarDatosLocalesPrueba() {
+            personas = [
+                { id: 1, nombre: "Roberto Gomez", fechaNacimiento: "1950-05-20", telefono: "555-123-4567", pareja: "Elena Ramos", padreId: null },
+                { id: 2, nombre: "Carlos Gomez", fechaNacimiento: "1978-11-12", telefono: "555-987-6543", pareja: "Laura Torres", padreId: 1 }
+            ];
+            idCounter = 3;
+            actualizarSelectorPadres();
+            renderizarArbol();
         }
 
         async function persistirDatosEnGitHub() {
