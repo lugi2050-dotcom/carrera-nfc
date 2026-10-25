@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arbol Genealogico Interactivo</title>
+    <title>Arbol Genealogico Familiar</title>
     <!-- Carga de D3.js -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg-color: #f8fafc;
+            --primary: #15803d;
+            --primary-hover: #166534;
+            --bg-color: #f0fdf4;
             --card-bg: #ffffff;
             --text-color: #1e293b;
-            --border-color: #e2e8f0;
-            --accent: #ec4899;
-            --selected: #10b981;
+            --border-color: #bbf7d0;
+            --accent: #b45309;
+            --selected: #047857;
+            --branch-color: #86efac;
         }
 
         * {
@@ -33,7 +34,7 @@
             overflow: hidden;
         }
 
-        /* Panel lateral */
+        /* Panel lateral estilo vivero */
         .sidebar {
             width: 400px;
             background-color: var(--card-bg);
@@ -42,7 +43,7 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            box-shadow: 4px 0 15px rgba(21, 128, 61, 0.05);
             z-index: 10;
             overflow-y: auto;
         }
@@ -64,7 +65,7 @@
         label {
             font-size: 0.8rem;
             font-weight: 600;
-            color: #64748b;
+            color: #475569;
         }
 
         input, select {
@@ -74,10 +75,12 @@
             font-size: 0.9rem;
             outline: none;
             transition: border-color 0.2s;
+            background-color: #fafaf9;
         }
 
         input:focus, select:focus {
             border-color: var(--primary);
+            background-color: #ffffff;
         }
 
         .btn-group {
@@ -111,23 +114,23 @@
         }
 
         button.btn-success {
-            background-color: #10b981;
+            background-color: #047857;
         }
         button.btn-success:hover {
-            background-color: #059669;
+            background-color: #065f46;
         }
 
         button.btn-danger {
-            background-color: #ef4444;
-        }
-        button.btn-danger:hover {
             background-color: #dc2626;
         }
+        button.btn-danger:hover {
+            background-color: #b91c1c;
+        }
 
-        /* Tarjeta de seleccion */
+        /* Tarjeta de seleccion de rama */
         .selection-card {
-            background-color: #f0fdf4;
-            border: 1px solid #bbf7d0;
+            background-color: #f7fee7;
+            border: 1px solid #d9f99d;
             padding: 12px;
             border-radius: 6px;
             display: flex;
@@ -143,14 +146,14 @@
 
         .selection-card h3 {
             font-size: 0.95rem;
-            color: #166534;
+            color: #365314;
         }
 
-        /* Area de visualizacion */
+        /* Area de visualizacion de ramas y hojas */
         .main-content {
             flex: 1;
             position: relative;
-            background-color: #f1f5f9;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
         }
 
         #tree-container {
@@ -158,23 +161,25 @@
             height: 100%;
         }
 
-        /* Estilos de los nodos */
+        /* Estilos de los nodos del arbol */
         .node circle {
-            fill: #fff;
+            fill: #ffffff;
             stroke: var(--primary);
-            stroke-width: 3px;
+            stroke-width: 3.5px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
         }
 
         .node circle:hover {
             stroke: var(--selected);
             stroke-width: 5px;
+            fill: #f0fdf4;
         }
 
         .node text {
             font-size: 12px;
             font-weight: 600;
+            fill: #1e293b;
             pointer-events: none;
         }
 
@@ -185,28 +190,30 @@
         }
 
         .node .phone-text {
-            fill: #059669;
+            fill: #047857;
             font-size: 10px;
         }
 
         .node--selected circle {
-            fill: #a7f3d0 !important;
+            fill: #dcfce7 !important;
             stroke: var(--selected) !important;
             stroke-width: 5px !important;
-            r: 10 !important;
+            r: 11 !important;
         }
 
         .node--highlight circle {
             fill: #fef08a !important;
             stroke: #ca8a04 !important;
             stroke-width: 5px !important;
-            r: 10 !important;
+            r: 11 !important;
         }
 
+        /* Ramas del arbol */
         .link {
             fill: none;
-            stroke: #cbd5e1;
-            stroke-width: 2px;
+            stroke: var(--branch-color);
+            stroke-width: 3px;
+            stroke-linecap: round;
         }
 
         .instructions {
@@ -218,8 +225,9 @@
             border-radius: 8px;
             font-size: 0.8rem;
             border: 1px solid var(--border-color);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             pointer-events: none;
+            color: #334155;
         }
     </style>
 </head>
@@ -234,29 +242,29 @@
             </div>
         </section>
 
-        <!-- Panel de Nodo Seleccionado -->
+        <!-- Panel de Rama Seleccionada -->
         <section id="selection-panel" style="display: none;">
             <div class="selection-card">
                 <header>
-                    <h3 id="selected-name">Persona Seleccionada</h3>
+                    <h3 id="selected-name">Rama Seleccionada</h3>
                     <button class="btn-danger" style="width: auto; padding: 2px 8px; font-size: 0.75rem;" onclick="deseleccionarNode()">Cerrar</button>
                 </header>
                 <div class="btn-group">
-                    <button class="btn-success" onclick="prepararAgregarHijo()">Agregar Hijo</button>
-                    <button class="btn-secondary" onclick="cargarEnFormularioEdicion()">Editar Datos</button>
-                    <button class="btn-danger" onclick="eliminarPersona()">Eliminar</button>
+                    <button class="btn-success" onclick="prepararAgregarHijo()">Crear Nueva Rama (Hijo)</button>
+                    <button class="btn-secondary" onclick="cargarEnFormularioEdicion()">Modificar Rama</button>
+                    <button class="btn-danger" onclick="eliminarPersona()">Podar (Eliminar)</button>
                 </div>
             </div>
         </section>
 
-        <!-- Formulario -->
+        <!-- Formulario de Cultivo -->
         <section>
-            <h2 id="form-title">Registrar Integrante</h2>
+            <h2 id="form-title">Registrar Nueva Rama</h2>
             <form id="person-form" onsubmit="guardarPersona(event)">
                 <input type="hidden" id="edit-id" value="">
 
                 <div class="form-group">
-                    <label for="padre-select">Progenitor o Padre</label>
+                    <label for="padre-select">Rama Progenitora</label>
                     <select id="padre-select" onchange="evaluarModoFormulario()">
                         <!-- Opciones dinamicas -->
                     </select>
@@ -283,7 +291,7 @@
                 </div>
 
                 <div class="btn-group">
-                    <button type="submit" id="submit-btn">Agregar al Arbol</button>
+                    <button type="submit" id="submit-btn">Plantar en el Arbol</button>
                     <button type="button" id="cancel-edit-btn" class="btn-secondary" style="display: none;" onclick="cancelarEdicion()">Cancelar</button>
                 </div>
             </form>
@@ -293,7 +301,7 @@
     <div class="main-content">
         <div id="tree-container"></div>
         <div class="instructions">
-            Nota: Los datos se sincronizan automaticamente con el repositorio de GitHub configurado.
+            Nota: Haz clic sobre cualquier rama para seleccionarla, modificarla, podarla o extender nuevas ramificaciones.
         </div>
     </div>
 
@@ -320,14 +328,12 @@
             .append("g");
 
         const g = svg.append("g").attr("transform", "translate(80,0)");
-        const treeLayout = d3.tree().nodeSize([85, 230]);
+        const treeLayout = d3.tree().nodeSize([90, 240]);
 
-        // Cargar datos desde el archivo datos.json en GitHub
         async function cargarDatosDesdeGitHub() {
             const { user, repo, token } = CONFIG_GITHUB;
 
             if (!user || user === "TU_USUARIO_AQUI" || !repo || !token) {
-                // Datos de prueba si no se han configurado las credenciales en el codigo
                 personas = [
                     { id: 1, nombre: "Roberto Gomez", fechaNacimiento: "1950-05-20", telefono: "555-123-4567", pareja: "Elena Ramos", padreId: null },
                     { id: 2, nombre: "Carlos Gomez", fechaNacimiento: "1978-11-12", telefono: "555-987-6543", pareja: "Laura Torres", padreId: 1 }
@@ -363,7 +369,6 @@
             }
         }
 
-        // Guardar cambios directamente en el archivo datos.json en GitHub
         async function persistirDatosEnGitHub() {
             const { user, repo, token } = CONFIG_GITHUB;
 
@@ -388,7 +393,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: "Actualizacion automatica del arbol genealogico",
+                        message: "Actualizacion de ramas y hojas del arbol",
                         content: contentEncoded,
                         sha: fileSha
                     })
@@ -464,18 +469,18 @@
             const formTitle = document.getElementById('form-title');
 
             if (editId) {
-                formTitle.textContent = "Editar Integrante";
+                formTitle.textContent = "Modificar Rama";
                 submitBtn.textContent = "Guardar Cambios";
                 submitBtn.className = "btn-success";
                 cancelBtn.style.display = "block";
             } else {
-                formTitle.textContent = "Registrar Integrante";
+                formTitle.textContent = "Registrar Nueva Rama";
                 submitBtn.className = "";
                 cancelBtn.style.display = "none";
                 if (select.value === "") {
-                    submitBtn.textContent = "Establecer Inicio del Arbol (Raiz)";
+                    submitBtn.textContent = "Establecer Tronco Principal (Raiz)";
                 } else {
-                    submitBtn.textContent = "Agregar Hijo o Rama";
+                    submitBtn.textContent = "Plantar en el Arbol";
                 }
             }
         }
@@ -494,7 +499,7 @@
                 const persona = personas.find(p => p.id === parseInt(editId));
                 if (persona) {
                     if (padreId && parseInt(padreId) === persona.id) {
-                        alert("Una persona no puede ser su propio progenitor.");
+                        alert("Una rama no puede sostenerse a si misma.");
                         return;
                     }
                     persona.nombre = nombre;
@@ -505,7 +510,7 @@
                 }
             } else {
                 if (padreId === "" && personas.length > 0) {
-                    if (!confirm("Ya existe un inicio de arbol. Deseas reiniciar y establecer esta persona como la nueva raiz?")) {
+                    if (!confirm("Ya existe un tronco principal. Deseas reiniciar y establecer esta persona como el nuevo inicio?")) {
                         return;
                     }
                     personas = [];
@@ -535,11 +540,11 @@
             
             const tieneHijos = personas.some(p => p.padreId === selectedNodeId);
             if (tieneHijos) {
-                alert("No se puede eliminar a una persona que tiene descendientes registrados. Elimine primero a los hijos.");
+                alert("No se puede podar una rama que tiene ramificaciones secundarias. Elimine primero los brotes hijos.");
                 return;
             }
 
-            if (confirm("Estas seguro de eliminar a esta persona del arbol?")) {
+            if (confirm("Estas seguro de podar y eliminar esta rama del arbol?")) {
                 personas = personas.filter(p => p.id !== selectedNodeId);
                 persistirDatosEnGitHub();
                 deseleccionarNode();
@@ -556,18 +561,18 @@
             if (personas.length === 0) {
                 const opt = document.createElement('option');
                 opt.value = "";
-                opt.textContent = "Crear Inicio del Arbol (Raiz)";
+                opt.textContent = "Establecer Tronco Principal (Raiz)";
                 select.appendChild(opt);
             } else {
                 const optRaiz = document.createElement('option');
                 optRaiz.value = "";
-                optRaiz.textContent = "Sin Padre / Nueva Raiz";
+                optRaiz.textContent = "Sin Rama Progenitora / Nuevo Tronco";
                 select.appendChild(optRaiz);
 
                 personas.forEach(p => {
                     const opt = document.createElement('option');
                     opt.value = p.id;
-                    opt.textContent = `Hijo de: ${p.nombre}` + (p.pareja ? ` y ${p.pareja}` : '');
+                    opt.textContent = `Rama de: ${p.nombre}` + (p.pareja ? ` y ${p.pareja}` : '');
                     select.appendChild(opt);
                 });
 
@@ -625,7 +630,7 @@
                     seleccionarNodo(d.data.id);
                 });
 
-            node.append("circle").attr("r", 8);
+            node.append("circle").attr("r", 8.5);
 
             node.append("text")
                 .attr("dy", "-0.8em")
@@ -669,7 +674,6 @@
             });
         }
 
-        // Al iniciar la pagina, carga automaticamente los datos usando las credenciales internas
         window.onload = () => {
             cargarDatosDesdeGitHub();
         };
