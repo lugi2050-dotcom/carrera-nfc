@@ -15,7 +15,15 @@
             "telefono": "5959232375 casa",
             "pareja": "Maria Luisa Miranda Fuentes",
             "padreId": 1
+        },
+        {
+            "id": 3,
+            "nombre": "Rodolfo Barrera Garcia",
+            "fechaNacimiento": "2026-10-25",
+            "telefono": null,
+            "pareja": null,
+            "padreId": 1
         }
     ],
-    "idCounter": 3
+    "idCounter": 4
 }
