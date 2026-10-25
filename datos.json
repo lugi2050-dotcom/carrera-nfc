@@ -7,7 +7,15 @@
             "telefono": null,
             "pareja": "Ofelia",
             "padreId": null
+        },
+        {
+            "id": 2,
+            "nombre": "Alfredo Barrera Garcia",
+            "fechaNacimiento": "1973-01-31",
+            "telefono": "5959232375 casa",
+            "pareja": "Maria Luisa Miranda Fuentes",
+            "padreId": 1
         }
     ],
-    "idCounter": 2
+    "idCounter": 3
 }
