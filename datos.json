@@ -1,1 +1,13 @@
-[]
+{
+    "personas": [
+        {
+            "id": 1,
+            "nombre": "Rodolfo Barrera",
+            "fechaNacimiento": "1950-10-05",
+            "telefono": null,
+            "pareja": "Ofelia",
+            "padreId": null
+        }
+    ],
+    "idCounter": 2
+}
