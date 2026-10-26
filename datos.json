@@ -116,7 +116,17 @@
                     "partner": "MARIA LUISA MIRANDA FUENTES",
                     "partnerBirthday": "",
                     "phone": "",
-                    "children": []
+                    "children": [
+                      {
+                        "id": "p_1793002497387",
+                        "name": "LUIS ALFREDO BARRERA MIRANDA",
+                        "birthday": "",
+                        "partner": "KARLA ITZEL",
+                        "partnerBirthday": "",
+                        "phone": "",
+                        "children": []
+                      }
+                    ]
                   },
                   {
                     "id": "p_1793001902926",
