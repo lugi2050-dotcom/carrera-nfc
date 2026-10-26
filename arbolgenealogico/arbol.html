@@ -112,12 +112,12 @@
       background: var(--card-bg);
       border-radius: 8px;
       display: inline-block;
-      min-width: 150px;
+      min-width: 180px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .person-name { font-weight: bold; font-size: 1.1em; }
-    .person-details { font-size: 0.85em; color: #64748b; margin-top: 4px; }
+    .person-details { font-size: 0.85em; color: #64748b; margin-top: 3px; }
     .person-actions { margin-top: 8px; display: flex; gap: 4px; justify-content: center; }
 
     /* Modales */
@@ -184,12 +184,20 @@
         <input type="text" id="personName" placeholder="Ej. Juan Pérez" />
       </div>
       <div class="form-group">
-        <label>Año de Nacimiento:</label>
-        <input type="number" id="personBirth" placeholder="Ej. 1950" />
+        <label>Cumpleaños:</label>
+        <input type="text" id="personBirthday" placeholder="Ej. 15 de Mayo" />
       </div>
       <div class="form-group">
-        <label>Detalles / Notas:</label>
-        <input type="text" id="personNotes" placeholder="Ej. Abuelo / Ciudad" />
+        <label>Nombre de la Pareja (Opcional):</label>
+        <input type="text" id="personPartner" placeholder="Ej. María López" />
+      </div>
+      <div class="form-group">
+        <label>Cumpleaños de la Pareja (Opcional):</label>
+        <input type="text" id="personPartnerBirthday" placeholder="Ej. 20 de Agosto" />
+      </div>
+      <div class="form-group">
+        <label>Teléfono Familiar:</label>
+        <input type="text" id="personPhone" placeholder="Ej. 55 1234 5678" />
       </div>
       <div class="modal-buttons">
         <button class="btn-secondary" onclick="closeModal('personModal')">Cancelar</button>
@@ -216,14 +224,12 @@
 
     function toggleEditMode() {
       if (isEditingEnabled) {
-        // Bloquear edición
         isEditingEnabled = false;
         localStorage.removeItem('gh_token');
         githubConfig.token = '';
         updateAuthUI();
         renderTree();
       } else {
-        // Activar edición: si ya hay token guardado, lo activamos directo; si no, pedimos token
         if (githubConfig.token) {
           isEditingEnabled = true;
           updateAuthUI();
@@ -254,7 +260,6 @@
       }
     }
 
-    // CARGAR DATOS
     async function loadTreeData() {
       const url = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${githubConfig.path}`;
       try {
@@ -286,11 +291,10 @@
         renderTree();
       } catch (err) {
         console.error(err);
-        document.getElementById('tree').innerHTML = `<p style="color:#b91c1c; text-align:center; padding:20px;">Error al cargar datos desde GitHub. Verifica tu conexión o repositorio.</p>`;
+        document.getElementById('tree').innerHTML = `<p style="color:#b91c1c; text-align:center; padding:20px;">Error al cargar datos desde GitHub.</p>`;
       }
     }
 
-    // GUARDAR EN GITHUB
     async function saveTreeDataToGitHub() {
       if (!githubConfig.token) {
         alert("Necesitas ingresar tu token de GitHub.");
@@ -329,7 +333,6 @@
       }
     }
 
-    // RENDERIZAR ÁRBOL
     function renderTree() {
       const container = document.getElementById('tree');
       if (!treeData || treeData.length === 0) {
@@ -352,7 +355,6 @@
     function renderNode(node) {
       let actions = '';
 
-      // Solo muestra los botones si el modo edición está activo
       if (isEditingEnabled) {
         actions = `
           <div class="person-actions">
@@ -367,8 +369,9 @@
         <li>
           <div class="person-card">
             <div class="person-name">${node.name}</div>
-            <div class="person-details">${node.birth ? 'Nac: ' + node.birth : ''}</div>
-            <div class="person-details">${node.notes || ''}</div>
+            ${node.birthday ? `<div class="person-details">🎂 ${node.birthday}</div>` : ''}
+            ${node.partner ? `<div class="person-details">❤️ ${node.partner} ${node.partnerBirthday ? '(' + node.partnerBirthday + ')' : ''}</div>` : ''}
+            ${node.phone ? `<div class="person-details">📞 ${node.phone}</div>` : ''}
             ${actions}
           </div>
       `;
@@ -385,7 +388,6 @@
       return html;
     }
 
-    // LÓGICA DE BÚSQUEDA EN JERARQUÍA
     function findAndAddChild(list, parentId, newPerson) {
       for (let person of list) {
         if (person.id === parentId) {
@@ -402,8 +404,10 @@
       for (let person of list) {
         if (person.id === id) {
           person.name = data.name;
-          person.birth = data.birth;
-          person.notes = data.notes;
+          person.birthday = data.birthday;
+          person.partner = data.partner;
+          person.partnerBirthday = data.partnerBirthday;
+          person.phone = data.phone;
           return true;
         }
         if (person.children && findAndEdit(person.children, id, data)) return true;
@@ -433,7 +437,6 @@
       return null;
     }
 
-    // MODALES Y EVENTOS
     function openTokenModal() {
       document.getElementById('ghTokenInput').value = githubConfig.token;
       document.getElementById('tokenModal').classList.add('active');
@@ -458,8 +461,10 @@
       document.getElementById('editPersonId').value = "";
       document.getElementById('parentPersonId').value = parentId || "";
       document.getElementById('personName').value = "";
-      document.getElementById('personBirth').value = "";
-      document.getElementById('personNotes').value = "";
+      document.getElementById('personBirthday').value = "";
+      document.getElementById('personPartner').value = "";
+      document.getElementById('personPartnerBirthday').value = "";
+      document.getElementById('personPhone').value = "";
       document.getElementById('personModal').classList.add('active');
     }
 
@@ -470,8 +475,10 @@
       document.getElementById('editPersonId').value = person.id;
       document.getElementById('parentPersonId').value = "";
       document.getElementById('personName').value = person.name;
-      document.getElementById('personBirth').value = person.birth || "";
-      document.getElementById('personNotes').value = person.notes || "";
+      document.getElementById('personBirthday').value = person.birthday || "";
+      document.getElementById('personPartner').value = person.partner || "";
+      document.getElementById('personPartnerBirthday').value = person.partnerBirthday || "";
+      document.getElementById('personPhone').value = person.phone || "";
       document.getElementById('personModal').classList.add('active');
     }
 
@@ -479,8 +486,10 @@
       const editId = document.getElementById('editPersonId').value;
       const parentId = document.getElementById('parentPersonId').value;
       const name = document.getElementById('personName').value.trim();
-      const birth = document.getElementById('personBirth').value.trim();
-      const notes = document.getElementById('personNotes').value.trim();
+      const birthday = document.getElementById('personBirthday').value.trim();
+      const partner = document.getElementById('personPartner').value.trim();
+      const partnerBirthday = document.getElementById('personPartnerBirthday').value.trim();
+      const phone = document.getElementById('personPhone').value.trim();
 
       if (!name) {
         alert("El nombre es obligatorio");
@@ -488,13 +497,15 @@
       }
 
       if (editId) {
-        findAndEdit(treeData, editId, { name, birth, notes });
+        findAndEdit(treeData, editId, { name, birthday, partner, partnerBirthday, phone });
       } else {
         const newPerson = {
           id: 'p_' + Date.now(),
           name,
-          birth,
-          notes,
+          birthday,
+          partner,
+          partnerBirthday,
+          phone,
           children: []
         };
         if (parentId) {
