@@ -13,7 +13,7 @@
         "children": [
           {
             "id": "p_3",
-            "name": "Sofía nez",
+            "name": "bisabuelos",
             "birth": "2000",
             "notes": "Nieto / Descendiente",
             "children": [
@@ -31,7 +31,11 @@
                 "notes": "kjhg",
                 "children": []
               }
-            ]
+            ],
+            "birthday": "",
+            "partner": "",
+            "partnerBirthday": "",
+            "phone": ""
           }
         ]
       }
