@@ -30,8 +30,16 @@
             "fechaNacimiento": "2026-10-29",
             "telefono": null,
             "pareja": null,
+            "padreId": 5
+        },
+        {
+            "id": 5,
+            "nombre": "maria",
+            "fechaNacimiento": "2026-10-14",
+            "telefono": null,
+            "pareja": null,
             "padreId": null
         }
     ],
-    "idCounter": 5
+    "idCounter": 6
 }
