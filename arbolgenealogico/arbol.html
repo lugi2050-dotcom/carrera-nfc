@@ -237,6 +237,16 @@
 <body>
 
     <div class="sidebar">
+        <!-- Configuracion simplificada: Solo pide el Token -->
+        <section>
+            <h2>Conexion con GitHub</h2>
+            <div class="form-group" style="margin-top: 8px;">
+                <label for="gh-token">Token de Acceso Personal (PAT)</label>
+                <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx">
+            </div>
+            <button class="btn-success" onclick="guardarTokenGitHub()">Guardar Token y Sincronizar</button>
+        </section>
+
         <!-- Busqueda -->
         <section>
             <h2>Buscar en el Jardin</h2>
@@ -309,13 +319,6 @@
     </div>
 
     <script>
-        // CONFIGURACION DE GITHUB (Sustituye con tus datos reales)
-        const CONFIG_GITHUB = {
-            user: lugi2050-dotcom,
-            repo: carrera-nfc,
-            token: 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
-        };
-
         let personas = [];
         let idCounter = 1;
         let selectedNodeId = null;
@@ -333,10 +336,42 @@
         const g = svg.append("g").attr("transform", "translate(80,0)");
         const treeLayout = d3.tree().nodeSize([95, 250]);
 
-        async function cargarDatosDesdeGitHub() {
-            const { user, repo, token } = CONFIG_GITHUB;
+        // Obtener usuario y repositorio automaticamente desde la URL de GitHub Pages
+        function obtenerConfiguracionGitHub() {
+            const hostname = window.location.hostname; // ej: usuario.github.io
+            let user = "";
+            let repo = "";
 
-            if (!user || user === lugi2050-dotcom || !repo || !token) {
+            if (hostname.includes("github.io")) {
+                user = hostname.split(".")[0];
+                const pathSegments = window.location.pathname.split("/").filter(Boolean);
+                repo = pathSegments[0] || "";
+            } else {
+                // Fallback por si se prueba localmente en la computadora
+                user = "lugi2050-dotcom";
+                repo = "carrera-nfc";
+            }
+
+            const token = localStorage.getItem('gh_token') || "";
+            return { user, repo, token };
+        }
+
+        function guardarTokenGitHub() {
+            const token = document.getElementById('gh-token').value.trim();
+            if (!token) {
+                alert("Por favor ingresa un token valido.");
+                return;
+            }
+            localStorage.setItem('gh_token', token);
+            alert("Token guardado correctamente. Sincronizando con GitHub...");
+            cargarDatosDesdeGitHub();
+        }
+
+        async function cargarDatosDesdeGitHub() {
+            const { user, repo, token } = obtenerConfiguracionGitHub();
+            document.getElementById('gh-token').value = token;
+
+            if (!token || !user || !repo) {
                 cargarDatosLocalesPrueba();
                 return;
             }
@@ -375,7 +410,7 @@
                 renderizarArbol();
             } catch (error) {
                 console.error(error);
-                alert("Error al conectar con GitHub. Se cargaran datos locales de prueba.");
+                alert("Error al conectar con GitHub. Verifica que tu token sea correcto o se cargaran datos locales de prueba.");
                 cargarDatosLocalesPrueba();
             }
         }
@@ -427,10 +462,10 @@
         }
 
         async function persistirDatosEnGitHub() {
-            const { user, repo, token } = CONFIG_GITHUB;
+            const { user, repo, token } = obtenerConfiguracionGitHub();
 
-            if (!user || user === "TU_USUARIO_AQUI" || !repo || !token) {
-                alert("Faltan configurar las credenciales de GitHub en el codigo fuente.");
+            if (!token) {
+                alert("Falta ingresar el token de GitHub.");
                 return;
             }
 
@@ -726,7 +761,6 @@
                 (p.telefono && p.telefono.includes(query))
             );
 
-            coincidentes.getResource = coincidentes;
             coincidentes.forEach(p => {
                 d3.selectAll(`.node-id-${p.id}`).classed('node--highlight', true);
             });
