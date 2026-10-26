@@ -16,7 +16,15 @@
             "name": "Sofía nez",
             "birth": "2000",
             "notes": "Nieto / Descendiente",
-            "children": []
+            "children": [
+              {
+                "id": "p_1792999562681",
+                "name": "marco",
+                "birth": "",
+                "notes": "oiuh",
+                "children": []
+              }
+            ]
           }
         ]
       }
