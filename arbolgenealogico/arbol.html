@@ -143,10 +143,10 @@
   <header>
     <div>
       <h1>Árbol Genealógico</h1>
-      <p style="margin:2px 0 0 0; font-size:0.85em; color:#64748b;">lugi2050-dotcom/carrera-nfc</p>
+      <p id="modeStatus" style="margin:2px 0 0 0; font-size:0.85em; color:#64748b;">lugi2050-dotcom/carrera-nfc (Modo Lectura)</p>
     </div>
     <div class="controls">
-      <button id="authBtn" onclick="openTokenModal()">Ingresar Token</button>
+      <button id="authBtn" onclick="toggleEditMode()">🔓 Activar Edición</button>
       <button id="addRootBtn" style="display:none;" onclick="openAddModal(null)">+ Agregar Antepasado Raíz</button>
     </div>
   </header>
@@ -160,15 +160,15 @@
   <!-- Modal Token -->
   <div id="tokenModal" class="modal">
     <div class="modal-content">
-      <h3>Autenticación GitHub</h3>
-      <p style="font-size:0.85em; color:#64748b; margin-bottom:12px;">Ingresa tu Personal Access Token con permisos de escritura (ámbito <b>repo</b>).</p>
+      <h3>Ingresar Token de GitHub</h3>
+      <p style="font-size:0.85em; color:#64748b; margin-bottom:12px;">Ingresa tu Personal Access Token con permisos de escritura (ámbito <b>repo</b>) para desbloquear la edición.</p>
       <div class="form-group">
         <label>GitHub Token:</label>
         <input type="password" id="ghTokenInput" placeholder="ghp_xxxx..." />
       </div>
       <div class="modal-buttons">
         <button class="btn-secondary" onclick="closeModal('tokenModal')">Cancelar</button>
-        <button onclick="saveToken()">Guardar Token</button>
+        <button onclick="saveToken()">Desbloquear Edición</button>
       </div>
     </div>
   </div>
@@ -206,23 +206,51 @@
       path: 'datos.json'
     };
 
+    let isEditingEnabled = false;
     let treeData = [];
     let fileSha = '';
 
     window.onload = () => {
-      updateAuthUI();
       loadTreeData();
     };
+
+    function toggleEditMode() {
+      if (isEditingEnabled) {
+        // Bloquear edición
+        isEditingEnabled = false;
+        localStorage.removeItem('gh_token');
+        githubConfig.token = '';
+        updateAuthUI();
+        renderTree();
+      } else {
+        // Activar edición: si ya hay token guardado, lo activamos directo; si no, pedimos token
+        if (githubConfig.token) {
+          isEditingEnabled = true;
+          updateAuthUI();
+          renderTree();
+        } else {
+          openTokenModal();
+        }
+      }
+    }
 
     function updateAuthUI() {
       const authBtn = document.getElementById('authBtn');
       const addRootBtn = document.getElementById('addRootBtn');
-      if (githubConfig.token) {
-        authBtn.innerText = "🔑 Token Activo (Editable)";
+      const modeStatus = document.getElementById('modeStatus');
+
+      if (isEditingEnabled) {
+        authBtn.innerText = "🔒 Bloquear Edición";
+        authBtn.className = "btn-secondary";
         addRootBtn.style.display = "inline-block";
+        modeStatus.innerText = "lugi2050-dotcom/carrera-nfc (Modo Edición Activado)";
+        modeStatus.style.color = "#16a34a";
       } else {
-        authBtn.innerText = "🔒 Ingresar Token";
+        authBtn.innerText = "🔓 Activar Edición";
+        authBtn.className = "";
         addRootBtn.style.display = "none";
+        modeStatus.innerText = "lugi2050-dotcom/carrera-nfc (Modo Lectura)";
+        modeStatus.style.color = "#64748b";
       }
     }
 
@@ -243,7 +271,7 @@
           document.getElementById('tree').innerHTML = `
             <div style="text-align:center; padding: 20px;">
               <p>El archivo <b>datos.json</b> aún no existe en el repositorio.</p>
-              ${githubConfig.token ? '<p>Haz clic arriba en <b>"+ Agregar Antepasado Raíz"</b> para crearlo automáticamente.</p>' : '<p>Ingresa tu token para poder crearlo.</p>'}
+              <p>Activa la edición con tu token para crearlo automáticamente.</p>
             </div>
           `;
           return;
@@ -258,7 +286,7 @@
         renderTree();
       } catch (err) {
         console.error(err);
-        document.getElementById('tree').innerHTML = `<p style="color:#b91c1c; text-align:center; padding:20px;">Error al cargar datos desde GitHub. Verifica tu token o conexión.</p>`;
+        document.getElementById('tree').innerHTML = `<p style="color:#b91c1c; text-align:center; padding:20px;">Error al cargar datos desde GitHub. Verifica tu conexión o repositorio.</p>`;
       }
     }
 
@@ -307,8 +335,7 @@
       if (!treeData || treeData.length === 0) {
         container.innerHTML = `
           <div style="text-align:center; padding: 20px;">
-            <p style="color:#64748b;">No hay personas registradas.</p>
-            ${githubConfig.token ? '<p>Haz clic en <b>"+ Agregar Antepasado Raíz"</b> para empezar.</p>' : ''}
+            <p style="color:#64748b;">No hay personas registradas en datos.json.</p>
           </div>
         `;
         return;
@@ -323,10 +350,10 @@
     }
 
     function renderNode(node) {
-      const isAuth = !!githubConfig.token;
       let actions = '';
 
-      if (isAuth) {
+      // Solo muestra los botones si el modo edición está activo
+      if (isEditingEnabled) {
         actions = `
           <div class="person-actions">
             <button title="Agregar Hijo" onclick="openAddModal('${node.id}')">+</button>
@@ -413,11 +440,17 @@
     }
 
     function saveToken() {
-      githubConfig.token = document.getElementById('ghTokenInput').value.trim();
-      localStorage.setItem('gh_token', githubConfig.token);
+      const tokenVal = document.getElementById('ghTokenInput').value.trim();
+      if (!tokenVal) {
+        alert("Por favor ingresa un token válido.");
+        return;
+      }
+      githubConfig.token = tokenVal;
+      localStorage.setItem('gh_token', tokenVal);
+      isEditingEnabled = true;
       closeModal('tokenModal');
       updateAuthUI();
-      loadTreeData();
+      renderTree();
     }
 
     function openAddModal(parentId) {
@@ -439,7 +472,7 @@
       document.getElementById('personName').value = person.name;
       document.getElementById('personBirth').value = person.birth || "";
       document.getElementById('personNotes').value = person.notes || "";
-      document.getElementById('personModal'].classList.add('active');
+      document.getElementById('personModal').classList.add('active');
     }
 
     function savePerson() {
