@@ -6,7 +6,7 @@
             "fechaNacimiento": "1950-10-05",
             "telefono": null,
             "pareja": "Ofelia",
-            "padreId": null
+            "padreId": 4
         },
         {
             "id": 2,
@@ -23,7 +23,15 @@
             "telefono": null,
             "pareja": null,
             "padreId": 1
+        },
+        {
+            "id": 4,
+            "nombre": "juan",
+            "fechaNacimiento": "2026-10-22",
+            "telefono": null,
+            "pareja": null,
+            "padreId": null
         }
     ],
-    "idCounter": 4
+    "idCounter": 5
 }
