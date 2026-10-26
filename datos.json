@@ -22,7 +22,17 @@
                 "name": "RODOLFO BARRERA",
                 "birth": "",
                 "notes": "oiuh",
-                "children": [],
+                "children": [
+                  {
+                    "id": "p_1793001828931",
+                    "name": "VICTOR BARRERA GARCIA",
+                    "birthday": "",
+                    "partner": "AUREA VERONICA BUSTAMANTE",
+                    "partnerBirthday": "",
+                    "phone": "",
+                    "children": []
+                  }
+                ],
                 "birthday": "",
                 "partner": "OFELIA GARCIA",
                 "partnerBirthday": "",
