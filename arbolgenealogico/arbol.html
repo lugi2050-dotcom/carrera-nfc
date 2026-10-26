@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Árbol Genealógico</title>
+  <title>Árbol Genealógico - lugi2050-dotcom/carrera-nfc</title>
   <style>
     :root {
       --bg: #f8fafc;
@@ -23,35 +23,25 @@
     }
 
     header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      text-align: center;
       max-width: 1200px;
-      margin: 0 auto 20px auto;
-      padding-bottom: 10px;
+      margin: 0 auto 30px auto;
+      padding-bottom: 15px;
       border-bottom: 2px solid var(--border);
     }
 
-    button {
-      background-color: var(--primary);
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
+    header h1 {
+      margin: 0 0 5px 0;
+      font-size: 1.8em;
     }
 
-    button:hover { opacity: 0.9; }
-    button.btn-danger { background-color: #ef4444; }
-    button.btn-secondary { background-color: #64748b; }
-
-    .controls {
-      display: flex;
-      gap: 10px;
+    header p {
+      margin: 0;
+      color: #64748b;
+      font-size: 0.9em;
     }
 
-    /* Árbol Genealógico Jerárquico */
+    /* Estructura del Árbol Genealógico Jerárquico */
     .tree-container {
       overflow-x: auto;
       padding: 20px 0;
@@ -68,22 +58,27 @@
     }
 
     .tree li {
-      float: left; text-align: center;
+      float: left; 
+      text-align: center;
       list-style-type: none;
       position: relative;
       padding: 20px 5px 0 5px;
       transition: all 0.5s;
     }
 
-    /* Conectores / Líneas */
+    /* Conectores / Líneas de parentesco */
     .tree li::before, .tree li::after {
       content: '';
-      position: absolute; top: 0; right: 50%;
+      position: absolute; 
+      top: 0; 
+      right: 50%;
       border-top: 2px solid var(--line);
-      width: 50%; height: 20px;
+      width: 50%; 
+      height: 20px;
     }
     .tree li::after {
-      right: auto; left: 50%;
+      right: auto; 
+      left: 50%;
       border-left: 2px solid var(--line);
     }
 
@@ -95,220 +90,109 @@
 
     .tree ul::before {
       content: '';
-      position: absolute; top: 0; left: 50%;
+      position: absolute; 
+      top: 0; 
+      left: 50%;
       border-left: 2px solid var(--line);
-      width: 0; height: 20px;
+      width: 0; 
+      height: 20px;
     }
 
-    /* Nodo / Tarjeta de Persona */
+    /* Tarjeta de Persona */
     .person-card {
       border: 2px solid var(--border);
-      padding: 10px 15px;
+      padding: 12px 18px;
       background: var(--card-bg);
       border-radius: 8px;
       display: inline-block;
-      min-width: 140px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      min-width: 150px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
     }
 
-    .person-name { font-weight: bold; font-size: 1.1em; }
-    .person-details { font-size: 0.85em; color: #64748b; margin-top: 4px; }
-    .person-actions { margin-top: 8px; display: flex; gap: 4px; justify-content: center; }
+    .person-name { 
+      font-weight: bold; 
+      font-size: 1.1em; 
+      color: var(--text);
+    }
+    
+    .person-details { 
+      font-size: 0.85em; 
+      color: #64748b; 
+      margin-top: 4px; 
+    }
 
-    /* Modal de Edición */
-    .modal {
-      display: none; position: fixed; z-index: 10;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5); justify-content: center; align-items: center;
+    .error-box {
+      background: #ffeeef;
+      border: 1px solid #f87171;
+      color: #b91c1c;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 500px;
+      margin: 40px auto;
+      text-align: center;
     }
-    .modal.active { display: flex; }
-    .modal-content {
-      background: white; padding: 24px; border-radius: 8px; width: 380px; max-width: 90%;
-    }
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; font-size: 0.9em; margin-bottom: 4px; }
-    .form-group input, .form-group select {
-      width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid var(--border); border-radius: 4px;
-    }
-    .modal-buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Árbol Genealógico (<span style="font-size: 0.7em; color: #64748b;">lugi2050-dotcom/carrera-nfc</span>)</h1>
-    <div class="controls">
-      <button id="authBtn" onclick="openTokenModal()">Ingresar Token GitHub</button>
-      <button id="addRootBtn" style="display:none;" onclick="openAddModal(null)">+ Agregar Antepasado Raíz</button>
-    </div>
+    <h1>Árbol Genealógico</h1>
+    <p>Repositorio: <strong>lugi2050-dotcom/carrera-nfc</strong> (Modo Solo Lectura)</p>
   </header>
 
   <main>
     <div class="tree-container">
-      <div id="tree" class="tree">Cargando datos...</div>
+      <div id="tree" class="tree">Cargando árbol genealógico...</div>
     </div>
   </main>
 
-  <!-- Modal Token -->
-  <div id="tokenModal" class="modal">
-    <div class="modal-content">
-      <h3>Autenticación GitHub</h3>
-      <p style="font-size:0.85em; color:#64748b; margin-bottom:12px;">Repo configurado: <b>lugi2050-dotcom/carrera-nfc</b></p>
-      <div class="form-group">
-        <label>Personal Access Token (PAT):</label>
-        <input type="password" id="ghTokenInput" placeholder="ghp_xxxx..." />
-      </div>
-      <div class="modal-buttons">
-        <button class="btn-secondary" onclick="closeModal('tokenModal')">Cancelar</button>
-        <button onclick="saveToken()">Guardar Token</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Agregar / Editar Persona -->
-  <div id="personModal" class="modal">
-    <div class="modal-content">
-      <h3 id="modalTitle">Persona</h3>
-      <input type="hidden" id="editPersonId" />
-      <input type="hidden" id="parentPersonId" />
-      <div class="form-group">
-        <label>Nombre Completo:</label>
-        <input type="text" id="personName" />
-      </div>
-      <div class="form-group">
-        <label>Año de Nacimiento:</label>
-        <input type="number" id="personBirth" placeholder="Ej. 1980" />
-      </div>
-      <div class="form-group">
-        <label>Detalles / Notas:</label>
-        <input type="text" id="personNotes" placeholder="Ej. Ciudad de Origen" />
-      </div>
-      <div class="modal-buttons">
-        <button class="btn-secondary" onclick="closeModal('personModal')">Cancelar</button>
-        <button onclick="savePerson()">Guardar</button>
-      </div>
-    </div>
-  </div>
-
   <script>
-    // Configuración preestablecida
-    let githubConfig = {
-      token: localStorage.getItem('gh_token') || '',
-      owner: 'lugi2050-dotcom',
-      repo: 'carrera-nfc',
-      path: 'datos.json'
-    };
-
-    let treeData = [];
-    let fileSha = '';
+    // URL directa al archivo bruto (Raw) en GitHub
+    const REPO_OWNER = "lugi2050-dotcom";
+    const REPO_NAME = "carrera-nfc";
+    const FILE_PATH = "datos.json";
 
     window.onload = () => {
-      updateAuthUI();
       loadTreeData();
     };
 
-    function updateAuthUI() {
-      const authBtn = document.getElementById('authBtn');
-      const addRootBtn = document.getElementById('addRootBtn');
-      if (githubConfig.token) {
-        authBtn.innerText = "Token Activo (Editable)";
-        addRootBtn.style.display = "inline-block";
-      } else {
-        authBtn.innerText = "Ingresar Token (Solo Lectura)";
-        addRootBtn.style.display = "none";
-      }
-    }
-
-    // 1. CARGA DE DATOS DESDE GITHUB
     async function loadTreeData() {
-      const url = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${githubConfig.path}`;
+      // Intentamos primero con la rama 'main', si falla probaremos con 'master'
+      let url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${FILE_PATH}`;
+      
       try {
-        const headers = {};
-        if (githubConfig.token) {
-          headers['Authorization'] = `Bearer ${githubConfig.token}`;
+        let response = await fetch(url);
+        if (!response.ok) {
+          // Si 'main' da 404, probamos con la rama 'master'
+          url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/master/${FILE_PATH}`;
+          response = await fetch(url);
         }
 
-        const response = await fetch(url, { headers });
-        
-        if (response.status === 404) {
-          // Si el archivo datos.json no existe aún
-          treeData = [];
-          fileSha = '';
-          document.getElementById('tree').innerHTML = `
-            <div style="text-align:center; padding: 20px;">
-              <p style="color:#475569;">El archivo <b>datos.json</b> aún no existe en el repositorio.</p>
-              ${githubConfig.token ? '<p>Haz clic arriba en <b>"+ Agregar Antepasado Raíz"</b> para crearlo.</p>' : '<p style="color:#b91c1c;">Ingresa tu Token de GitHub para poder crear el primer registro.</p>'}
-            </div>
-          `;
-          return;
+        if (!response.ok) {
+          throw new Error("No se pudo encontrar el archivo datos.json en el repositorio.");
         }
 
-        if (!response.ok) throw new Error("No se pudo cargar datos.json desde el repositorio.");
-        
-        const data = await response.json();
-        fileSha = data.sha;
-        
-        const jsonText = decodeURIComponent(escape(atob(data.content.replace(/\s/g, ''))));
-        treeData = JSON.parse(jsonText);
-        renderTree();
+        const treeData = await response.json();
+        renderTree(treeData);
       } catch (err) {
         console.error(err);
-        document.getElementById('tree').innerHTML = `<p style="color:#b91c1c; padding:20px; text-align:center;">Error cargando 'datos.json'. Asegúrate de que el repositorio sea público o ingresa un Token válido.</p>`;
-      }
-    }
-
-    // 2. GUARDAR DATOS EN GITHUB
-    async function saveTreeDataToGitHub() {
-      if (!githubConfig.token) {
-        alert("Necesitas ingresar un Personal Access Token para guardar los cambios.");
-        openTokenModal();
-        return;
-      }
-
-      const url = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${githubConfig.path}`;
-      const jsonString = JSON.stringify(treeData, null, 2);
-      const contentEncoded = btoa(unescape(encodeURIComponent(jsonString)));
-
-      const body = {
-        message: "Actualización de árbol genealógico",
-        content: contentEncoded
-      };
-      
-      if (fileSha) {
-        body.sha = fileSha; // Solo se incluye si el archivo ya existe
-      }
-
-      try {
-        const response = await fetch(url, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${githubConfig.token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(body)
-        });
-
-        if (!response.ok) throw new Error("Error al guardar en GitHub. Verifica permisos del Token.");
-        
-        const resData = await response.json();
-        fileSha = resData.content.sha;
-        renderTree();
-        alert("¡Cambios guardados con éxito en GitHub!");
-      } catch (err) {
-        alert("Error al actualizar el repositorio: " + err.message);
-      }
-    }
-
-    // 3. RENDERIZADO DEL ÁRBOL
-    function renderTree() {
-      const container = document.getElementById('tree');
-      if (!treeData || treeData.length === 0) {
-        container.innerHTML = `
-          <div style="text-align:center; padding: 20px;">
-            <p>No hay personas registradas en el árbol.</p>
-            ${githubConfig.token ? '<p>Haz clic en <b>"+ Agregar Antepasado Raíz"</b> para empezar.</p>' : ''}
+        document.getElementById('tree').innerHTML = `
+          <div class="error-box">
+            <h3>⚠️ No se pudo cargar el archivo</h3>
+            <p>Asegúrate de que:</p>
+            <ul style="text-align: left; display: inline-block; margin-top: 8px;">
+              <li>El repositorio <b>carrera-nfc</b> sea <b>público</b>.</li>
+              <li>El archivo <b>datos.json</b> exista en la raíz del repositorio.</li>
+            </ul>
           </div>
         `;
+      }
+    }
+
+    function renderTree(treeData) {
+      const container = document.getElementById('tree');
+      if (!treeData || treeData.length === 0) {
+        container.innerHTML = "<p style='color: #64748b;'>El archivo datos.json está vacío.</p>";
         return;
       }
 
@@ -321,26 +205,12 @@
     }
 
     function renderNode(node) {
-      const isAuth = !!githubConfig.token;
-      let actions = '';
-      
-      if (isAuth) {
-        actions = `
-          <div class="person-actions">
-            <button title="Agregar Hijo" onclick="openAddModal('${node.id}')">+</button>
-            <button title="Editar" class="btn-secondary" onclick="openEditModal('${node.id}')">✏️</button>
-            <button title="Eliminar" class="btn-danger" onclick="deletePerson('${node.id}')">🗑️</button>
-          </div>
-        `;
-      }
-
       let html = `
         <li>
           <div class="person-card">
             <div class="person-name">${node.name}</div>
             <div class="person-details">${node.birth ? 'Nac: ' + node.birth : ''}</div>
             <div class="person-details">${node.notes || ''}</div>
-            ${actions}
           </div>
       `;
 
@@ -354,142 +224,6 @@
 
       html += "</li>";
       return html;
-    }
-
-    // 4. BÚSQUEDA Y MANIPULACIÓN DE NODOS
-    function findAndAddChild(list, parentId, newPerson) {
-      for (let person of list) {
-        if (person.id === parentId) {
-          if (!person.children) person.children = [];
-          person.children.push(newPerson);
-          return true;
-        }
-        if (person.children && findAndAddChild(person.children, parentId, newPerson)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    function findAndEdit(list, id, data) {
-      for (let person of list) {
-        if (person.id === id) {
-          person.name = data.name;
-          person.birth = data.birth;
-          person.notes = data.notes;
-          return true;
-        }
-        if (person.children && findAndEdit(person.children, id, data)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    function findAndDelete(list, id) {
-      for (let i = 0; i < list.length; i++) {
-        if (list[i].id === id) {
-          list.splice(i, 1);
-          return true;
-        }
-        if (list[i].children && findAndDelete(list[i].children, id)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    function findById(list, id) {
-      for (let person of list) {
-        if (person.id === id) return person;
-        if (person.children) {
-          const found = findById(person.children, id);
-          if (found) return found;
-        }
-      }
-      return null;
-    }
-
-    // 5. MODALES Y EVENTOS
-    function openTokenModal() {
-      document.getElementById('ghTokenInput').value = githubConfig.token;
-      document.getElementById('tokenModal').classList.add('active');
-    }
-
-    function saveToken() {
-      githubConfig.token = document.getElementById('ghTokenInput').value.trim();
-      localStorage.setItem('gh_token', githubConfig.token);
-      closeModal('tokenModal');
-      updateAuthUI();
-      loadTreeData();
-    }
-
-    function openAddModal(parentId) {
-      document.getElementById('modalTitle').innerText = parentId ? "Agregar Hijo" : "Agregar Antepasado Raíz";
-      document.getElementById('editPersonId').value = "";
-      document.getElementById('parentPersonId').value = parentId || "";
-      document.getElementById('personName').value = "";
-      document.getElementById('personBirth').value = "";
-      document.getElementById('personNotes').value = "";
-      document.getElementById('personModal').classList.add('active');
-    }
-
-    function openEditModal(id) {
-      const person = findById(treeData, id);
-      if (!person) return;
-
-      document.getElementById('modalTitle').innerText = "Editar Persona";
-      document.getElementById('editPersonId').value = person.id;
-      document.getElementById('parentPersonId').value = "";
-      document.getElementById('personName').value = person.name;
-      document.getElementById('personBirth').value = person.birth || "";
-      document.getElementById('personNotes').value = person.notes || "";
-      document.getElementById('personModal').classList.add('active');
-    }
-
-    function savePerson() {
-      const editId = document.getElementById('editPersonId').value;
-      const parentId = document.getElementById('parentPersonId').value;
-      const name = document.getElementById('personName').value.trim();
-      const birth = document.getElementById('personBirth').value.trim();
-      const notes = document.getElementById('personNotes').value.trim();
-
-      if (!name) {
-        alert("El nombre es obligatorio");
-        return;
-      }
-
-      if (editId) {
-        findAndEdit(treeData, editId, { name, birth, notes });
-      } else {
-        const newPerson = {
-          id: 'p_' + Date.now(),
-          name,
-          birth,
-          notes,
-          children: []
-        };
-
-        if (parentId) {
-          findAndAddChild(treeData, parentId, newPerson);
-        } else {
-          treeData.push(newPerson);
-        }
-      }
-
-      closeModal('personModal');
-      saveTreeDataToGitHub();
-    }
-
-    function deletePerson(id) {
-      if (confirm("¿Estás seguro de eliminar esta persona y todos sus descendientes?")) {
-        findAndDelete(treeData, id);
-        saveTreeDataToGitHub();
-      }
-    }
-
-    function closeModal(id) {
-      document.getElementById(id).classList.remove('active');
     }
   </script>
 </body>
