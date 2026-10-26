@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Árbol Genealógico - lugi2050-dotcom/carrera-nfc</title>
+  <title>Árbol Genealógico</title>
   <style>
     :root {
       --bg: #f8fafc;
@@ -232,7 +232,7 @@
   <header>
     <div>
       <h1>Árbol Genealógico</h1>
-      <p id="modeStatus">lugi2050-dotcom/carrera-nfc (Modo Lectura)</p>
+      <p id="modeStatus">FAMILIA BARRERA</p>
     </div>
     <div class="controls">
       <button id="authBtn" onclick="toggleEditMode()">🔓 Activar Edición</button>
@@ -254,10 +254,10 @@
   <!-- Modal Token -->
   <div id="tokenModal" class="modal">
     <div class="modal-content">
-      <h3>Ingresar Token de GitHub</h3>
+      <h3>Ingresar Token</h3>
       <p style="font-size:0.8em; color:#64748b; margin-bottom:12px;">Ingresa tu Token para habilitar edición.</p>
       <div class="form-group">
-        <label>GitHub Token:</label>
+        <label>Token:</label>
         <input type="password" id="ghTokenInput" placeholder="ghp_xxxx..." />
       </div>
       <div class="modal-buttons">
@@ -419,13 +419,13 @@
         authBtn.innerText = "🔒 Bloquear";
         authBtn.className = "btn-secondary";
         addRootBtn.style.display = "inline-block";
-        modeStatus.innerText = "lugi2050-dotcom/carrera-nfc (Edición Activada)";
+        modeStatus.innerText = "(Edición Activada)";
         modeStatus.style.color = "#16a34a";
       } else {
         authBtn.innerText = "🔓 Activar Edición";
         authBtn.className = "";
         addRootBtn.style.display = "none";
-        modeStatus.innerText = "lugi2050-dotcom/carrera-nfc (Modo Lectura)";
+        modeStatus.innerText = "(Modo Lectura)";
         modeStatus.style.color = "#64748b";
       }
     }
