@@ -1,895 +1,486 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jardin Genealogico Familiar</title>
-    <!-- Carga de D3.js -->
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <style>
-        :root {
-            --primary: #15803d;
-            --primary-hover: #166534;
-            --bg-color: #f0fdf4;
-            --card-bg: #ffffff;
-            --text-color: #1e293b;
-            --border-color: #bbf7d0;
-            --accent: #b45309;
-            --selected: #047857;
-            --branch-color: #a3e635;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Árbol Genealógico</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #cbd5e1;
+      --primary: #2563eb;
+      --text: #1e293b;
+      --line: #94a3b8;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+    }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto 20px auto;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border);
+    }
 
-        /* Panel lateral */
-        .sidebar {
-            width: 400px;
-            background-color: var(--card-bg);
-            border-right: 1px solid var(--border-color);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            box-shadow: 4px 0 15px rgba(21, 128, 61, 0.05);
-            z-index: 10;
-            overflow-y: auto;
-        }
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
 
-        h2 {
-            font-size: 1.1rem;
-            color: var(--primary);
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 6px;
-        }
+    button:hover { opacity: 0.9; }
+    button.btn-danger { background-color: #ef4444; }
+    button.btn-secondary { background-color: #64748b; }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            margin-bottom: 10px;
-        }
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
 
-        label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #475569;
-        }
+    /* Árbol Genealógico Jerárquico */
+    .tree-container {
+      overflow-x: auto;
+      padding: 20px 0;
+      display: flex;
+      justify-content: center;
+    }
 
-        input, select {
-            padding: 8px 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 0.9rem;
-            outline: none;
-            transition: border-color 0.2s;
-            background-color: #fafaf9;
-        }
+    .tree, .tree ul {
+      padding-top: 20px;
+      position: relative;
+      transition: all 0.5s;
+      display: flex;
+      justify-content: center;
+    }
 
-        input:focus, select:focus {
-            border-color: var(--primary);
-            background-color: #ffffff;
-        }
+    .tree li {
+      float: left; text-align: center;
+      list-style-type: none;
+      position: relative;
+      padding: 20px 5px 0 5px;
+      transition: all 0.5s;
+    }
 
-        .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 5px;
-        }
+    /* Conectores / Líneas */
+    .tree li::before, .tree li::after {
+      content: '';
+      position: absolute; top: 0; right: 50%;
+      border-top: 2px solid var(--line);
+      width: 50%; height: 20px;
+    }
+    .tree li::after {
+      right: auto; left: 50%;
+      border-left: 2px solid var(--line);
+    }
 
-        .btn-row {
-            display: flex;
-            gap: 8px;
-        }
+    .tree li:only-child::after, .tree li:only-child::before { display: none; }
+    .tree li:only-child { padding-top: 0; }
+    .tree li:first-child::before, .tree li:last-child::after { border: none; }
+    .tree li:last-child::before { border-right: 2px solid var(--line); border-radius: 0 5px 0 0; }
+    .tree li:first-child::after { border-radius: 5px 0 0 0; }
 
-        button {
-            padding: 9px 12px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            width: 100%;
-        }
+    .tree ul::before {
+      content: '';
+      position: absolute; top: 0; left: 50%;
+      border-left: 2px solid var(--line);
+      width: 0; height: 20px;
+    }
 
-        button:hover {
-            background-color: var(--primary-hover);
-        }
+    /* Nodo / Tarjeta de Persona */
+    .person-card {
+      border: 2px solid var(--border);
+      padding: 10px 15px;
+      background: var(--card-bg);
+      border-radius: 8px;
+      display: inline-block;
+      min-width: 140px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
 
-        button.btn-secondary {
-            background-color: #64748b;
-        }
-        button.btn-secondary:hover {
-            background-color: #475569;
-        }
+    .person-name { font-weight: bold; font-size: 1.1em; }
+    .person-details { font-size: 0.85em; color: #64748b; margin-top: 4px; }
+    .person-actions { margin-top: 8px; display: flex; gap: 4px; justify-content: center; }
 
-        button.btn-success {
-            background-color: #047857;
-        }
-        button.btn-success:hover {
-            background-color: #065f46;
-        }
-
-        button.btn-danger {
-            background-color: #dc2626;
-        }
-        button.btn-danger:hover {
-            background-color: #b91c1c;
-        }
-
-        /* Modal Pop-up para el Token */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: #ffffff;
-            padding: 24px;
-            border-radius: 10px;
-            width: 380px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .modal-content h3 {
-            color: var(--primary);
-            font-size: 1.2rem;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 6px;
-        }
-
-        /* Estado del modo edicion */
-        .auth-status {
-            padding: 8px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .auth-status.unlocked {
-            background-color: #dcfce7;
-            color: #15803d;
-            border: 1px solid #bbf7d0;
-        }
-
-        .auth-status.locked {
-            background-color: #fef2f2;
-            color: #b91c1c;
-            border: 1px solid #fecaca;
-        }
-
-        /* Tarjeta de seleccion de rama */
-        .selection-card {
-            background-color: #f7fee7;
-            border: 1px solid #d9f99d;
-            padding: 12px;
-            border-radius: 6px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .selection-card header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .selection-card h3 {
-            font-size: 0.95rem;
-            color: #365314;
-        }
-
-        /* Area de visualizacion tipo Jardin */
-        .main-content {
-            flex: 1;
-            position: relative;
-            background: linear-gradient(180deg, #bae6fd 0%, #e0f2fe 50%, #dcfce7 100%);
-        }
-
-        #tree-container {
-            width: 100%;
-            height: 100%;
-        }
-
-        /* Estilos de las hojas y brotes del arbol */
-        .node circle {
-            fill: #ffffff;
-            stroke: #16a34a;
-            stroke-width: 4px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            filter: drop-shadow(0px 3px 4px rgba(0,0,0,0.15));
-        }
-
-        .node circle:hover {
-            stroke: #047857;
-            stroke-width: 6px;
-            fill: #f0fdf4;
-        }
-
-        .node text {
-            font-size: 12px;
-            font-weight: 700;
-            fill: #14532d;
-            pointer-events: none;
-            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
-        }
-
-        .node .couple-text {
-            fill: #9a3412;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .node .phone-text {
-            fill: #047857;
-            font-size: 10px;
-        }
-
-        .node--selected circle {
-            fill: #bbf7d0 !important;
-            stroke: #047857 !important;
-            stroke-width: 6px !important;
-            r: 12 !important;
-        }
-
-        .node--highlight circle {
-            fill: #fef08a !important;
-            stroke: #ca8a04 !important;
-            stroke-width: 6px !important;
-            r: 12 !important;
-        }
-
-        /* Ramas organicas del arbol */
-        .link {
-            fill: none;
-            stroke: #78350f;
-            stroke-width: 4px;
-            stroke-linecap: round;
-            opacity: 0.85;
-        }
-
-        .instructions {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            pointer-events: none;
-            color: #334155;
-        }
-    </style>
+    /* Modal de Edición */
+    .modal {
+      display: none; position: fixed; z-index: 10;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); justify-content: center; align-items: center;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: white; padding: 24px; border-radius: 8px; width: 380px; max-width: 90%;
+    }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 0.9em; margin-bottom: 4px; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid var(--border); border-radius: 4px;
+    }
+    .modal-buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+  </style>
 </head>
 <body>
 
-    <!-- Ventana Modal Pop-up para el Token -->
-    <div id="token-modal" class="modal-overlay">
-        <div class="modal-content">
-            <h3>Activar Modo Edicion</h3>
-            <p style="font-size: 0.85rem; color: #475569;">Ingresa tu Token de Acceso Personal (PAT) de GitHub para habilitar las modificaciones en el arbol.</p>
-            <div class="form-group">
-                <label for="modal-token">Token de GitHub</label>
-                <input type="password" id="modal-token" placeholder="ghp_xxxxxxxxxxxx">
-            </div>
-            <div class="btn-row">
-                <button class="btn-success" onclick="verificarYGuardarToken()">Desbloquear</button>
-                <button class="btn-secondary" onclick="cerrarModalToken()">Cancelar</button>
-            </div>
-        </div>
+  <header>
+    <h1>Árbol Genealógico</h1>
+    <div class="controls">
+      <button id="authBtn" onclick="openTokenModal()">Ingresar Token GitHub</button>
+      <button id="addRootBtn" style="display:none;" onclick="openAddModal(null)">+ Agregar Antepasado Raíz</button>
     </div>
+  </header>
 
-    <div class="sidebar">
-        <!-- Busqueda -->
-        <section>
-            <h2>Buscar en el Jardin</h2>
-            <div class="form-group" style="margin-top: 8px;">
-                <input type="text" id="search-input" placeholder="Nombre, pareja o telefono..." oninput="buscarPersona()">
-            </div>
-        </section>
-
-        <!-- Estado de Edicion y Boton Pop-up -->
-        <section>
-            <h2>Panel de Administracion</h2>
-            <div id="auth-status-banner" class="auth-status locked" style="margin-top: 8px;">
-                Modo lectura activado
-            </div>
-            <div class="btn-group" style="margin-top: 8px;">
-                <button id="btn-open-modal" class="btn-success" onclick="abrirModalToken()">Activar Modo Edicion</button>
-                <button id="btn-lock" class="btn-secondary" style="display: none;" onclick="bloquearEdicion()">Bloquear Edicion</button>
-            </div>
-        </section>
-
-        <!-- Panel de Rama Seleccionada -->
-        <section id="selection-panel" style="display: none;">
-            <div class="selection-card">
-                <header>
-                    <h3 id="selected-name">Rama Seleccionada</h3>
-                    <button class="btn-danger" style="width: auto; padding: 2px 8px; font-size: 0.75rem;" onclick="deseleccionarNode()">Cerrar</button>
-                </header>
-                <div class="btn-group">
-                    <button class="btn-success" onclick="prepararAgregarHijo()">Agregar Hijo</button>
-                    <button class="btn-success" onclick="prepararAgregarPadre()">Agregar Padre / Antecesor</button>
-                    <button class="btn-secondary" onclick="cargarEnFormularioEdicion()">Modificar Rama</button>
-                    <button class="btn-danger" onclick="eliminarPersona()">Podar (Eliminar)</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Formulario de Cultivo -->
-        <section id="form-section" style="display: none;">
-            <h2 id="form-title">Registrar Nueva Rama</h2>
-            <form id="person-form" onsubmit="guardarPersona(event)">
-                <input type="hidden" id="edit-id" value="">
-
-                <div class="form-group">
-                    <label for="nombre">Nombre Completo *</label>
-                    <input type="text" id="nombre" required placeholder="Ej. Juan Perez">
-                </div>
-
-                <div class="form-group">
-                    <label for="fecha-nacimiento">Fecha de Nacimiento *</label>
-                    <input type="date" id="fecha-nacimiento" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="telefono">Numero de Telefono</label>
-                    <input type="tel" id="telefono" placeholder="Ej. 55 1234 5678">
-                </div>
-
-                <div class="form-group">
-                    <label for="pareja">Pareja o Conyuge (Opcional)</label>
-                    <input type="text" id="pareja" placeholder="Ej. Maria Lopez">
-                </div>
-
-                <div class="btn-row">
-                    <button type="submit" id="submit-btn">Guardar</button>
-                    <button type="button" class="btn-secondary" onclick="cancelarFormulario()">Cancelar</button>
-                </div>
-            </form>
-        </section>
+  <main>
+    <div class="tree-container">
+      <div id="tree" class="tree">Cargando datos...</div>
     </div>
+  </main>
 
-    <div class="main-content">
-        <div id="tree-container"></div>
-        <div class="instructions">
-            Nota: Haga clic en cualquier rama del arbol para ver sus opciones. Use el boton superior para desbloquear la edicion.
-        </div>
+  <!-- Modal Token -->
+  <div id="tokenModal" class="modal">
+    <div class="modal-content">
+      <h3>Autenticación GitHub</h3>
+      <div class="form-group">
+        <label>Personal Access Token (PAT):</label>
+        <input type="password" id="ghTokenInput" placeholder="ghp_xxxx..." />
+      </div>
+      <div class="form-group">
+        <label>Usuario / Organización:</label>
+        <input type="text" id="ghOwnerInput" placeholder="Ej. tu-usuario" />
+      </div>
+      <div class="form-group">
+        <label>Repositorio:</label>
+        <input type="text" id="ghRepoInput" placeholder="Ej. mi-arbol-genealogico" />
+      </div>
+      <div class="modal-buttons">
+        <button class="btn-secondary" onclick="closeModal('tokenModal')">Cancelar</button>
+        <button onclick="saveToken()">Guardar Token</button>
+      </div>
     </div>
+  </div>
 
-    <script>
-        let personas = [];
-        let idCounter = 1;
-        let selectedNodeId = null;
-        let modoEdicionDesbloqueado = false;
-        let tipoAccionFormulario = ''; 
-        let targetChildIdForParent = null;
+  <!-- Modal Agregar / Editar Persona -->
+  <div id="personModal" class="modal">
+    <div class="modal-content">
+      <h3 id="modalTitle">Persona</h3>
+      <input type="hidden" id="editPersonId" />
+      <input type="hidden" id="parentPersonId" />
+      <div class="form-group">
+        <label>Nombre Completo:</label>
+        <input type="text" id="personName" />
+      </div>
+      <div class="form-group">
+        <label>Año de Nacimiento:</label>
+        <input type="number" id="personBirth" placeholder="Ej. 1980" />
+      </div>
+      <div class="form-group">
+        <label>Detalles / Notas:</label>
+        <input type="text" id="personNotes" placeholder="Ej. Ciudad de Origen" />
+      </div>
+      <div class="modal-buttons">
+        <button class="btn-secondary" onclick="closeModal('personModal')">Cancelar</button>
+        <button onclick="savePerson()">Guardar</button>
+      </div>
+    </div>
+  </div>
 
-        const container = document.getElementById('tree-container');
-        const svg = d3.select("#tree-container").append("svg")
-            .attr("width", "100%")
-            .attr("height", "100%")
-            .call(d3.zoom().on("zoom", (event) => {
-                g.attr("transform", event.transform);
-            }))
-            .append("g");
+  <script>
+    // Configuración general
+    let githubConfig = {
+      token: localStorage.getItem('gh_token') || '',
+      owner: localStorage.getItem('gh_owner') || 'TU_USUARIO', // Cambia tu usuario por defecto aquí
+      repo: localStorage.getItem('gh_repo') || 'TU_REPO',     // Cambia tu repo por defecto aquí
+      path: 'datos.json'
+    };
 
-        const g = svg.append("g").attr("transform", "translate(80,0)");
-        const treeLayout = d3.tree().nodeSize([95, 250]);
+    let treeData = [];
+    let fileSha = ''; // Requerido por GitHub API para editar/sobrescribir archivos
 
-        function obtenerConfiguracionGitHub() {
-            const hostname = window.location.hostname;
-            let user = "";
-            let repo = "";
+    window.onload = () => {
+      updateAuthUI();
+      loadTreeData();
+    };
 
-            if (hostname.includes("github.io")) {
-                user = hostname.split(".")[0];
-                const pathSegments = window.location.pathname.split("/").filter(Boolean);
-                repo = pathSegments[0] || "";
-            } else {
-                user = "lugi2050-dotcom";
-                repo = "carrera-nfc";
-            }
+    // Actualiza visibilidad de botones según si existe un token guardado
+    function updateAuthUI() {
+      const authBtn = document.getElementById('authBtn');
+      const addRootBtn = document.getElementById('addRootBtn');
+      if (githubConfig.token) {
+        authBtn.innerText = "Configuración Token (Conectado)";
+        addRootBtn.style.display = "inline-block";
+      } else {
+        authBtn.innerText = "Ingresar Token (Modo Lectura)";
+        addRootBtn.style.display = "none";
+      }
+    }
 
-            const token = localStorage.getItem('gh_token') || "";
-            return { user, repo, token };
+    // 1. CARGA DE DATOS DESDE GITHUB
+    async function loadTreeData() {
+      const url = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${githubConfig.path}`;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("No se pudo cargar datos.json desde el repositorio.");
+        const data = await response.json();
+        fileSha = data.sha;
+        // Decodificar Base64 de la API de GitHub
+        const jsonText = decodeURIComponent(escape(atob(data.content)));
+        treeData = JSON.parse(jsonText);
+        renderTree();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('tree').innerHTML = `<p style="color:red;">Error cargando 'datos.json'. Verifica que el repositorio sea público o ingresa un Token con acceso.</p>`;
+      }
+    }
+
+    // 2. GUARDAR DATOS EN GITHUB
+    async function saveTreeDataToGitHub() {
+      if (!githubConfig.token) {
+        alert("Necesitas ingresar un Personal Access Token para guardar los cambios.");
+        return;
+      }
+
+      const url = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${githubConfig.path}`;
+      const jsonString = JSON.stringify(treeData, null, 2);
+      // Codificación UTF-8 a Base64
+      const contentEncoded = btoa(unescape(encodeURIComponent(jsonString)));
+
+      const body = {
+        message: "Actualización de árbol genealógico",
+        content: contentEncoded,
+        sha: fileSha
+      };
+
+      try {
+        const response = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${githubConfig.token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+        });
+
+        if (!response.ok) throw new Error("Error al guardar en GitHub");
+        
+        const resData = await response.json();
+        fileSha = resData.content.sha; // Actualizar SHA del archivo
+        renderTree();
+        alert("Cambios guardados con éxito en GitHub.");
+      } catch (err) {
+        alert("Error al actualizar el repositorio: " + err.message);
+      }
+    }
+
+    // 3. RENDERIZADO DEL ÁRBOL (HTML RECURSIVO)
+    function renderTree() {
+      const container = document.getElementById('tree');
+      if (!treeData || treeData.length === 0) {
+        container.innerHTML = "<p>No hay personas en el árbol.</p>";
+        return;
+      }
+
+      let html = "<ul>";
+      treeData.forEach(node => {
+        html += renderNode(node);
+      });
+      html += "</ul>";
+      container.innerHTML = html;
+    }
+
+    function renderNode(node) {
+      const isAuth = !!githubConfig.token;
+      let actions = '';
+      
+      if (isAuth) {
+        actions = `
+          <div class="person-actions">
+            <button title="Agregar Hijo" onclick="openAddModal('${node.id}')">+</button>
+            <button title="Editar" class="btn-secondary" onclick="openEditModal('${node.id}')">✏️</button>
+            <button title="Eliminar" class="btn-danger" onclick="deletePerson('${node.id}')">🗑️</button>
+          </div>
+        `;
+      }
+
+      let html = `
+        <li>
+          <div class="person-card">
+            <div class="person-name">${node.name}</div>
+            <div class="person-details">${node.birth ? 'Nac: ' + node.birth : ''}</div>
+            <div class="person-details">${node.notes || ''}</div>
+            ${actions}
+          </div>
+      `;
+
+      if (node.children && node.children.length > 0) {
+        html += "<ul>";
+        node.children.forEach(child => {
+          html += renderNode(child);
+        });
+        html += "</ul>";
+      }
+
+      html += "</li>";
+      return html;
+    }
+
+    // 4. BÚSQUEDA Y MANIPULACIÓN DE NODOS (Recursión)
+    function findAndAddChild(list, parentId, newPerson) {
+      for (let person of list) {
+        if (person.id === parentId) {
+          if (!person.children) person.children = [];
+          person.children.push(newPerson);
+          return true;
         }
-
-        function abrirModalToken() {
-            document.getElementById('token-modal').style.display = 'flex';
-            document.getElementById('modal-token').value = localStorage.getItem('gh_token') || '';
-            document.getElementById('modal-token'].focus();
+        if (person.children && findAndAddChild(person.children, parentId, newPerson)) {
+          return true;
         }
+      }
+      return false;
+    }
 
-        function cerrarModalToken() {
-            document.getElementById('token-modal').style.display = 'none';
+    function findAndEdit(list, id, data) {
+      for (let person of list) {
+        if (person.id === id) {
+          person.name = data.name;
+          person.birth = data.birth;
+          person.notes = data.notes;
+          return true;
         }
-
-        function verificarYGuardarToken() {
-            const token = document.getElementById('modal-token').value.trim();
-            if (!token) {
-                alert("Por favor ingresa un token valido.");
-                return;
-            }
-            localStorage.setItem('gh_token', token);
-            cerrarModalToken();
-            actualizarEstadoEdicion(true);
-            alert("Modo edicion activado correctamente.");
-            cargarDatosPublicos(); // Recargar datos usando el token recién guardado
+        if (person.children && findAndEdit(person.children, id, data)) {
+          return true;
         }
+      }
+      return false;
+    }
 
-        function bloquearEdicion() {
-            localStorage.removeItem('gh_token');
-            actualizarEstadoEdicion(false);
-            document.getElementById('form-section').style.display = 'none';
-            alert("Se ha bloqueado el modo edicion.");
+    function findAndDelete(list, id) {
+      for (let i = 0; i < list.length; i++) {
+        if (list[i].id === id) {
+          list.splice(i, 1);
+          return true;
         }
-
-        function actualizarEstadoEdicion(habilitado) {
-            modoEdicionDesbloqueado = habilitado;
-            const statusBanner = document.getElementById('auth-status-banner');
-            const btnOpenModal = document.getElementById('btn-open-modal');
-            const btnLock = document.getElementById('btn-lock');
-
-            if (habilitado) {
-                statusBanner.className = "auth-status unlocked";
-                statusBanner.textContent = "Modo edicion activo";
-                btnOpenModal.style.display = "none";
-                btnLock.style.display = "block";
-            } else {
-                statusBanner.className = "auth-status locked";
-                statusBanner.textContent = "Modo lectura activado";
-                btnOpenModal.style.display = "block";
-                btnLock.style.display = "none";
-            }
+        if (list[i].children && findAndDelete(list[i].children, id)) {
+          return true;
         }
+      }
+      return false;
+    }
 
-        // Carga directa mediante la API de GitHub (soluciona problemas de ramas main/master y repos privados)
-        async function cargarDatosPublicos() {
-            const { user, repo, token } = obtenerConfiguracionGitHub();
-
-            if (token) {
-                actualizarEstadoEdicion(true);
-            } else {
-                actualizarEstadoEdicion(false);
-            }
-
-            try {
-                const headers = {
-                    'Accept': 'application/vnd.github.v3+json'
-                };
-                if (token) {
-                    headers['Authorization'] = `token ${token}`;
-                }
-
-                // Usamos la API de contenidos directamente para evitar errores con raw.githubusercontent.com
-                let response = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/datos.json?t=${new Date().getTime()}`, {
-                    headers: headers
-                });
-
-                if (response.status === 404) {
-                    // Si el archivo no existe aún, cargamos datos vacíos o de prueba iniciales
-                    console.warn("El archivo datos.json no existe en el repositorio.");
-                    cargarDatosLocalesPrueba();
-                    return;
-                }
-
-                if (!response.ok) throw new Error("No se pudo conectar con la API de GitHub (Verifica tu token o conexión).");
-
-                const data = await response.json();
-                
-                if (data.content) {
-                    const cleanBase64 = data.content.replace(/\s/g, '');
-                    const jsonString = new TextDecoder().decode(Uint8Array.from(atob(cleanBase64), c => c.charCodeAt(0)));
-                    const parsedData = JSON.parse(jsonString);
-
-                    if (Array.isArray(parsedData)) {
-                        personas = parsedData;
-                        idCounter = personas.length > 0 ? Math.max(...personas.map(p => p.id)) + 1 : 1;
-                    } else {
-                        personas = parsedData.personas || [];
-                        idCounter = parsedData.idCounter || (personas.length > 0 ? Math.max(...personas.map(p => p.id)) + 1 : 1);
-                    }
-
-                    renderizarArbol();
-                } else {
-                    throw new Error("El contenido del archivo en GitHub está vacío.");
-                }
-            } catch (error) {
-                console.error("Error al cargar datos:", error);
-                // Si ya hay personas cargadas en memoria, no las borramos ante un fallo de red pasajero
-                if (personas.length === 0) {
-                    cargarDatosLocalesPrueba();
-                }
-            }
+    function findById(list, id) {
+      for (let person of list) {
+        if (person.id === id) return person;
+        if (person.children) {
+          const found = findById(person.children, id);
+          if (found) return found;
         }
+      }
+      return null;
+    }
 
-        function cargarDatosLocalesPrueba() {
-            personas = [
-                { id: 1, nombre: "Roberto Gomez", fechaNacimiento: "1950-05-20", telefono: "555-123-4567", pareja: "Elena Ramos", padreId: null },
-                { id: 2, nombre: "Carlos Gomez", fechaNacimiento: "1978-11-12", telefono: "555-987-6543", pareja: "Laura Torres", padreId: 1 }
-            ];
-            idCounter = 3;
-            renderizarArbol();
-        }
+    // 5. MODALES Y EVENTOS
+    function openTokenModal() {
+      document.getElementById('ghTokenInput').value = githubConfig.token;
+      document.getElementById('ghOwnerInput').value = githubConfig.owner;
+      document.getElementById('ghRepoInput').value = githubConfig.repo;
+      document.getElementById('tokenModal').classList.add('active');
+    }
 
-        // Función robusta para guardar en GitHub obteniendo el SHA en tiempo real
-        async function persistirDatosEnGitHub() {
-            const { user, repo, token } = obtenerConfiguracionGitHub();
+    function saveToken() {
+      githubConfig.token = document.getElementById('ghTokenInput').value.trim();
+      githubConfig.owner = document.getElementById('ghOwnerInput').value.trim();
+      githubConfig.repo = document.getElementById('ghRepoInput').value.trim();
 
-            if (!token || !modoEdicionDesbloqueado) {
-                alert("Debes activar el modo edicion con tu Token para guardar cambios.");
-                abrirModalToken();
-                return false;
-            }
+      localStorage.setItem('gh_token', githubConfig.token);
+      localStorage.setItem('gh_owner', githubConfig.owner);
+      localStorage.setItem('gh_repo', githubConfig.repo);
 
-            try {
-                const headers = {
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                };
+      closeModal('tokenModal');
+      updateAuthUI();
+      loadTreeData();
+    }
 
-                // 1. Obtener el SHA más reciente del servidor de GitHub antes de actualizar
-                const getRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/datos.json?t=${new Date().getTime()}`, {
-                    headers: headers
-                });
+    function openAddModal(parentId) {
+      document.getElementById('modalTitle').innerText = parentId ? "Agregar Hijo" : "Agregar Antepasado Raíz";
+      document.getElementById('editPersonId').value = "";
+      document.getElementById('parentPersonId').value = parentId || "";
+      document.getElementById('personName').value = "";
+      document.getElementById('personBirth').value = "";
+      document.getElementById('personNotes').value = "";
+      document.getElementById('personModal').classList.add('active');
+    }
 
-                let currentSha = null;
-                if (getRes.ok) {
-                    const getData = await getRes.json();
-                    currentSha = getData.sha;
-                }
+    function openEditModal(id) {
+      const person = findById(treeData, id);
+      if (!person) return;
 
-                // 2. Codificar contenido JSON
-                const contenidoObjeto = { personas, idCounter };
-                const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(contenidoObjeto, null, 4))));
+      document.getElementById('modalTitle').innerText = "Editar Persona";
+      document.getElementById('editPersonId').value = person.id;
+      document.getElementById('parentPersonId').value = "";
+      document.getElementById('personName').value = person.name;
+      document.getElementById('personBirth').value = person.birth || "";
+      document.getElementById('personNotes').value = person.notes || "";
+      document.getElementById('personModal').classList.add('active');
+    }
 
-                // 3. Preparar la petición PUT
-                const bodyPayload = {
-                    message: "Actualizacion del arbol genealogico",
-                    content: contentEncoded
-                };
+    function savePerson() {
+      const editId = document.getElementById('editPersonId').value;
+      const parentId = document.getElementById('parentPersonId').value;
+      const name = document.getElementById('personName').value.trim();
+      const birth = document.getElementById('personBirth').value.trim();
+      const notes = document.getElementById('personNotes').value.trim();
 
-                if (currentSha) {
-                    bodyPayload.sha = currentSha;
-                }
+      if (!name) {
+        alert("El nombre es obligatorio");
+        return;
+      }
 
-                // 4. Enviar cambios
-                const response = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/datos.json`, {
-                    method: 'PUT',
-                    headers: {
-                        ...headers,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(bodyPayload)
-                });
-
-                if (!response.ok) {
-                    const errData = await response.json();
-                    throw new Error(errData.message || "Error al actualizar en GitHub.");
-                }
-
-                return true;
-            } catch (error) {
-                console.error(error);
-                alert("Error al guardar en GitHub: " + error.message);
-                return false;
-            }
-        }
-
-        function seleccionarNodo(id) {
-            selectedNodeId = id;
-            const persona = personas.find(p => p.id === id);
-            
-            if (persona) {
-                document.getElementById('selection-panel').style.display = 'block';
-                document.getElementById('selected-name').textContent = persona.nombre;
-            } else {
-                deseleccionarNode();
-            }
-
-            renderizarArbol();
-        }
-
-        function deseleccionarNode() {
-            selectedNodeId = null;
-            document.getElementById('selection-panel').style.display = 'none';
-            document.getElementById('form-section').style.display = 'none';
-            renderizarArbol();
-        }
-
-        function prepararAgregarHijo() {
-            if (!modoEdicionDesbloqueado) {
-                abrirModalToken();
-                return;
-            }
-            if (!selectedNodeId) return;
-            
-            tipoAccionFormulario = 'hijo';
-            targetChildIdForParent = null;
-            document.getElementById('edit-id').value = "";
-            document.getElementById('form-title').textContent = "Registrar Nuevo Hijo";
-            document.getElementById('submit-btn').textContent = "Plantar Brote";
-            document.getElementById('person-form').reset();
-            document.getElementById('form-section').style.display = 'block';
-            document.getElementById('nombre').focus();
-        }
-
-        function prepararAgregarPadre() {
-            if (!modoEdicionDesbloqueado) {
-                abrirModalToken();
-                return;
-            }
-            if (!selectedNodeId) return;
-
-            const hijoActual = personas.find(p => p.id === selectedNodeId);
-            if (!hijoActual) return;
-
-            tipoAccionFormulario = 'padre';
-            targetChildIdForParent = selectedNodeId;
-            document.getElementById('edit-id').value = "";
-            document.getElementById('form-title').textContent = `Agregar Padre/Madre a: ${hijoActual.nombre}`;
-            document.getElementById('submit-btn').textContent = "Agregar Antecesor";
-            document.getElementById('person-form').reset();
-            document.getElementById('form-section').style.display = 'block';
-            document.getElementById('nombre').focus();
-        }
-
-        function cargarEnFormularioEdicion() {
-            if (!modoEdicionDesbloqueado) {
-                abrirModalToken();
-                return;
-            }
-            if (!selectedNodeId) return;
-            const persona = personas.find(p => p.id === selectedNodeId);
-            if (!persona) return;
-
-            tipoAccionFormulario = 'editar';
-            targetChildIdForParent = null;
-            document.getElementById('edit-id').value = persona.id;
-            document.getElementById('form-title').textContent = "Modificar Rama";
-            document.getElementById('submit-btn').textContent = "Guardar Cambios";
-
-            document.getElementById('nombre').value = persona.nombre;
-            document.getElementById('fecha-nacimiento').value = persona.fechaNacimiento;
-            document.getElementById('telefono').value = persona.telefono || '';
-            document.getElementById('pareja').value = persona.pareja || '';
-
-            document.getElementById('form-section').style.display = 'block';
-            document.getElementById('nombre').focus();
-        }
-
-        function cancelarFormulario() {
-            document.getElementById('form-section').style.display = 'none';
-            document.getElementById('person-form').reset();
-        }
-
-        async function guardarPersona(e) {
-            e.preventDefault();
-
-            if (!modoEdicionDesbloqueado) {
-                abrirModalToken();
-                return;
-            }
-
-            const editId = document.getElementById('edit-id').value;
-            const nombre = document.getElementById('nombre').value.trim();
-            const fecha = document.getElementById('fecha-nacimiento').value;
-            const telefono = document.getElementById('telefono').value.trim();
-            const pareja = document.getElementById('pareja').value.trim();
-
-            if (tipoAccionFormulario === 'editar' && editId) {
-                const persona = personas.find(p => p.id === parseInt(editId));
-                if (persona) {
-                    persona.nombre = nombre;
-                    persona.fechaNacimiento = fecha;
-                    persona.telefono = telefono || null;
-                    persona.pareja = pareja || null;
-                }
-            } else if (tipoAccionFormulario === 'hijo' && selectedNodeId) {
-                const nuevoHijo = {
-                    id: idCounter++,
-                    nombre: nombre,
-                    fechaNacimiento: fecha,
-                    telefono: telefono || null,
-                    pareja: pareja || null,
-                    padreId: selectedNodeId
-                };
-                personas.push(nuevoHijo);
-            } else if (tipoAccionFormulario === 'padre' && targetChildIdForParent) {
-                const hijo = personas.find(p => p.id === targetChildIdForParent);
-                const viejoPadreId = hijo ? hijo.padreId : null;
-
-                const nuevoPadre = {
-                    id: idCounter++,
-                    nombre: nombre,
-                    fechaNacimiento: fecha,
-                    telefono: telefono || null,
-                    pareja: pareja || null,
-                    padreId: viejoPadreId
-                };
-
-                personas.push(nuevoPadre);
-                if (hijo) {
-                    hijo.padreId = nuevoPadre.id;
-                }
-            } else {
-                if (personas.length > 0 && !confirm("¿Deseas establecer esta persona como el nuevo tronco principal?")) {
-                    return;
-                }
-                const nuevaRaiz = {
-                    id: idCounter++,
-                    nombre: nombre,
-                    fechaNacimiento: fecha,
-                    telefono: telefono || null,
-                    pareja: pareja || null,
-                    padreId: null
-                };
-                personas.push(nuevaRaiz);
-            }
-
-            const exito = await persistirDatosEnGitHub();
-            if (exito) {
-                cancelarFormulario();
-                deseleccionarNode();
-                await cargarDatosPublicos(); // Sincronizar de inmediato tras guardar
-                alert("Cambios guardados exitosamente.");
-            }
-        }
-
-        async function eliminarPersona() {
-            if (!modoEdicionDesbloqueado) {
-                abrirModalToken();
-                return;
-            }
-            if (!selectedNodeId) return;
-            
-            const tieneHijos = personas.some(p => p.padreId === selectedNodeId);
-            if (tieneHijos) {
-                alert("No se puede eliminar una rama que tiene ramificaciones secundarias. Elimine primero los hijos.");
-                return;
-            }
-
-            if (confirm("¿Estas seguro de eliminar esta rama del arbol?")) {
-                personas = personas.filter(p => p.id !== selectedNodeId);
-                const exito = await persistirDatosEnGitHub();
-                if (exito) {
-                    deseleccionarNode();
-                    await cargarDatosPublicos();
-                    alert("Rama eliminada correctamente.");
-                }
-            }
-        }
-
-        function estructurarDatos() {
-            if (personas.length === 0) return null;
-
-            const mapa = {};
-            personas.forEach(p => mapa[p.id] = { ...p, children: [] });
-
-            let raizObj = personas.find(p => p.padreId === null || !mapa[p.padreId]);
-            if (!raizObj && personas.length > 0) {
-                raizObj = personas[0];
-            }
-
-            personas.forEach(p => {
-                if (p.padreId && mapa[p.padreId]) {
-                    mapa[p.padreId].children.push(mapa[p.id]);
-                }
-            });
-
-            return raizObj ? d3.hierarchy(mapa[raizObj.id]) : null;
-        }
-
-        function renderizarArbol() {
-            g.selectAll("*").remove();
-
-            const dataJerarquica = estructurarDatos();
-            if (!dataJerarquica) return;
-
-            const root = treeLayout(dataJerarquica);
-
-            g.selectAll(".link")
-                .data(root.links())
-                .enter().append("path")
-                .attr("class", "link")
-                .attr("d", d3.linkHorizontal()
-                    .x(d => d.y)
-                    .y(d => d.x));
-
-            const node = g.selectAll(".node")
-                .data(root.descendants())
-                .enter().append("g")
-                .attr("class", d => {
-                    let cls = `node node-id-${d.data.id}`;
-                    if (d.data.id === selectedNodeId) cls += ' node--selected';
-                    return cls;
-                })
-                .attr("transform", d => `translate(${d.y},${d.x})`)
-                .on("click", (event, d) => {
-                    event.stopPropagation();
-                    seleccionarNodo(d.data.id);
-                });
-
-            node.append("circle").attr("r", 9);
-
-            node.append("text")
-                .attr("dy", "-0.8em")
-                .attr("x", 14)
-                .text(d => d.data.nombre);
-
-            node.append("text")
-                .attr("class", "couple-text")
-                .attr("dy", "0.4em")
-                .attr("x", 14)
-                .text(d => d.data.pareja ? `Pareja: ${d.data.pareja}` : '');
-
-            node.append("text")
-                .attr("class", "phone-text")
-                .attr("dy", "1.6em")
-                .attr("x", 14)
-                .text(d => d.data.telefono ? `Tel: ${d.data.telefono}` : '');
-
-            node.append("text")
-                .attr("dy", "2.8em")
-                .attr("x", 14)
-                .style("fill", "#475569")
-                .style("font-size", "10px")
-                .text(d => d.data.fechaNacimiento ? `Nac: ${d.data.fechaNacimiento}` : '');
-        }
-
-        function buscarPersona() {
-            const query = document.getElementById('search-input').value.toLowerCase().trim();
-            d3.selectAll('.node').classed('node--highlight', false);
-
-            if (query === '') return;
-
-            const coincidentes = personas.filter(p => 
-                p.nombre.toLowerCase().includes(query) || 
-                (p.pareja && p.pareja.toLowerCase().includes(query)) ||
-                (p.telefono && p.telefono.includes(query))
-            );
-
-            coincidentes.forEach(p => {
-                d3.selectAll(`.node-id-${p.id}`).classed('node--highlight', true);
-            });
-        }
-
-        window.onload = () => {
-            cargarDatosPublicos();
+      if (editId) {
+        // Editar
+        findAndEdit(treeData, editId, { name, birth, notes });
+      } else {
+        // Crear nuevo
+        const newPerson = {
+          id: 'p_' + Date.now(),
+          name,
+          birth,
+          notes,
+          children: []
         };
-    </script>
+
+        if (parentId) {
+          findAndAddChild(treeData, parentId, newPerson);
+        } else {
+          treeData.push(newPerson);
+        }
+      }
+
+      closeModal('personModal');
+      saveTreeDataToGitHub();
+    }
+
+    function deletePerson(id) {
+      if (confirm("¿Estás seguro de eliminar esta persona y todos sus descendientes?")) {
+        findAndDelete(treeData, id);
+        saveTreeDataToGitHub();
+      }
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+  </script>
 </body>
 </html>
