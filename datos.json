@@ -15,7 +15,15 @@
             "telefono": "5618782196",
             "pareja": "toña",
             "padreId": null
+        },
+        {
+            "id": 4,
+            "nombre": "yo",
+            "fechaNacimiento": "2026-10-12",
+            "telefono": "8866",
+            "pareja": "ghj",
+            "padreId": 1
         }
     ],
-    "idCounter": 4
+    "idCounter": 5
 }
