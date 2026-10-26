@@ -41,7 +41,7 @@
     "id": "p_1792999527208",
     "name": "yo",
     "birth": "1815",
-    "notes": "jhgf",
+    "notes": "",
     "children": [
       {
         "id": "p_1793000017954",
@@ -57,7 +57,9 @@
         "notes": "sdfgh",
         "children": []
       }
-    ]
+    ],
+    "partner": "ella",
+    "birthday": "5 marzo"
   },
   {
     "id": "p_1792999860817",
