@@ -311,9 +311,9 @@
     <script>
         // CONFIGURACION DE GITHUB (Sustituye con tus datos reales)
         const CONFIG_GITHUB = {
-            user: "TU_USUARIO_AQUI",
-            repo: "TU_REPOSITORIO_AQUI",
-            token: "TU_TOKEN_AQUI"
+            user: lugi2050-dotcom,
+            repo: carrera-nfc,
+            token: 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
         };
 
         let personas = [];
@@ -336,7 +336,7 @@
         async function cargarDatosDesdeGitHub() {
             const { user, repo, token } = CONFIG_GITHUB;
 
-            if (!user || user === "TU_USUARIO_AQUI" || !repo || !token) {
+            if (!user || user === lugi2050-dotcom || !repo || !token) {
                 cargarDatosLocalesPrueba();
                 return;
             }
