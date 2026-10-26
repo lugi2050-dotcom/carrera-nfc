@@ -136,7 +136,7 @@
 <body>
 
   <header>
-    <h1>Árbol Genealógico</h1>
+    <h1>Árbol Genealógico (<span style="font-size: 0.7em; color: #64748b;">lugi2050-dotcom/carrera-nfc</span>)</h1>
     <div class="controls">
       <button id="authBtn" onclick="openTokenModal()">Ingresar Token GitHub</button>
       <button id="addRootBtn" style="display:none;" onclick="openAddModal(null)">+ Agregar Antepasado Raíz</button>
@@ -153,17 +153,10 @@
   <div id="tokenModal" class="modal">
     <div class="modal-content">
       <h3>Autenticación GitHub</h3>
+      <p style="font-size:0.85em; color:#64748b; margin-bottom:12px;">Repo configurado: <b>lugi2050-dotcom/carrera-nfc</b></p>
       <div class="form-group">
         <label>Personal Access Token (PAT):</label>
         <input type="password" id="ghTokenInput" placeholder="ghp_xxxx..." />
-      </div>
-      <div class="form-group">
-        <label>Usuario / Organización:</label>
-        <input type="text" id="ghOwnerInput" placeholder="Ej. tu-usuario" />
-      </div>
-      <div class="form-group">
-        <label>Repositorio:</label>
-        <input type="text" id="ghRepoInput" placeholder="Ej. mi-arbol-genealogico" />
       </div>
       <div class="modal-buttons">
         <button class="btn-secondary" onclick="closeModal('tokenModal')">Cancelar</button>
@@ -198,31 +191,30 @@
   </div>
 
   <script>
-    // Configuración general
+    // Configuración preestablecida
     let githubConfig = {
       token: localStorage.getItem('gh_token') || '',
-      owner: localStorage.getItem('gh_owner') || 'TU_USUARIO', // Cambia tu usuario por defecto aquí
-      repo: localStorage.getItem('gh_repo') || 'TU_REPO',     // Cambia tu repo por defecto aquí
+      owner: 'lugi2050-dotcom',
+      repo: 'carrera-nfc',
       path: 'datos.json'
     };
 
     let treeData = [];
-    let fileSha = ''; // Requerido por GitHub API para editar/sobrescribir archivos
+    let fileSha = '';
 
     window.onload = () => {
       updateAuthUI();
       loadTreeData();
     };
 
-    // Actualiza visibilidad de botones según si existe un token guardado
     function updateAuthUI() {
       const authBtn = document.getElementById('authBtn');
       const addRootBtn = document.getElementById('addRootBtn');
       if (githubConfig.token) {
-        authBtn.innerText = "Configuración Token (Conectado)";
+        authBtn.innerText = "Token Activo (Editable)";
         addRootBtn.style.display = "inline-block";
       } else {
-        authBtn.innerText = "Ingresar Token (Modo Lectura)";
+        authBtn.innerText = "Ingresar Token (Solo Lectura)";
         addRootBtn.style.display = "none";
       }
     }
@@ -231,17 +223,37 @@
     async function loadTreeData() {
       const url = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${githubConfig.path}`;
       try {
-        const response = await fetch(url);
+        const headers = {};
+        if (githubConfig.token) {
+          headers['Authorization'] = `Bearer ${githubConfig.token}`;
+        }
+
+        const response = await fetch(url, { headers });
+        
+        if (response.status === 404) {
+          // Si el archivo datos.json no existe aún
+          treeData = [];
+          fileSha = '';
+          document.getElementById('tree').innerHTML = `
+            <div style="text-align:center; padding: 20px;">
+              <p style="color:#475569;">El archivo <b>datos.json</b> aún no existe en el repositorio.</p>
+              ${githubConfig.token ? '<p>Haz clic arriba en <b>"+ Agregar Antepasado Raíz"</b> para crearlo.</p>' : '<p style="color:#b91c1c;">Ingresa tu Token de GitHub para poder crear el primer registro.</p>'}
+            </div>
+          `;
+          return;
+        }
+
         if (!response.ok) throw new Error("No se pudo cargar datos.json desde el repositorio.");
+        
         const data = await response.json();
         fileSha = data.sha;
-        // Decodificar Base64 de la API de GitHub
-        const jsonText = decodeURIComponent(escape(atob(data.content)));
+        
+        const jsonText = decodeURIComponent(escape(atob(data.content.replace(/\s/g, ''))));
         treeData = JSON.parse(jsonText);
         renderTree();
       } catch (err) {
         console.error(err);
-        document.getElementById('tree').innerHTML = `<p style="color:red;">Error cargando 'datos.json'. Verifica que el repositorio sea público o ingresa un Token con acceso.</p>`;
+        document.getElementById('tree').innerHTML = `<p style="color:#b91c1c; padding:20px; text-align:center;">Error cargando 'datos.json'. Asegúrate de que el repositorio sea público o ingresa un Token válido.</p>`;
       }
     }
 
@@ -249,19 +261,22 @@
     async function saveTreeDataToGitHub() {
       if (!githubConfig.token) {
         alert("Necesitas ingresar un Personal Access Token para guardar los cambios.");
+        openTokenModal();
         return;
       }
 
       const url = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${githubConfig.path}`;
       const jsonString = JSON.stringify(treeData, null, 2);
-      // Codificación UTF-8 a Base64
       const contentEncoded = btoa(unescape(encodeURIComponent(jsonString)));
 
       const body = {
         message: "Actualización de árbol genealógico",
-        content: contentEncoded,
-        sha: fileSha
+        content: contentEncoded
       };
+      
+      if (fileSha) {
+        body.sha = fileSha; // Solo se incluye si el archivo ya existe
+      }
 
       try {
         const response = await fetch(url, {
@@ -273,22 +288,27 @@
           body: JSON.stringify(body)
         });
 
-        if (!response.ok) throw new Error("Error al guardar en GitHub");
+        if (!response.ok) throw new Error("Error al guardar en GitHub. Verifica permisos del Token.");
         
         const resData = await response.json();
-        fileSha = resData.content.sha; // Actualizar SHA del archivo
+        fileSha = resData.content.sha;
         renderTree();
-        alert("Cambios guardados con éxito en GitHub.");
+        alert("¡Cambios guardados con éxito en GitHub!");
       } catch (err) {
         alert("Error al actualizar el repositorio: " + err.message);
       }
     }
 
-    // 3. RENDERIZADO DEL ÁRBOL (HTML RECURSIVO)
+    // 3. RENDERIZADO DEL ÁRBOL
     function renderTree() {
       const container = document.getElementById('tree');
       if (!treeData || treeData.length === 0) {
-        container.innerHTML = "<p>No hay personas en el árbol.</p>";
+        container.innerHTML = `
+          <div style="text-align:center; padding: 20px;">
+            <p>No hay personas registradas en el árbol.</p>
+            ${githubConfig.token ? '<p>Haz clic en <b>"+ Agregar Antepasado Raíz"</b> para empezar.</p>' : ''}
+          </div>
+        `;
         return;
       }
 
@@ -336,7 +356,7 @@
       return html;
     }
 
-    // 4. BÚSQUEDA Y MANIPULACIÓN DE NODOS (Recursión)
+    // 4. BÚSQUEDA Y MANIPULACIÓN DE NODOS
     function findAndAddChild(list, parentId, newPerson) {
       for (let person of list) {
         if (person.id === parentId) {
@@ -393,20 +413,12 @@
     // 5. MODALES Y EVENTOS
     function openTokenModal() {
       document.getElementById('ghTokenInput').value = githubConfig.token;
-      document.getElementById('ghOwnerInput').value = githubConfig.owner;
-      document.getElementById('ghRepoInput').value = githubConfig.repo;
       document.getElementById('tokenModal').classList.add('active');
     }
 
     function saveToken() {
       githubConfig.token = document.getElementById('ghTokenInput').value.trim();
-      githubConfig.owner = document.getElementById('ghOwnerInput').value.trim();
-      githubConfig.repo = document.getElementById('ghRepoInput').value.trim();
-
       localStorage.setItem('gh_token', githubConfig.token);
-      localStorage.setItem('gh_owner', githubConfig.owner);
-      localStorage.setItem('gh_repo', githubConfig.repo);
-
       closeModal('tokenModal');
       updateAuthUI();
       loadTreeData();
@@ -448,10 +460,8 @@
       }
 
       if (editId) {
-        // Editar
         findAndEdit(treeData, editId, { name, birth, notes });
       } else {
-        // Crear nuevo
         const newPerson = {
           id: 'p_' + Date.now(),
           name,
