@@ -40,29 +40,5 @@
     "partner": "",
     "partnerBirthday": "",
     "phone": ""
-  },
-  {
-    "id": "p_1792999527208",
-    "name": "yo",
-    "birth": "1815",
-    "notes": "",
-    "children": [
-      {
-        "id": "p_1793000017954",
-        "name": "kjhgf",
-        "birth": "",
-        "notes": "kjh",
-        "children": []
-      },
-      {
-        "id": "p_1793000171955",
-        "name": "MNBVC",
-        "birth": "",
-        "notes": "sdfgh",
-        "children": []
-      }
-    ],
-    "partner": "ella",
-    "birthday": "5 marzo"
   }
 ]
