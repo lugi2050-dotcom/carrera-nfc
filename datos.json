@@ -163,7 +163,17 @@
                     "partner": "LAURA BRAVO",
                     "partnerBirthday": "",
                     "phone": "",
-                    "children": []
+                    "children": [
+                      {
+                        "id": "p_1793002709362",
+                        "name": "AARON BARRERA BRAVO",
+                        "birthday": "",
+                        "partner": "",
+                        "partnerBirthday": "",
+                        "phone": "",
+                        "children": []
+                      }
+                    ]
                   },
                   {
                     "id": "p_1793002064548",
