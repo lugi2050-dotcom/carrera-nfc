@@ -7,7 +7,15 @@
             "telefono": "555-123-4567",
             "pareja": "Elena Ramos",
             "padreId": null
+        },
+        {
+            "id": 3,
+            "nombre": "luis alfredo",
+            "fechaNacimiento": "2026-10-12",
+            "telefono": null,
+            "pareja": null,
+            "padreId": 1
         }
     ],
-    "idCounter": 3
+    "idCounter": 4
 }
