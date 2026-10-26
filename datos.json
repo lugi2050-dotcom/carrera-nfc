@@ -42,7 +42,15 @@
     "name": "yo",
     "birth": "1815",
     "notes": "jhgf",
-    "children": []
+    "children": [
+      {
+        "id": "p_1793000017954",
+        "name": "kjhgf",
+        "birth": "",
+        "notes": "kjh",
+        "children": []
+      }
+    ]
   },
   {
     "id": "p_1792999860817",
