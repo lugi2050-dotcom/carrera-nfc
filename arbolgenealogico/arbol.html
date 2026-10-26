@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Árbol Genealógico</title>
+  <title>Árbol Genealógico - lugi2050-dotcom/carrera-nfc</title>
   <style>
     :root {
       --bg: #f8fafc;
@@ -232,11 +232,11 @@
   <header>
     <div>
       <h1>Árbol Genealógico</h1>
-      <p id="modeStatus">FAMILIA BARRERA</p>
+      <p id="modeStatus">lugi2050-dotcom/carrera-nfc (Modo Lectura)</p>
     </div>
     <div class="controls">
-      <button id="authBtn" onclick="toggleEditMode()">🔓</button>
-<!--  <button id="addRootBtn" style="display:none;" onclick="openAddModal(null)">+ ANTEPASADO</button> -->
+      <button id="authBtn" onclick="toggleEditMode()">🔓 Activar Edición</button>
+      <button id="addRootBtn" style="display:none;" onclick="openAddModal(null)">+ Raíz</button>
     </div>
   </header>
 
@@ -254,11 +254,11 @@
   <!-- Modal Token -->
   <div id="tokenModal" class="modal">
     <div class="modal-content">
-      <h3>Ingresar Token</h3>
+      <h3>Ingresar Token de GitHub</h3>
       <p style="font-size:0.8em; color:#64748b; margin-bottom:12px;">Ingresa tu Token para habilitar edición.</p>
       <div class="form-group">
-        <label>Token:</label>
-        <input type="password" id="ghTokenInput" placeholder="ghp_..." />
+        <label>GitHub Token:</label>
+        <input type="password" id="ghTokenInput" placeholder="ghp_xxxx..." />
       </div>
       <div class="modal-buttons">
         <button class="btn-secondary" onclick="closeModal('tokenModal')">Cancelar</button>
@@ -275,7 +275,7 @@
       <input type="hidden" id="parentPersonId" />
       <div class="form-group">
         <label>Nombre Completo:</label>
-        <input type="text" id="personName" placeholder="" />
+        <input type="text" id="personName" placeholder="Ej. Juan Pérez" />
       </div>
       <div class="form-group">
         <label>Cumpleaños:</label>
@@ -283,7 +283,7 @@
       </div>
       <div class="form-group">
         <label>Nombre de la Pareja (Opcional):</label>
-        <input type="text" id="personPartner" placeholder="" />
+        <input type="text" id="personPartner" placeholder="Ej. María López" />
       </div>
       <div class="form-group">
         <label>Cumpleaños de la Pareja (Opcional):</label>
@@ -419,13 +419,13 @@
         authBtn.innerText = "🔒 Bloquear";
         authBtn.className = "btn-secondary";
         addRootBtn.style.display = "inline-block";
-        modeStatus.innerText = "(Edición Activada)";
+        modeStatus.innerText = "lugi2050-dotcom/carrera-nfc (Edición Activada)";
         modeStatus.style.color = "#16a34a";
       } else {
         authBtn.innerText = "🔓 Activar Edición";
         authBtn.className = "";
         addRootBtn.style.display = "none";
-        modeStatus.innerText = "(Modo Lectura)";
+        modeStatus.innerText = "lugi2050-dotcom/carrera-nfc (Modo Lectura)";
         modeStatus.style.color = "#64748b";
       }
     }
@@ -451,7 +451,7 @@
           return;
         }
 
-        if (!response.ok) throw new Error("No se pudo cargar datos");
+        if (!response.ok) throw new Error("No se pudo cargar datos.json");
 
         const data = await response.json();
         fileSha = data.sha;
@@ -460,13 +460,13 @@
         renderTree();
       } catch (err) {
         console.error(err);
-        document.getElementById('tree').innerHTML = `<p style="color:#b91c1c; text-align:center;">Error al cargar datos.</p>`;
+        document.getElementById('tree').innerHTML = `<p style="color:#b91c1c; text-align:center;">Error al cargar datos desde GitHub.</p>`;
       }
     }
 
     async function saveTreeDataToGitHub() {
       if (!githubConfig.token) {
-        alert("Necesitas ingresar tu token.");
+        alert("Necesitas ingresar tu token de GitHub.");
         openTokenModal();
         return;
       }
@@ -491,7 +491,7 @@
           body: JSON.stringify(body)
         });
 
-        if (!response.ok) throw new Error("Error al guardar.");
+        if (!response.ok) throw new Error("Error al guardar en GitHub.");
 
         const resData = await response.json();
         fileSha = resData.content.sha;
@@ -523,7 +523,7 @@
       if (isEditingEnabled) {
         actions = `
           <div class="person-actions">
-            <button title="Agregar Hij@" onclick="openAddModal('${node.id}')">+</button>
+            <button title="Agregar Hijo" onclick="openAddModal('${node.id}')">+</button>
             <button title="Editar" class="btn-secondary" onclick="openEditModal('${node.id}')">✏️</button>
             <button title="Eliminar" class="btn-danger" onclick="deletePerson('${node.id}')">🗑️</button>
           </div>
