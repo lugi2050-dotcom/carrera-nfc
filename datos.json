@@ -219,17 +219,7 @@
                     "partner": "JUAN ORTA",
                     "partnerBirthday": "",
                     "phone": "",
-                    "children": [
-                      {
-                        "id": "p_1793004384011",
-                        "name": "VIRI",
-                        "birthday": "",
-                        "partner": "",
-                        "partnerBirthday": "",
-                        "phone": "",
-                        "children": []
-                      }
-                    ]
+                    "children": []
                   }
                 ],
                 "birthday": "",
