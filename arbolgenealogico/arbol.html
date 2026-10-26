@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arbol Genealogico Interactivo</title>
+    <title>Jardin Genealogico Familiar</title>
     <!-- Carga de D3.js -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg-color: #f8fafc;
+            --primary: #15803d;
+            --primary-hover: #166534;
+            --bg-color: #f0fdf4;
             --card-bg: #ffffff;
             --text-color: #1e293b;
-            --border-color: #e2e8f0;
-            --accent: #ec4899;
-            --selected: #10b981;
+            --border-color: #bbf7d0;
+            --accent: #b45309;
+            --selected: #047857;
+            --branch-color: #a3e635;
         }
 
         * {
@@ -33,7 +34,7 @@
             overflow: hidden;
         }
 
-        /* Panel lateral */
+        /* Panel lateral estilo vivero */
         .sidebar {
             width: 400px;
             background-color: var(--card-bg);
@@ -42,7 +43,7 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            box-shadow: 4px 0 15px rgba(21, 128, 61, 0.05);
             z-index: 10;
             overflow-y: auto;
         }
@@ -64,7 +65,7 @@
         label {
             font-size: 0.8rem;
             font-weight: 600;
-            color: #64748b;
+            color: #475569;
         }
 
         input, select {
@@ -74,10 +75,12 @@
             font-size: 0.9rem;
             outline: none;
             transition: border-color 0.2s;
+            background-color: #fafaf9;
         }
 
         input:focus, select:focus {
             border-color: var(--primary);
+            background-color: #ffffff;
         }
 
         .btn-group {
@@ -111,23 +114,23 @@
         }
 
         button.btn-success {
-            background-color: #10b981;
+            background-color: #047857;
         }
         button.btn-success:hover {
-            background-color: #059669;
+            background-color: #065f46;
         }
 
         button.btn-danger {
-            background-color: #ef4444;
-        }
-        button.btn-danger:hover {
             background-color: #dc2626;
         }
+        button.btn-danger:hover {
+            background-color: #b91c1c;
+        }
 
-        /* Tarjeta de seleccion */
+        /* Tarjeta de seleccion de rama */
         .selection-card {
-            background-color: #f0fdf4;
-            border: 1px solid #bbf7d0;
+            background-color: #f7fee7;
+            border: 1px solid #d9f99d;
             padding: 12px;
             border-radius: 6px;
             display: flex;
@@ -143,14 +146,14 @@
 
         .selection-card h3 {
             font-size: 0.95rem;
-            color: #166534;
+            color: #365314;
         }
 
-        /* Area de visualizacion */
+        /* Area de visualizacion tipo Jardin */
         .main-content {
             flex: 1;
             position: relative;
-            background-color: #f1f5f9;
+            background: linear-gradient(180deg, #bae6fd 0%, #e0f2fe 50%, #dcfce7 100%);
         }
 
         #tree-container {
@@ -158,55 +161,62 @@
             height: 100%;
         }
 
-        /* Estilos de los nodos */
+        /* Estilos de las hojas y brotes del arbol */
         .node circle {
-            fill: #fff;
-            stroke: var(--primary);
-            stroke-width: 3px;
+            fill: #ffffff;
+            stroke: #16a34a;
+            stroke-width: 4px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0px 3px 4px rgba(0,0,0,0.15));
         }
 
         .node circle:hover {
-            stroke: var(--selected);
-            stroke-width: 5px;
+            stroke: #047857;
+            stroke-width: 6px;
+            fill: #f0fdf4;
         }
 
         .node text {
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
+            fill: #14532d;
             pointer-events: none;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
         }
 
         .node .couple-text {
-            fill: var(--accent);
+            fill: #9a3412;
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .node .phone-text {
-            fill: #059669;
+            fill: #047857;
             font-size: 10px;
         }
 
         .node--selected circle {
-            fill: #a7f3d0 !important;
-            stroke: var(--selected) !important;
-            stroke-width: 5px !important;
-            r: 10 !important;
+            fill: #bbf7d0 !important;
+            stroke: #047857 !important;
+            stroke-width: 6px !important;
+            r: 12 !important;
         }
 
         .node--highlight circle {
             fill: #fef08a !important;
             stroke: #ca8a04 !important;
-            stroke-width: 5px !important;
-            r: 10 !important;
+            stroke-width: 6px !important;
+            r: 12 !important;
         }
 
+        /* Ramas organicas del arbol */
         .link {
             fill: none;
-            stroke: #cbd5e1;
-            stroke-width: 2px;
+            stroke: #78350f;
+            stroke-width: 4px;
+            stroke-linecap: round;
+            opacity: 0.85;
         }
 
         .instructions {
@@ -218,63 +228,46 @@
             border-radius: 8px;
             font-size: 0.8rem;
             border: 1px solid var(--border-color);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             pointer-events: none;
+            color: #334155;
         }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <!-- Configuracion de GitHub -->
-        <section>
-            <h2>Conexion con GitHub</h2>
-            <div class="form-group" style="margin-top: 8px;">
-                <label for="gh-user">Usuario de GitHub</label>
-                <input type="text" id="gh-user" placeholder="Ej. tu-usuario">
-            </div>
-            <div class="form-group">
-                <label for="gh-repo">Nombre del Repositorio</label>
-                <input type="text" id="gh-repo" placeholder="Ej. arbol-genealogico">
-            </div>
-            <div class="form-group">
-                <label for="gh-token">Token Personal (PAT)</label>
-                <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx">
-            </div>
-            <button class="btn-success" onclick="guardarConfiguracionGitHub()">Guardar Credenciales y Sincronizar</button>
-        </section>
-
         <!-- Busqueda -->
         <section>
-            <h2>Buscar en el Arbol</h2>
+            <h2>Buscar en el Jardin</h2>
             <div class="form-group" style="margin-top: 8px;">
                 <input type="text" id="search-input" placeholder="Nombre, pareja o telefono..." oninput="buscarPersona()">
             </div>
         </section>
 
-        <!-- Panel de Nodo Seleccionado -->
+        <!-- Panel de Rama Seleccionada -->
         <section id="selection-panel" style="display: none;">
             <div class="selection-card">
                 <header>
-                    <h3 id="selected-name">Persona Seleccionada</h3>
+                    <h3 id="selected-name">Rama Seleccionada</h3>
                     <button class="btn-danger" style="width: auto; padding: 2px 8px; font-size: 0.75rem;" onclick="deseleccionarNode()">Cerrar</button>
                 </header>
                 <div class="btn-group">
-                    <button class="btn-success" onclick="prepararAgregarHijo()">Agregar Hijo</button>
-                    <button class="btn-secondary" onclick="cargarEnFormularioEdicion()">Editar Datos</button>
-                    <button class="btn-danger" onclick="eliminarPersona()">Eliminar</button>
+                    <button class="btn-success" onclick="prepararAgregarHijo()">Crear Nuevo Brote (Hijo)</button>
+                    <button class="btn-secondary" onclick="cargarEnFormularioEdicion()">Modificar Rama</button>
+                    <button class="btn-danger" onclick="eliminarPersona()">Podar (Eliminar)</button>
                 </div>
             </div>
         </section>
 
-        <!-- Formulario -->
+        <!-- Formulario de Cultivo -->
         <section>
-            <h2 id="form-title">Registrar Integrante</h2>
+            <h2 id="form-title">Registrar Nueva Rama</h2>
             <form id="person-form" onsubmit="guardarPersona(event)">
                 <input type="hidden" id="edit-id" value="">
 
                 <div class="form-group">
-                    <label for="padre-select">Progenitor o Padre</label>
+                    <label for="padre-select">Rama Progenitora</label>
                     <select id="padre-select" onchange="evaluarModoFormulario()">
                         <!-- Opciones dinamicas -->
                     </select>
@@ -301,7 +294,7 @@
                 </div>
 
                 <div class="btn-group">
-                    <button type="submit" id="submit-btn">Agregar al Arbol</button>
+                    <button type="submit" id="submit-btn">Plantar en el Arbol</button>
                     <button type="button" id="cancel-edit-btn" class="btn-secondary" style="display: none;" onclick="cancelarEdicion()">Cancelar</button>
                 </div>
             </form>
@@ -311,15 +304,22 @@
     <div class="main-content">
         <div id="tree-container"></div>
         <div class="instructions">
-            Nota: Configura tus credenciales de GitHub arriba para cargar y guardar los cambios directamente en el archivo datos.json del repositorio.
+            Nota: Haz clic sobre cualquier hoja del arbol para seleccionarla, modificarla, podarla o extender nuevas ramificaciones.
         </div>
     </div>
 
     <script>
+        // CONFIGURACION DE GITHUB (Sustituye con tus datos reales)
+        const CONFIG_GITHUB = {
+            user: "TU_USUARIO_AQUI",
+            repo: "TU_REPOSITORIO_AQUI",
+            token: "TU_TOKEN_AQUI"
+        };
+
         let personas = [];
         let idCounter = 1;
         let selectedNodeId = null;
-        let fileSha = null; // Necesario para actualizar archivos en GitHub
+        let fileSha = null;
 
         const container = document.getElementById('tree-container');
         const svg = d3.select("#tree-container").append("svg")
@@ -331,48 +331,13 @@
             .append("g");
 
         const g = svg.append("g").attr("transform", "translate(80,0)");
-        const treeLayout = d3.tree().nodeSize([85, 230]);
+        const treeLayout = d3.tree().nodeSize([95, 250]);
 
-        // Cargar credenciales guardadas en el navegador
-        function cargarCredenciales() {
-            document.getElementById('gh-user').value = localStorage.getItem('gh_user') || '';
-            document.getElementById('gh-repo').value = localStorage.getItem('gh_repo') || '';
-            document.getElementById('gh-token').value = localStorage.getItem('gh_token') || '';
-        }
-
-        function guardarConfiguracionGitHub() {
-            const user = document.getElementById('gh-user').value.trim();
-            const repo = document.getElementById('gh-repo').value.trim();
-            const token = document.getElementById('gh-token').value.trim();
-
-            if (!user || !repo || !token) {
-                alert("Por favor completa todos los campos de configuracion de GitHub.");
-                return;
-            }
-
-            localStorage.setItem('gh_user', user);
-            localStorage.setItem('gh_repo', repo);
-            localStorage.setItem('gh_token', token);
-
-            alert("Credenciales guardadas. Sincronizando con el repositorio...");
-            cargarDatosDesdeGitHub();
-        }
-
-        // Cargar datos desde el archivo datos.json en GitHub
         async function cargarDatosDesdeGitHub() {
-            const user = localStorage.getItem('gh_user');
-            const repo = localStorage.getItem('gh_repo');
-            const token = localStorage.getItem('gh_token');
+            const { user, repo, token } = CONFIG_GITHUB;
 
-            if (!user || !repo || !token) {
-                // Datos por defecto si no hay configuracion
-                personas = [
-                    { id: 1, nombre: "Roberto Gomez", fechaNacimiento: "1950-05-20", telefono: "555-123-4567", pareja: "Elena Ramos", padreId: null },
-                    { id: 2, nombre: "Carlos Gomez", fechaNacimiento: "1978-11-12", telefono: "555-987-6543", pareja: "Laura Torres", padreId: 1 }
-                ];
-                idCounter = 3;
-                actualizarSelectorPadres();
-                renderizarArbol();
+            if (!user || user === "TU_USUARIO_AQUI" || !repo || !token) {
+                cargarDatosLocalesPrueba();
                 return;
             }
 
@@ -384,41 +349,45 @@
                     }
                 });
 
+                if (response.status === 404) {
+                    await inicializarArchivoEnGitHub(user, repo, token);
+                    return;
+                }
+
                 if (!response.ok) throw new Error("No se pudo obtener el archivo datos.json del repositorio.");
 
                 const data = await response.json();
-                fileSha = data.sha; // Guardar el SHA requerido por GitHub para hacer commits
+                fileSha = data.sha;
 
-                // Decodificar contenido Base64 de la API de GitHub
-                const decodedContent = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-                personas = decodedContent.personas || [];
-                idCounter = decodedContent.idCounter || 1;
+                const cleanBase64 = data.content.replace(/\s/g, '');
+                const jsonString = new TextDecoder().decode(Uint8Array.from(atob(cleanBase64), c => c.charCodeAt(0)));
+                const parsedData = JSON.parse(jsonString);
+
+                if (Array.isArray(parsedData)) {
+                    personas = parsedData;
+                    idCounter = personas.length > 0 ? Math.max(...personas.map(p => p.id)) + 1 : 1;
+                } else {
+                    personas = parsedData.personas || [];
+                    idCounter = parsedData.idCounter || (personas.length > 0 ? Math.max(...personas.map(p => p.id)) + 1 : 1);
+                }
 
                 actualizarSelectorPadres();
                 renderizarArbol();
             } catch (error) {
                 console.error(error);
-                alert("Error al cargar datos desde GitHub. Verifica tus credenciales y que el archivo datos.json exista.");
+                alert("Error al conectar con GitHub. Se cargaran datos locales de prueba.");
+                cargarDatosLocalesPrueba();
             }
         }
 
-        // Guardar cambios directamente en el archivo datos.json en GitHub
-        async function persistirDatosEnGitHub() {
-            const user = localStorage.getItem('gh_user');
-            const repo = localStorage.getItem('gh_repo');
-            const token = localStorage.getItem('gh_token');
+        async function inicializarArchivoEnGitHub(user, repo, token) {
+            personas = [
+                { id: 1, nombre: "Roberto Gomez", fechaNacimiento: "1950-05-20", telefono: "555-123-4567", pareja: "Elena Ramos", padreId: null },
+                { id: 2, nombre: "Carlos Gomez", fechaNacimiento: "1978-11-12", telefono: "555-987-6543", pareja: "Laura Torres", padreId: 1 }
+            ];
+            idCounter = 3;
 
-            if (!user || !repo || !token) {
-                alert("Configura tus credenciales de GitHub en el panel lateral para guardar los cambios en la nube.");
-                return;
-            }
-
-            const contenidoObjeto = {
-                personas: personas,
-                idCounter: idCounter
-            };
-
-            // Codificar a Base64 soportando caracteres latinos/acentos
+            const contenidoObjeto = { personas, idCounter };
             const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(contenidoObjeto, null, 4))));
 
             try {
@@ -430,7 +399,58 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: "Actualizacion automatica del arbol genealogico",
+                        message: "Creacion inicial automatica de datos.json",
+                        content: contentEncoded
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    fileSha = data.content.sha;
+                }
+            } catch (e) {
+                console.error("Error al inicializar el archivo en GitHub:", e);
+            }
+
+            actualizarSelectorPadres();
+            renderizarArbol();
+        }
+
+        function cargarDatosLocalesPrueba() {
+            personas = [
+                { id: 1, nombre: "Roberto Gomez", fechaNacimiento: "1950-05-20", telefono: "555-123-4567", pareja: "Elena Ramos", padreId: null },
+                { id: 2, nombre: "Carlos Gomez", fechaNacimiento: "1978-11-12", telefono: "555-987-6543", pareja: "Laura Torres", padreId: 1 }
+            ];
+            idCounter = 3;
+            actualizarSelectorPadres();
+            renderizarArbol();
+        }
+
+        async function persistirDatosEnGitHub() {
+            const { user, repo, token } = CONFIG_GITHUB;
+
+            if (!user || user === "TU_USUARIO_AQUI" || !repo || !token) {
+                alert("Faltan configurar las credenciales de GitHub en el codigo fuente.");
+                return;
+            }
+
+            const contenidoObjeto = {
+                personas: personas,
+                idCounter: idCounter
+            };
+
+            const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(contenidoObjeto, null, 4))));
+
+            try {
+                const response = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/datos.json`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: "Actualizacion de ramas y hojas del arbol",
                         content: contentEncoded,
                         sha: fileSha
                     })
@@ -442,8 +462,7 @@
                 }
 
                 const responseData = await response.json();
-                fileSha = responseData.content.sha; // Actualizar el SHA con el nuevo commit
-                alert("Cambios guardados exitosamente en el archivo datos.json de GitHub.");
+                fileSha = responseData.content.sha;
             } catch (error) {
                 console.error(error);
                 alert("Error al guardar en GitHub: " + error.message);
@@ -507,18 +526,18 @@
             const formTitle = document.getElementById('form-title');
 
             if (editId) {
-                formTitle.textContent = "Editar Integrante";
+                formTitle.textContent = "Modificar Rama";
                 submitBtn.textContent = "Guardar Cambios";
                 submitBtn.className = "btn-success";
                 cancelBtn.style.display = "block";
             } else {
-                formTitle.textContent = "Registrar Integrante";
+                formTitle.textContent = "Registrar Nueva Rama";
                 submitBtn.className = "";
                 cancelBtn.style.display = "none";
                 if (select.value === "") {
-                    submitBtn.textContent = "Establecer Inicio del Arbol (Raiz)";
+                    submitBtn.textContent = "Establecer Tronco Principal (Raiz)";
                 } else {
-                    submitBtn.textContent = "Agregar Hijo o Rama";
+                    submitBtn.textContent = "Plantar en el Arbol";
                 }
             }
         }
@@ -537,7 +556,7 @@
                 const persona = personas.find(p => p.id === parseInt(editId));
                 if (persona) {
                     if (padreId && parseInt(padreId) === persona.id) {
-                        alert("Una persona no puede ser su propio progenitor.");
+                        alert("Una rama no puede sostenerse a si misma.");
                         return;
                     }
                     persona.nombre = nombre;
@@ -548,7 +567,7 @@
                 }
             } else {
                 if (padreId === "" && personas.length > 0) {
-                    if (!confirm("Ya existe un inicio de arbol. Deseas reiniciar y establecer esta persona como la nueva raiz?")) {
+                    if (!confirm("Ya existe un tronco principal. Deseas reiniciar y establecer esta persona como el nuevo inicio?")) {
                         return;
                     }
                     personas = [];
@@ -578,11 +597,11 @@
             
             const tieneHijos = personas.some(p => p.padreId === selectedNodeId);
             if (tieneHijos) {
-                alert("No se puede eliminar a una persona que tiene descendientes registrados. Elimine primero a los hijos.");
+                alert("No se puede podar una rama que tiene ramificaciones secundarias. Elimine primero los brotes hijos.");
                 return;
             }
 
-            if (confirm("Estas seguro de eliminar a esta persona del arbol?")) {
+            if (confirm("Estas seguro de podar y eliminar esta rama del arbol?")) {
                 personas = personas.filter(p => p.id !== selectedNodeId);
                 persistirDatosEnGitHub();
                 deseleccionarNode();
@@ -599,18 +618,18 @@
             if (personas.length === 0) {
                 const opt = document.createElement('option');
                 opt.value = "";
-                opt.textContent = "Crear Inicio del Arbol (Raiz)";
+                opt.textContent = "Establecer Tronco Principal (Raiz)";
                 select.appendChild(opt);
             } else {
                 const optRaiz = document.createElement('option');
                 optRaiz.value = "";
-                optRaiz.textContent = "Sin Padre / Nueva Raiz";
+                optRaiz.textContent = "Sin Rama Progenitora / Nuevo Tronco";
                 select.appendChild(optRaiz);
 
                 personas.forEach(p => {
                     const opt = document.createElement('option');
                     opt.value = p.id;
-                    opt.textContent = `Hijo de: ${p.nombre}` + (p.pareja ? ` y ${p.pareja}` : '');
+                    opt.textContent = `Rama de: ${p.nombre}` + (p.pareja ? ` y ${p.pareja}` : '');
                     select.appendChild(opt);
                 });
 
@@ -668,7 +687,7 @@
                     seleccionarNodo(d.data.id);
                 });
 
-            node.append("circle").attr("r", 8);
+            node.append("circle").attr("r", 9);
 
             node.append("text")
                 .attr("dy", "-0.8em")
@@ -690,7 +709,7 @@
             node.append("text")
                 .attr("dy", "2.8em")
                 .attr("x", 14)
-                .style("fill", "#64748b")
+                .style("fill", "#475569")
                 .style("font-size", "10px")
                 .text(d => d.data.fechaNacimiento ? `Nac: ${d.data.fechaNacimiento}` : '');
         }
@@ -707,13 +726,13 @@
                 (p.telefono && p.telefono.includes(query))
             );
 
+            coincidentes.getResource = coincidentes;
             coincidentes.forEach(p => {
                 d3.selectAll(`.node-id-${p.id}`).classed('node--highlight', true);
             });
         }
 
         window.onload = () => {
-            cargarCredenciales();
             cargarDatosDesdeGitHub();
         };
     </script>
