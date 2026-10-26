@@ -1,7 +1,13 @@
 {
     "personas": [
-        { "id": 1, "nombre": "Roberto Gomez", "fechaNacimiento": "1950-05-20", "telefono": "555-123-4567", "pareja": "Elena Ramos", "padreId": null },
-        { "id": 2, "nombre": "Carlos Gomez", "fechaNacimiento": "1978-11-12", "telefono": "555-987-6543", "pareja": "Laura Torres", "padreId": 1 }
+        {
+            "id": 1,
+            "nombre": "Roberto Gomez",
+            "fechaNacimiento": "1950-05-20",
+            "telefono": "555-123-4567",
+            "pareja": "Elena Ramos",
+            "padreId": null
+        }
     ],
     "idCounter": 3
 }
