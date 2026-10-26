@@ -3,300 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jardín Genealógico Familiar</title>
-    <!-- D3.js v7 CDN -->
+    <title>Jardin Genealogico Familiar</title>
+    <!-- Carga de D3.js -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         :root {
-            --bg-sky: linear-gradient(180deg, #e0f2fe 0%, #f0fdf4 60%, #dc2626 0%, #f7fee7 100%);
-            --tree-brown: #78350f;
-            --tree-brown-dark: #451a03;
-            --leaf-green: #15803d;
-            --leaf-hover: #166534;
-            --accent-gold: #ca8a04;
-            --card-bg: rgba(255, 255, 255, 0.92);
-            --border-color: #cbd5e1;
-            --text-dark: #0f172a;
-            --text-muted: #475569;
-            --danger: #dc2626;
-            --danger-hover: #b91c1c;
-            --success: #16a34a;
-            --success-hover: #15803d;
+            --primary: #15803d;
+            --primary-hover: #166534;
+            --bg-color: #f0fdf4;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #bbf7d0;
+            --accent: #b45309;
+            --selected: #047857;
+            --branch-color: #a3e635;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: #f0fdf4;
-            color: var(--text-dark);
-        }
-
-        /* Lienzo principal */
-        #main-canvas {
-            width: 100vw;
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
             height: 100vh;
-            background: linear-gradient(180deg, #e0f2fe 0%, #f0fdf4 50%, #dcfce7 100%);
-            cursor: grab;
+            overflow: hidden;
         }
 
-        #main-canvas:active {
-            cursor: grabbing;
-        }
-
-        /* Controles flotantes en modo lectura */
-        .floating-controls {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
+        /* Panel lateral */
+        .sidebar {
+            width: 400px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            pointer-events: none;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 4px 0 15px rgba(21, 128, 61, 0.05);
             z-index: 10;
+            overflow-y: auto;
         }
 
-        .floating-controls > * {
-            pointer-events: auto;
+        h2 {
+            font-size: 1.1rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 6px;
         }
 
-        .search-box {
-            background: var(--card-bg);
-            backdrop-filter: blur(8px);
-            padding: 8px 16px;
-            border-radius: 30px;
-            border: 1px solid rgba(21, 128, 61, 0.2);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        .form-group {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 320px;
-            max-width: 70vw;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 10px;
         }
 
-        .search-box input {
-            border: none;
-            outline: none;
-            background: transparent;
-            width: 100%;
-            font-size: 0.95rem;
-            color: var(--text-dark);
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: 30px;
-            border: none;
+        label {
+            font-size: 0.8rem;
             font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            color: #475569;
         }
 
-        .btn-primary {
-            background: var(--leaf-green);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--leaf-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: #ffffff;
-            color: var(--text-dark);
+        input, select {
+            padding: 8px 10px;
             border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+            background-color: #fafaf9;
         }
 
-        .btn-secondary:hover {
-            background: #f8fafc;
+        input:focus, select:focus {
+            border-color: var(--primary);
+            background-color: #ffffff;
         }
 
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: var(--danger-hover);
-        }
-
-        .badge-mode {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: var(--card-bg);
-            backdrop-filter: blur(8px);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--leaf-green);
-            border: 1px solid rgba(21, 128, 61, 0.2);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        .btn-group {
             display: flex;
-            align-items: center;
-            gap: 6px;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 5px;
         }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #22c55e;
+        .btn-row {
+            display: flex;
+            gap: 8px;
         }
 
-        .status-dot.locked {
-            background: #eab308;
+        button {
+            padding: 9px 12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
         }
 
-        /* Modal Pop-up */
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button.btn-secondary {
+            background-color: #64748b;
+        }
+        button.btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        button.btn-success {
+            background-color: #047857;
+        }
+        button.btn-success:hover {
+            background-color: #065f46;
+        }
+
+        button.btn-danger {
+            background-color: #dc2626;
+        }
+        button.btn-danger:hover {
+            background-color: #b91c1c;
+        }
+
+        /* Modal Pop-up para el Token */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(4px);
-            display: flex;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
             justify-content: center;
             align-items: center;
-            z-index: 100;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
+            z-index: 1000;
         }
 
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-card {
+        .modal-content {
             background: #ffffff;
-            width: 480px;
-            max-width: 90vw;
-            max-height: 85vh;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             padding: 24px;
+            border-radius: 10px;
+            width: 380px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            overflow-y: auto;
-            transform: scale(0.95);
-            transition: transform 0.3s ease;
+            gap: 14px;
         }
 
-        .modal-overlay.active .modal-card {
-            transform: scale(1);
+        .modal-content h3 {
+            color: var(--primary);
+            font-size: 1.2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 6px;
         }
 
-        .modal-header {
+        /* Estado del modo edicion */
+        .auth-status {
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .auth-status.unlocked {
+            background-color: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        .auth-status.locked {
+            background-color: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        /* Tarjeta de seleccion de rama */
+        .selection-card {
+            background-color: #f7fee7;
+            border: 1px solid #d9f99d;
+            padding: 12px;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .selection-card header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #f1f5f9;
-            padding-bottom: 12px;
         }
 
-        .modal-header h3 {
-            font-size: 1.25rem;
-            color: var(--leaf-green);
-        }
-
-        .close-btn {
-            background: transparent;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #94a3b8;
-            line-height: 1;
-        }
-
-        .close-btn:hover {
-            color: var(--text-dark);
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .form-group label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-
-        .form-group input, .form-group select {
-            padding: 10px 14px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            outline: none;
+        .selection-card h3 {
             font-size: 0.95rem;
-            transition: border-color 0.2s;
+            color: #365314;
         }
 
-        .form-group input:focus, .form-group select:focus {
-            border-color: var(--leaf-green);
+        /* Area de visualizacion tipo Jardin */
+        .main-content {
+            flex: 1;
+            position: relative;
+            background: linear-gradient(180deg, #bae6fd 0%, #e0f2fe 50%, #dcfce7 100%);
         }
 
-        /* Estilos de SVG D3 */
+        #tree-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Estilos de las hojas y brotes del arbol */
         .node circle {
             fill: #ffffff;
-            stroke: var(--leaf-green);
-            stroke-width: 3px;
+            stroke: #16a34a;
+            stroke-width: 4px;
             cursor: pointer;
             transition: all 0.3s ease;
-            filter: drop-shadow(0px 3px 5px rgba(0,0,0,0.15));
+            filter: drop-shadow(0px 3px 4px rgba(0,0,0,0.15));
         }
 
-        .node:hover circle {
-            stroke: var(--leaf-hover);
-            stroke-width: 5px;
+        .node circle:hover {
+            stroke: #047857;
+            stroke-width: 6px;
             fill: #f0fdf4;
         }
 
-        .node--selected circle {
-            fill: #bbf7d0 !important;
-            stroke: var(--leaf-hover) !important;
-            stroke-width: 6px !important;
-            r: 12 !important;
-        }
-
-        .node--highlight circle {
-            fill: #fef08a !important;
-            stroke: var(--accent-gold) !important;
-            stroke-width: 6px !important;
-            r: 12 !important;
-        }
-
         .node text {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             fill: #14532d;
             pointer-events: none;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
         }
 
         .node .couple-text {
@@ -305,176 +250,156 @@
             font-weight: 600;
         }
 
-        .node .sub-text {
-            fill: #475569;
+        .node .phone-text {
+            fill: #047857;
             font-size: 10px;
-            font-weight: 400;
         }
 
+        .node--selected circle {
+            fill: #bbf7d0 !important;
+            stroke: #047857 !important;
+            stroke-width: 6px !important;
+            r: 12 !important;
+        }
+
+        .node--highlight circle {
+            fill: #fef08a !important;
+            stroke: #ca8a04 !important;
+            stroke-width: 6px !important;
+            r: 12 !important;
+        }
+
+        /* Ramas organicas del arbol */
         .link {
             fill: none;
-            stroke: var(--tree-brown);
+            stroke: #78350f;
             stroke-width: 4px;
             stroke-linecap: round;
-            opacity: 0.8;
+            opacity: 0.85;
         }
 
-        /* Banner de rama seleccionada */
-        .selected-banner {
+        .instructions {
             position: absolute;
             bottom: 20px;
             right: 20px;
-            background: var(--card-bg);
-            backdrop-filter: blur(8px);
-            padding: 16px 20px;
-            border-radius: 16px;
-            border: 1px solid rgba(21, 128, 61, 0.2);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 10;
-            max-width: 320px;
-        }
-
-        .selected-banner h4 {
-            color: var(--leaf-green);
-            font-size: 1rem;
-        }
-
-        .selected-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .selected-actions button {
-            flex: 1;
-            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 8px;
             font-size: 0.8rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            pointer-events: none;
+            color: #334155;
         }
     </style>
 </head>
 <body>
 
-    <!-- Lienzo de Árbol Genealógico -->
-    <div id="main-canvas"></div>
-
-    <!-- Controles flotantes superiores -->
-    <div class="floating-controls">
-        <div class="search-box">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="search-input" placeholder="Buscar por nombre, pareja o teléfono..." oninput="buscarPersona()">
-        </div>
-        <div class="action-buttons">
-            <button class="btn btn-primary" id="btn-open-edit" onclick="abrirModalEdicion()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                Modo Edición
-            </button>
-            <button class="btn btn-secondary" id="btn-lock-mode" style="display: none;" onclick="bloquearEdicion()">
-                Salir de Edición
-            </button>
-        </div>
-    </div>
-
-    <!-- Indicador de modo -->
-    <div class="badge-mode">
-        <div class="status-dot locked" id="status-dot"></div>
-        <span id="status-text">Modo Lectura</span>
-    </div>
-
-    <!-- Panel de rama seleccionada (al hacer clic en un nodo) -->
-    <div class="selected-banner" id="selected-banner" style="display: none;">
-        <div>
-            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">RAMA SELECCIONADA</span>
-            <h4 id="selected-node-title">Nombre</h4>
-        </div>
-        <div class="selected-actions" id="banner-actions">
-            <!-- Acciones dinamicas según modo -->
-        </div>
-    </div>
-
-    <!-- Pop-up / Modal Principal -->
-    <div class="modal-overlay" id="modal-overlay">
-        <div class="modal-card" id="modal-card">
-            <div class="modal-header">
-                <h3 id="modal-title">Autenticación requerida</h3>
-                <button class="close-btn" onclick="cerrarModal()">&times;</button>
+    <!-- Ventana Modal Pop-up para el Token -->
+    <div id="token-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Activar Modo Edicion</h3>
+            <p style="font-size: 0.85rem; color: #475569;">Ingresa tu Token de Acceso Personal (PAT) de GitHub para habilitar las modificaciones en el arbol.</p>
+            <div class="form-group">
+                <label for="modal-token">Token de GitHub</label>
+                <input type="password" id="modal-token" placeholder="ghp_xxxxxxxxxxxx">
             </div>
+            <div class="btn-row">
+                <button class="btn-success" onclick="verificarYGuardarToken()">Desbloquear</button>
+                <button class="btn-secondary" onclick="cerrarModalToken()">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
-            <!-- Paso 1: Ingreso de Token (si no está autenticado) -->
-            <div id="modal-step-auth">
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">
-                    Ingresa tu Token de Acceso Personal (PAT) de GitHub para desbloquear las funciones de edición y guardar cambios directamente en el repositorio.
-                </p>
-                <div class="form-group" style="margin-bottom: 20px;">
-                    <label for="token-input">Token de GitHub</label>
-                    <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+    <div class="sidebar">
+        <!-- Busqueda -->
+        <section>
+            <h2>Buscar en el Jardin</h2>
+            <div class="form-group" style="margin-top: 8px;">
+                <input type="text" id="search-input" placeholder="Nombre, pareja o telefono..." oninput="buscarPersona()">
+            </div>
+        </section>
+
+        <!-- Estado de Edicion y Boton Pop-up -->
+        <section>
+            <h2>Panel de Administracion</h2>
+            <div id="auth-status-banner" class="auth-status locked" style="margin-top: 8px;">
+                Modo lectura activado
+            </div>
+            <div class="btn-group" style="margin-top: 8px;">
+                <button id="btn-open-modal" class="btn-success" onclick="abrirModalToken()">Activar Modo Edicion</button>
+                <button id="btn-lock" class="btn-secondary" style="display: none;" onclick="bloquearEdicion()">Bloquear Edicion</button>
+            </div>
+        </section>
+
+        <!-- Panel de Rama Seleccionada -->
+        <section id="selection-panel" style="display: none;">
+            <div class="selection-card">
+                <header>
+                    <h3 id="selected-name">Rama Seleccionada</h3>
+                    <button class="btn-danger" style="width: auto; padding: 2px 8px; font-size: 0.75rem;" onclick="deseleccionarNode()">Cerrar</button>
+                </header>
+                <div class="btn-group">
+                    <button class="btn-success" onclick="prepararAgregarHijo()">Agregar Hijo</button>
+                    <button class="btn-success" onclick="prepararAgregarPadre()">Agregar Padre / Antecesor</button>
+                    <button class="btn-secondary" onclick="cargarEnFormularioEdicion()">Modificar Rama</button>
+                    <button class="btn-danger" onclick="eliminarPersona()">Podar (Eliminar)</button>
                 </div>
-                <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="validarYGuardarToken()">
-                    Desbloquear Edición
-                </button>
             </div>
+        </section>
 
-            <!-- Paso 2: Formulario de Registro / Edición de Integrantes -->
-            <div id="modal-step-edit" style="display: none;">
-                <form id="person-form" onsubmit="guardarPersona(event)" style="display: flex; flex-direction: column; gap: 14px;">
-                    <input type="hidden" id="edit-id" value="">
+        <!-- Formulario de Cultivo -->
+        <section id="form-section" style="display: none;">
+            <h2 id="form-title">Registrar Nueva Rama</h2>
+            <form id="person-form" onsubmit="guardarPersona(event)">
+                <input type="hidden" id="edit-id" value="">
 
-                    <div class="form-group">
-                        <label for="padre-select">Rama Progenitora (Padre/Madre)</label>
-                        <select id="padre-select" onchange="evaluarEstadoFormulario()">
-                            <!-- Generado dinámicamente -->
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label for="nombre">Nombre Completo *</label>
+                    <input type="text" id="nombre" required placeholder="Ej. Juan Perez">
+                </div>
 
-                    <div class="form-group">
-                        <label for="nombre">Nombre Completo *</label>
-                        <input type="text" id="nombre" required placeholder="Ej. Ana María Gómez">
-                    </div>
+                <div class="form-group">
+                    <label for="fecha-nacimiento">Fecha de Nacimiento *</label>
+                    <input type="date" id="fecha-nacimiento" required>
+                </div>
 
-                    <div class="form-group">
-                        <label for="fecha-nacimiento">Fecha de Nacimiento *</label>
-                        <input type="date" id="fecha-nacimiento" required>
-                    </div>
+                <div class="form-group">
+                    <label for="telefono">Numero de Telefono</label>
+                    <input type="tel" id="telefono" placeholder="Ej. 55 1234 5678">
+                </div>
 
-                    <div class="form-group">
-                        <label for="telefono">Teléfono</label>
-                        <input type="tel" id="telefono" placeholder="Ej. 55 1234 5678">
-                    </div>
+                <div class="form-group">
+                    <label for="pareja">Pareja o Conyuge (Opcional)</label>
+                    <input type="text" id="pareja" placeholder="Ej. Maria Lopez">
+                </div>
 
-                    <div class="form-group">
-                        <label for="pareja">Pareja / Cónyuge (Opcional)</label>
-                        <input type="text" id="pareja" placeholder="Ej. Carlos Mendoza">
-                    </div>
+                <div class="btn-row">
+                    <button type="submit" id="submit-btn">Guardar</button>
+                    <button type="button" class="btn-secondary" onclick="cancelarFormulario()">Cancelar</button>
+                </div>
+            </form>
+        </section>
+    </div>
 
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button type="submit" class="btn btn-primary" id="btn-submit-form" style="flex: 1; justify-content: center;">
-                            Guardar Cambios
-                        </button>
-                        <button type="button" class="btn btn-secondary" onclick="cerrarModal()">
-                            Cancelar
-                        </button>
-                    </div>
-                </form>
-            </div>
+    <div class="main-content">
+        <div id="tree-container"></div>
+        <div class="instructions">
+            Nota: Haga clic en cualquier rama del arbol para ver sus opciones. Use el boton superior para desbloquear la edicion.
         </div>
     </div>
 
     <script>
-        // --- ESTADO GLOBAL ---
         let personas = [];
         let idCounter = 1;
         let selectedNodeId = null;
         let fileSha = null;
-        let modoEdicionActivo = false;
+        let modoEdicionDesbloqueado = false;
+        let tipoAccionFormulario = ''; // 'hijo', 'padre', 'editar'
+        let targetChildIdForParent = null;
 
-        // Configuración de lienzo D3
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-
-        const svg = d3.select("#main-canvas")
-            .append("svg")
+        const container = document.getElementById('tree-container');
+        const svg = d3.select("#tree-container").append("svg")
             .attr("width", "100%")
             .attr("height", "100%")
             .call(d3.zoom().on("zoom", (event) => {
@@ -482,10 +407,9 @@
             }))
             .append("g");
 
-        const g = svg.append("g").attr("transform", `translate(${width / 4}, ${height / 2})`);
-        const treeLayout = d3.tree().nodeSize([100, 260]);
+        const g = svg.append("g").attr("transform", "translate(80,0)");
+        const treeLayout = d3.tree().nodeSize([95, 250]);
 
-        // --- DETECCIÓN Y CONFIGURACIÓN DE GITHUB ---
         function obtenerConfiguracionGitHub() {
             const hostname = window.location.hostname;
             let user = "";
@@ -496,7 +420,6 @@
                 const pathSegments = window.location.pathname.split("/").filter(Boolean);
                 repo = pathSegments[0] || "";
             } else {
-                // Fallback de desarrollo o pruebas locales
                 user = "lugi2050-dotcom";
                 repo = "carrera-nfc";
             }
@@ -505,17 +428,66 @@
             return { user, repo, token };
         }
 
-        // --- CARGA DE DATOS MODO LECTURA ---
+        function abrirModalToken() {
+            document.getElementById('token-modal').style.display = 'flex';
+            document.getElementById('modal-token').value = localStorage.getItem('gh_token') || '';
+            document.getElementById('modal-token').focus();
+        }
+
+        function cerrarModalToken() {
+            document.getElementById('token-modal').style.display = 'none';
+        }
+
+        function verificarYGuardarToken() {
+            const token = document.getElementById('modal-token').value.trim();
+            if (!token) {
+                alert("Por favor ingresa un token valido.");
+                return;
+            }
+            localStorage.setItem('gh_token', token);
+            cerrarModalToken();
+            actualizarEstadoEdicion(true);
+            alert("Modo edicion activado correctamente.");
+        }
+
+        function bloquearEdicion() {
+            localStorage.removeItem('gh_token');
+            actualizarEstadoEdicion(false);
+            document.getElementById('form-section').style.display = 'none';
+            alert("Se ha bloqueado el modo edicion.");
+        }
+
+        function actualizarEstadoEdicion(habilitado) {
+            modoEdicionDesbloqueado = habilitado;
+            const statusBanner = document.getElementById('auth-status-banner');
+            const btnOpenModal = document.getElementById('btn-open-modal');
+            const btnLock = document.getElementById('btn-lock');
+
+            if (habilitado) {
+                statusBanner.className = "auth-status unlocked";
+                statusBanner.textContent = "Modo edicion activo";
+                btnOpenModal.style.display = "none";
+                btnLock.style.display = "block";
+            } else {
+                statusBanner.className = "auth-status locked";
+                statusBanner.textContent = "Modo lectura activado";
+                btnOpenModal.style.display = "block";
+                btnLock.style.display = "none";
+            }
+        }
+
         async function cargarDatosPublicos() {
             const { user, repo, token } = obtenerConfiguracionGitHub();
 
-            // Si hay un token previamente guardado, habilitar interfaz
             if (token) {
-                habilitarModoEdicionInterfaz(true);
+                actualizarEstadoEdicion(true);
+            } else {
+                actualizarEstadoEdicion(false);
             }
 
             try {
-                let response = await fetch(`https://raw.githubusercontent.com/${user}/${repo}/main/datos.json`);
+                let rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/main/datos.json`;
+                let response = await fetch(rawUrl);
 
                 if (!response.ok) {
                     response = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/datos.json`, {
@@ -523,11 +495,11 @@
                     });
                 }
 
-                if (!response.ok) throw new Error("No se pudo obtener datos.json");
+                if (!response.ok) throw new Error("No se pudo cargar datos.json");
 
                 let parsedData;
                 const contentType = response.headers.get("content-type");
-
+                
                 if (contentType && contentType.includes("application/json")) {
                     parsedData = await response.json();
                     if (parsedData.content) {
@@ -553,11 +525,10 @@
                     obtenerShaParaEdicion(user, repo, token);
                 }
 
-                actualizarSelectorPadres();
                 renderizarArbol();
             } catch (error) {
-                console.warn("Cargando datos de prueba por defecto...", error);
-                cargarDatosEjemplo();
+                console.error("Error al cargar datos:", error);
+                cargarDatosLocalesPrueba();
             }
         }
 
@@ -571,35 +542,29 @@
                     fileSha = d.sha;
                 }
             } catch (e) {
-                console.error("Error obteniendo SHA:", e);
+                console.error("No se pudo obtener el SHA:", e);
             }
         }
 
-        function cargarDatosEjemplo() {
+        function cargarDatosLocalesPrueba() {
             personas = [
-                { id: 1, nombre: "Guillermo Silva", fechaNacimiento: "1952-04-15", telefono: "555-0192", pareja: "Rosa María Morales", padreId: null },
-                { id: 2, nombre: "Alejandro Silva Morales", fechaNacimiento: "1980-08-22", telefono: "555-0143", pareja: "Sofia Castro", padreId: 1 },
-                { id: 3, nombre: "Beatriz Silva Morales", fechaNacimiento: "1985-01-10", telefono: "555-0188", pareja: "David Ortega", padreId: 1 }
+                { id: 1, nombre: "Roberto Gomez", fechaNacimiento: "1950-05-20", telefono: "555-123-4567", pareja: "Elena Ramos", padreId: null },
+                { id: 2, nombre: "Carlos Gomez", fechaNacimiento: "1978-11-12", telefono: "555-987-6543", pareja: "Laura Torres", padreId: 1 }
             ];
-            idCounter = 4;
-            actualizarSelectorPadres();
+            idCounter = 3;
             renderizarArbol();
         }
 
-        // --- PERSISTENCIA EN GITHUB REST API ---
-        async function guardarEnGitHub() {
+        async function persistirDatosEnGitHub() {
             const { user, repo, token } = obtenerConfiguracionGitHub();
 
-            if (!token || !modoEdicionActivo) {
-                alert("Debes ingresar un Token válido para guardar los cambios.");
-                return;
+            if (!token || !modoEdicionDesbloqueado) {
+                alert("Debes activar el modo edicion con tu Token para guardar cambios.");
+                abrirModalToken();
+                return false;
             }
 
-            const contenidoObjeto = {
-                personas: personas,
-                idCounter: idCounter
-            };
-
+            const contenidoObjeto = { personas, idCounter };
             const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(contenidoObjeto, null, 4))));
 
             try {
@@ -611,178 +576,119 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: "Actualización de árbol genealógico",
+                        message: "Actualizacion del arbol genealogico",
                         content: contentEncoded,
                         sha: fileSha
                     })
                 });
 
                 if (!response.ok) {
-                    const err = await response.json();
-                    throw new Error(err.message || "Error al actualizar archivo.");
+                    const errData = await response.json();
+                    throw new Error(errData.message || "Error al actualizar en GitHub.");
                 }
 
-                const resData = await response.json();
-                fileSha = resData.content.sha;
-                alert("Cambios guardados con éxito en GitHub.");
+                const responseData = await response.json();
+                fileSha = responseData.content.sha;
+                return true;
             } catch (error) {
-                alert("Error al guardar: " + error.message);
+                console.error(error);
+                alert("Error al guardar en GitHub: " + error.message);
+                return false;
             }
         }
 
-        // --- GESTIÓN DE MODAL Y MODO EDICIÓN ---
-        function abrirModalEdicion() {
-            const token = localStorage.getItem('gh_token');
-            document.getElementById('modal-overlay').classList.add('active');
-
-            if (token && modoEdicionActivo) {
-                document.getElementById('modal-title').textContent = "Administrar Integrantes";
-                document.getElementById('modal-step-auth').style.display = "none";
-                document.getElementById('modal-step-edit').style.display = "block";
-            } else {
-                document.getElementById('modal-title').textContent = "Autenticación de Edición";
-                document.getElementById('modal-step-auth').style.display = "block";
-                document.getElementById('modal-step-edit').style.display = "none";
-            }
-        }
-
-        function cerrarModal() {
-            document.getElementById('modal-overlay').classList.remove('active');
-        }
-
-        function validarYGuardarToken() {
-            const token = document.getElementById('token-input').value.trim();
-            if (!token) {
-                alert("Por favor ingresa un Token válido.");
-                return;
-            }
-            localStorage.setItem('gh_token', token);
-            habilitarModoEdicionInterfaz(true);
-            
-            document.getElementById('modal-title').textContent = "Administrar Integrantes";
-            document.getElementById('modal-step-auth').style.display = "none";
-            document.getElementById('modal-step-edit').style.display = "block";
-        }
-
-        function habilitarModoEdicionInterfaz(activar) {
-            modoEdicionActivo = activar;
-            const dot = document.getElementById('status-dot');
-            const statusText = document.getElementById('status-text');
-            const btnLock = document.getElementById('btn-lock-mode');
-
-            if (activar) {
-                dot.classList.remove('locked');
-                statusText.textContent = "Modo Edición Activo";
-                btnLock.style.display = "flex";
-            } else {
-                dot.classList.add('locked');
-                statusText.textContent = "Modo Lectura";
-                btnLock.style.display = "none";
-            }
-            actualizarBannerSeleccion();
-        }
-
-        function bloquearEdicion() {
-            localStorage.removeItem('gh_token');
-            habilitarModoEdicionInterfaz(false);
-            deseleccionarNodo();
-        }
-
-        // --- ACCIONES SOBRE RAMAS (SELECCIÓN) ---
         function seleccionarNodo(id) {
             selectedNodeId = id;
-            actualizarBannerSeleccion();
-            renderizarArbol();
-        }
-
-        function deseleccionarNodo() {
-            selectedNodeId = null;
-            document.getElementById('selected-banner').style.display = "none";
-            renderizarArbol();
-        }
-
-        function actualizarBannerSeleccion() {
-            if (!selectedNodeId) {
-                document.getElementById('selected-banner').style.display = "none";
-                return;
+            const persona = personas.find(p => p.id === id);
+            
+            if (persona) {
+                document.getElementById('selection-panel').style.display = 'block';
+                document.getElementById('selected-name').textContent = persona.nombre;
+            } else {
+                deseleccionarNode();
             }
 
+            renderizarArbol();
+        }
+
+        function deseleccionarNode() {
+            selectedNodeId = null;
+            document.getElementById('selection-panel').style.display = 'none';
+            document.getElementById('form-section').style.display = 'none';
+            renderizarArbol();
+        }
+
+        function prepararAgregarHijo() {
+            if (!modoEdicionDesbloqueado) {
+                abrirModalToken();
+                return;
+            }
+            if (!selectedNodeId) return;
+            
+            tipoAccionFormulario = 'hijo';
+            targetChildIdForParent = null;
+            document.getElementById('edit-id').value = "";
+            document.getElementById('form-title').textContent = "Registrar Nuevo Hijo";
+            document.getElementById('submit-btn').textContent = "Plantar Brote";
+            document.getElementById('person-form').reset();
+            document.getElementById('form-section').style.display = 'block';
+            document.getElementById('nombre').focus();
+        }
+
+        function prepararAgregarPadre() {
+            if (!modoEdicionDesbloqueado) {
+                abrirModalToken();
+                return;
+            }
+            if (!selectedNodeId) return;
+
+            const hijoActual = personas.find(p => p.id === selectedNodeId);
+            if (!hijoActual) return;
+
+            tipoAccionFormulario = 'padre';
+            targetChildIdForParent = selectedNodeId;
+            document.getElementById('edit-id').value = "";
+            document.getElementById('form-title').textContent = `Agregar Padre/Madre a: ${hijoActual.nombre}`;
+            document.getElementById('submit-btn').textContent = "Agregar Antecesor";
+            document.getElementById('person-form').reset();
+            document.getElementById('form-section').style.display = 'block';
+            document.getElementById('nombre').focus();
+        }
+
+        function cargarEnFormularioEdicion() {
+            if (!modoEdicionDesbloqueado) {
+                abrirModalToken();
+                return;
+            }
+            if (!selectedNodeId) return;
             const persona = personas.find(p => p.id === selectedNodeId);
             if (!persona) return;
 
-            document.getElementById('selected-banner').style.display = "flex";
-            document.getElementById('selected-node-title').textContent = persona.nombre;
-
-            const actionsContainer = document.getElementById('banner-actions');
-            actionsContainer.innerHTML = '';
-
-            if (modoEdicionActivo) {
-                const btnAgregar = document.createElement('button');
-                btnAgregar.className = "btn btn-primary";
-                btnAgregar.textContent = "+ Agregar Hijo";
-                btnAgregar.onclick = () => prepararAgregarHijo(persona.id);
-
-                const btnEditar = document.createElement('button');
-                btnEditar.className = "btn btn-secondary";
-                btnEditar.textContent = "Editar";
-                btnEditar.onclick = () => cargarEnFormulario(persona.id);
-
-                const btnEliminar = document.createElement('button');
-                btnEliminar.className = "btn btn-danger";
-                btnEliminar.textContent = "Podar";
-                btnEliminar.onclick = () => eliminarPersona(persona.id);
-
-                actionsContainer.appendChild(btnAgregar);
-                actionsContainer.appendChild(btnEditar);
-                actionsContainer.appendChild(btnEliminar);
-            } else {
-                const btnInfo = document.createElement('span');
-                btnInfo.style.fontSize = "0.8rem";
-                btnInfo.style.color = "var(--text-muted)";
-                btnInfo.textContent = "Desbloquea el modo edición para realizar cambios en esta rama.";
-                actionsContainer.appendChild(btnInfo);
-            }
-        }
-
-        function prepararAgregarHijo(padreId) {
-            document.getElementById('edit-id').value = "";
-            document.getElementById('person-form').reset();
-            document.getElementById('padre-select').value = padreId;
-            evaluarEstadoFormulario();
-            abrirModalEdicion();
-        }
-
-        function cargarEnFormulario(id) {
-            const persona = personas.find(p => p.id === id);
-            if (!persona) return;
-
+            tipoAccionFormulario = 'editar';
+            targetChildIdForParent = null;
             document.getElementById('edit-id').value = persona.id;
+            document.getElementById('form-title').textContent = "Modificar Rama";
+            document.getElementById('submit-btn').textContent = "Guardar Cambios";
+
             document.getElementById('nombre').value = persona.nombre;
             document.getElementById('fecha-nacimiento').value = persona.fechaNacimiento;
             document.getElementById('telefono').value = persona.telefono || '';
             document.getElementById('pareja').value = persona.pareja || '';
-            document.getElementById('padre-select').value = persona.padreId || '';
 
-            evaluarEstadoFormulario();
-            abrirModalEdicion();
+            document.getElementById('form-section').style.display = 'block';
+            document.getElementById('nombre').focus();
         }
 
-        function evaluarEstadoFormulario() {
-            const editId = document.getElementById('edit-id').value;
-            const submitBtn = document.getElementById('btn-submit-form');
-
-            if (editId) {
-                submitBtn.textContent = "Actualizar Integrante";
-            } else {
-                submitBtn.textContent = "Plantar Nueva Rama";
-            }
+        function cancelarFormulario() {
+            document.getElementById('form-section').style.display = 'none';
+            document.getElementById('person-form').reset();
         }
 
-        function guardarPersona(e) {
+        async function guardarPersona(e) {
             e.preventDefault();
 
-            if (!modoEdicionActivo) {
-                alert("Debes estar en Modo Edición para guardar.");
+            if (!modoEdicionDesbloqueado) {
+                abrirModalToken();
                 return;
             }
 
@@ -791,86 +697,110 @@
             const fecha = document.getElementById('fecha-nacimiento').value;
             const telefono = document.getElementById('telefono').value.trim();
             const pareja = document.getElementById('pareja').value.trim();
-            const padreId = document.getElementById('padre-select').value;
 
-            if (editId) {
+            if (tipoAccionFormulario === 'editar' && editId) {
                 const persona = personas.find(p => p.id === parseInt(editId));
                 if (persona) {
                     persona.nombre = nombre;
                     persona.fechaNacimiento = fecha;
                     persona.telefono = telefono || null;
                     persona.pareja = pareja || null;
-                    persona.padreId = padreId ? parseInt(padreId) : null;
                 }
-            } else {
-                const nuevaPersona = {
+            } else if (tipoAccionFormulario === 'hijo' && selectedNodeId) {
+                const nuevoHijo = {
                     id: idCounter++,
                     nombre: nombre,
                     fechaNacimiento: fecha,
                     telefono: telefono || null,
                     pareja: pareja || null,
-                    padreId: padreId ? parseInt(padreId) : null
+                    padreId: selectedNodeId
                 };
-                personas.push(nuevaPersona);
+                personas.push(nuevoHijo);
+            } else if (tipoAccionFormulario === 'padre' && targetChildIdForParent) {
+                const hijo = personas.find(p => p.id === targetChildIdForParent);
+                const viejoPadreId = hijo ? hijo.padreId : null;
+
+                const nuevoPadre = {
+                    id: idCounter++,
+                    nombre: nombre,
+                    fechaNacimiento: fecha,
+                    telefono: telefono || null,
+                    pareja: pareja || null,
+                    padreId: viejoPadreId
+                };
+
+                personas.push(nuevoPadre);
+                if (hijo) {
+                    hijo.padreId = nuevoPadre.id;
+                }
+            } else {
+                if (personas.length > 0 && !confirm("¿Deseas establecer esta persona como el nuevo tronco principal?")) {
+                    return;
+                }
+                const nuevaRaiz = {
+                    id: idCounter++,
+                    nombre: nombre,
+                    fechaNacimiento: fecha,
+                    telefono: telefono || null,
+                    pareja: pareja || null,
+                    padreId: null
+                };
+                personas.push(nuevaRaiz);
             }
 
-            guardarEnGitHub();
-            actualizarSelectorPadres();
-            renderizarArbol();
-            cerrarModal();
+            const exito = await persistirDatosEnGitHub();
+            if (exito) {
+                cancelarFormulario();
+                deseleccionarNode();
+                renderizarArbol();
+                alert("Cambios guardados exitosamente.");
+            }
         }
 
-        function eliminarPersona(id) {
-            const tieneHijos = personas.some(p => p.padreId === id);
+        async function eliminarPersona() {
+            if (!modoEdicionDesbloqueado) {
+                abrirModalToken();
+                return;
+            }
+            if (!selectedNodeId) return;
+            
+            const tieneHijos = personas.some(p => p.padreId === selectedNodeId);
             if (tieneHijos) {
-                alert("No se puede podar una rama que tiene ramas hijas. Elimina primero a los descendientes.");
+                alert("No se puede eliminar una rama que tiene ramificaciones secundarias. Elimine primero los hijos.");
                 return;
             }
 
-            if (confirm("¿Estás seguro de podar/eliminar esta persona del árbol?")) {
-                personas = personas.filter(p => p.id !== id);
-                guardarEnGitHub();
-                deseleccionarNodo();
-                actualizarSelectorPadres();
-                renderizarArbol();
+            if (confirm("¿Estas seguro de eliminar esta rama del arbol?")) {
+                personas = personas.filter(p => p.id !== selectedNodeId);
+                const exito = await persistirDatosEnGitHub();
+                if (exito) {
+                    deseleccionarNode();
+                    renderizarArbol();
+                    alert("Rama eliminada correctamente.");
+                }
             }
         }
 
-        function actualizarSelectorPadres() {
-            const select = document.getElementById('padre-select');
-            select.innerHTML = '';
-
-            const optRaiz = document.createElement('option');
-            optRaiz.value = "";
-            optRaiz.textContent = "Tronco Principal (Sin padre)";
-            select.appendChild(optRaiz);
-
-            personas.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.id;
-                opt.textContent = `${p.nombre}` + (p.pareja ? ` & ${p.pareja}` : '');
-                select.appendChild(opt);
-            });
-        }
-
-        // --- ESTRUCTURA Y RENDERIZADO CON D3 ---
+        // Estructura jerarquica que encuentra automaticamente la raiz principal global
         function estructurarDatos() {
             if (personas.length === 0) return null;
 
             const mapa = {};
             personas.forEach(p => mapa[p.id] = { ...p, children: [] });
 
-            let raiz = null;
+            // Identificar la verdadera raiz (la persona que no tiene padre)
+            let raizObj = personas.find(p => p.padreId === null || !mapa[p.padreId]);
+            if (!raizObj && personas.length > 0) {
+                raizObj = personas[0];
+            }
 
             personas.forEach(p => {
                 if (p.padreId && mapa[p.padreId]) {
                     mapa[p.padreId].children.push(mapa[p.id]);
-                } else if (!raiz) {
-                    raiz = mapa[p.id];
                 }
             });
 
-            return raiz ? d3.hierarchy(raiz) : null;
+            return raizObj ? d3.hierarchy(mapa[raizObj.id]) : null;
         }
 
         function renderizarArbol() {
@@ -881,7 +811,6 @@
 
             const root = treeLayout(dataJerarquica);
 
-            // Dibujar ramas orgánicas
             g.selectAll(".link")
                 .data(root.links())
                 .enter().append("path")
@@ -890,7 +819,6 @@
                     .x(d => d.y)
                     .y(d => d.x));
 
-            // Dibujar nodos/brotes
             const node = g.selectAll(".node")
                 .data(root.descendants())
                 .enter().append("g")
@@ -905,23 +833,30 @@
                     seleccionarNodo(d.data.id);
                 });
 
-            node.append("circle").attr("r", 10);
+            node.append("circle").attr("r", 9);
 
             node.append("text")
                 .attr("dy", "-0.8em")
-                .attr("x", 16)
+                .attr("x", 14)
                 .text(d => d.data.nombre);
 
             node.append("text")
                 .attr("class", "couple-text")
-                .attr("dy", "0.5em")
-                .attr("x", 16)
-                .text(d => d.data.pareja ? `♥ ${d.data.pareja}` : '');
+                .attr("dy", "0.4em")
+                .attr("x", 14)
+                .text(d => d.data.pareja ? `Pareja: ${d.data.pareja}` : '');
 
             node.append("text")
-                .attr("class", "sub-text")
-                .attr("dy", "1.8em")
-                .attr("x", 16)
+                .attr("class", "phone-text")
+                .attr("dy", "1.6em")
+                .attr("x", 14)
+                .text(d => d.data.telefono ? `Tel: ${d.data.telefono}` : '');
+
+            node.append("text")
+                .attr("dy", "2.8em")
+                .attr("x", 14)
+                .style("fill", "#475569")
+                .style("font-size", "10px")
                 .text(d => d.data.fechaNacimiento ? `Nac: ${d.data.fechaNacimiento}` : '');
         }
 
@@ -942,7 +877,890 @@
             });
         }
 
-        // Carga inicial
+        window.onload = () => {
+            cargarDatosPublicos();
+        };
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jardin Genealogico Familiar</title>
+    <!-- Carga de D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        :root {
+            --primary: #15803d;
+            --primary-hover: #166534;
+            --bg-color: #f0fdf4;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #bbf7d0;
+            --accent: #b45309;
+            --selected: #047857;
+            --branch-color: #a3e635;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Panel lateral */
+        .sidebar {
+            width: 400px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 4px 0 15px rgba(21, 128, 61, 0.05);
+            z-index: 10;
+            overflow-y: auto;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 6px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        input, select {
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+            background-color: #fafaf9;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            background-color: #ffffff;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        button {
+            padding: 9px 12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button.btn-secondary {
+            background-color: #64748b;
+        }
+        button.btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        button.btn-success {
+            background-color: #047857;
+        }
+        button.btn-success:hover {
+            background-color: #065f46;
+        }
+
+        button.btn-danger {
+            background-color: #dc2626;
+        }
+        button.btn-danger:hover {
+            background-color: #b91c1c;
+        }
+
+        /* Modal Pop-up para el Token */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 10px;
+            width: 380px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .modal-content h3 {
+            color: var(--primary);
+            font-size: 1.2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 6px;
+        }
+
+        /* Estado del modo edicion */
+        .auth-status {
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .auth-status.unlocked {
+            background-color: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        .auth-status.locked {
+            background-color: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        /* Tarjeta de seleccion de rama */
+        .selection-card {
+            background-color: #f7fee7;
+            border: 1px solid #d9f99d;
+            padding: 12px;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .selection-card header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .selection-card h3 {
+            font-size: 0.95rem;
+            color: #365314;
+        }
+
+        /* Area de visualizacion tipo Jardin */
+        .main-content {
+            flex: 1;
+            position: relative;
+            background: linear-gradient(180deg, #bae6fd 0%, #e0f2fe 50%, #dcfce7 100%);
+        }
+
+        #tree-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Estilos de las hojas y brotes del arbol */
+        .node circle {
+            fill: #ffffff;
+            stroke: #16a34a;
+            stroke-width: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0px 3px 4px rgba(0,0,0,0.15));
+        }
+
+        .node circle:hover {
+            stroke: #047857;
+            stroke-width: 6px;
+            fill: #f0fdf4;
+        }
+
+        .node text {
+            font-size: 12px;
+            font-weight: 700;
+            fill: #14532d;
+            pointer-events: none;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+        }
+
+        .node .couple-text {
+            fill: #9a3412;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .node .phone-text {
+            fill: #047857;
+            font-size: 10px;
+        }
+
+        .node--selected circle {
+            fill: #bbf7d0 !important;
+            stroke: #047857 !important;
+            stroke-width: 6px !important;
+            r: 12 !important;
+        }
+
+        .node--highlight circle {
+            fill: #fef08a !important;
+            stroke: #ca8a04 !important;
+            stroke-width: 6px !important;
+            r: 12 !important;
+        }
+
+        /* Ramas organicas del arbol */
+        .link {
+            fill: none;
+            stroke: #78350f;
+            stroke-width: 4px;
+            stroke-linecap: round;
+            opacity: 0.85;
+        }
+
+        .instructions {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            pointer-events: none;
+            color: #334155;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ventana Modal Pop-up para el Token -->
+    <div id="token-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Activar Modo Edicion</h3>
+            <p style="font-size: 0.85rem; color: #475569;">Ingresa tu Token de Acceso Personal (PAT) de GitHub para habilitar las modificaciones en el arbol.</p>
+            <div class="form-group">
+                <label for="modal-token">Token de GitHub</label>
+                <input type="password" id="modal-token" placeholder="ghp_xxxxxxxxxxxx">
+            </div>
+            <div class="btn-row">
+                <button class="btn-success" onclick="verificarYGuardarToken()">Desbloquear</button>
+                <button class="btn-secondary" onclick="cerrarModalToken()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <!-- Busqueda -->
+        <section>
+            <h2>Buscar en el Jardin</h2>
+            <div class="form-group" style="margin-top: 8px;">
+                <input type="text" id="search-input" placeholder="Nombre, pareja o telefono..." oninput="buscarPersona()">
+            </div>
+        </section>
+
+        <!-- Estado de Edicion y Boton Pop-up -->
+        <section>
+            <h2>Panel de Administracion</h2>
+            <div id="auth-status-banner" class="auth-status locked" style="margin-top: 8px;">
+                Modo lectura activado
+            </div>
+            <div class="btn-group" style="margin-top: 8px;">
+                <button id="btn-open-modal" class="btn-success" onclick="abrirModalToken()">Activar Modo Edicion</button>
+                <button id="btn-lock" class="btn-secondary" style="display: none;" onclick="bloquearEdicion()">Bloquear Edicion</button>
+            </div>
+        </section>
+
+        <!-- Panel de Rama Seleccionada -->
+        <section id="selection-panel" style="display: none;">
+            <div class="selection-card">
+                <header>
+                    <h3 id="selected-name">Rama Seleccionada</h3>
+                    <button class="btn-danger" style="width: auto; padding: 2px 8px; font-size: 0.75rem;" onclick="deseleccionarNode()">Cerrar</button>
+                </header>
+                <div class="btn-group">
+                    <button class="btn-success" onclick="prepararAgregarHijo()">Agregar Hijo</button>
+                    <button class="btn-success" onclick="prepararAgregarPadre()">Agregar Padre / Antecesor</button>
+                    <button class="btn-secondary" onclick="cargarEnFormularioEdicion()">Modificar Rama</button>
+                    <button class="btn-danger" onclick="eliminarPersona()">Podar (Eliminar)</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Formulario de Cultivo -->
+        <section id="form-section" style="display: none;">
+            <h2 id="form-title">Registrar Nueva Rama</h2>
+            <form id="person-form" onsubmit="guardarPersona(event)">
+                <input type="hidden" id="edit-id" value="">
+
+                <div class="form-group">
+                    <label for="nombre">Nombre Completo *</label>
+                    <input type="text" id="nombre" required placeholder="Ej. Juan Perez">
+                </div>
+
+                <div class="form-group">
+                    <label for="fecha-nacimiento">Fecha de Nacimiento *</label>
+                    <input type="date" id="fecha-nacimiento" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="telefono">Numero de Telefono</label>
+                    <input type="tel" id="telefono" placeholder="Ej. 55 1234 5678">
+                </div>
+
+                <div class="form-group">
+                    <label for="pareja">Pareja o Conyuge (Opcional)</label>
+                    <input type="text" id="pareja" placeholder="Ej. Maria Lopez">
+                </div>
+
+                <div class="btn-row">
+                    <button type="submit" id="submit-btn">Guardar</button>
+                    <button type="button" class="btn-secondary" onclick="cancelarFormulario()">Cancelar</button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <div class="main-content">
+        <div id="tree-container"></div>
+        <div class="instructions">
+            Nota: Haga clic en cualquier rama del arbol para ver sus opciones. Use el boton superior para desbloquear la edicion.
+        </div>
+    </div>
+
+    <script>
+        let personas = [];
+        let idCounter = 1;
+        let selectedNodeId = null;
+        let fileSha = null;
+        let modoEdicionDesbloqueado = false;
+        let tipoAccionFormulario = ''; // 'hijo', 'padre', 'editar'
+        let targetChildIdForParent = null;
+
+        const container = document.getElementById('tree-container');
+        const svg = d3.select("#tree-container").append("svg")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .call(d3.zoom().on("zoom", (event) => {
+                g.attr("transform", event.transform);
+            }))
+            .append("g");
+
+        const g = svg.append("g").attr("transform", "translate(80,0)");
+        const treeLayout = d3.tree().nodeSize([95, 250]);
+
+        function obtenerConfiguracionGitHub() {
+            const hostname = window.location.hostname;
+            let user = "";
+            let repo = "";
+
+            if (hostname.includes("github.io")) {
+                user = hostname.split(".")[0];
+                const pathSegments = window.location.pathname.split("/").filter(Boolean);
+                repo = pathSegments[0] || "";
+            } else {
+                user = "lugi2050-dotcom";
+                repo = "carrera-nfc";
+            }
+
+            const token = localStorage.getItem('gh_token') || "";
+            return { user, repo, token };
+        }
+
+        function abrirModalToken() {
+            document.getElementById('token-modal').style.display = 'flex';
+            document.getElementById('modal-token').value = localStorage.getItem('gh_token') || '';
+            document.getElementById('modal-token').focus();
+        }
+
+        function cerrarModalToken() {
+            document.getElementById('token-modal').style.display = 'none';
+        }
+
+        function verificarYGuardarToken() {
+            const token = document.getElementById('modal-token').value.trim();
+            if (!token) {
+                alert("Por favor ingresa un token valido.");
+                return;
+            }
+            localStorage.setItem('gh_token', token);
+            cerrarModalToken();
+            actualizarEstadoEdicion(true);
+            alert("Modo edicion activado correctamente.");
+        }
+
+        function bloquearEdicion() {
+            localStorage.removeItem('gh_token');
+            actualizarEstadoEdicion(false);
+            document.getElementById('form-section').style.display = 'none';
+            alert("Se ha bloqueado el modo edicion.");
+        }
+
+        function actualizarEstadoEdicion(habilitado) {
+            modoEdicionDesbloqueado = habilitado;
+            const statusBanner = document.getElementById('auth-status-banner');
+            const btnOpenModal = document.getElementById('btn-open-modal');
+            const btnLock = document.getElementById('btn-lock');
+
+            if (habilitado) {
+                statusBanner.className = "auth-status unlocked";
+                statusBanner.textContent = "Modo edicion activo";
+                btnOpenModal.style.display = "none";
+                btnLock.style.display = "block";
+            } else {
+                statusBanner.className = "auth-status locked";
+                statusBanner.textContent = "Modo lectura activado";
+                btnOpenModal.style.display = "block";
+                btnLock.style.display = "none";
+            }
+        }
+
+        async function cargarDatosPublicos() {
+            const { user, repo, token } = obtenerConfiguracionGitHub();
+
+            if (token) {
+                actualizarEstadoEdicion(true);
+            } else {
+                actualizarEstadoEdicion(false);
+            }
+
+            try {
+                let rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/main/datos.json`;
+                let response = await fetch(rawUrl);
+
+                if (!response.ok) {
+                    response = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/datos.json`, {
+                        headers: token ? { 'Authorization': `token ${token}` } : {}
+                    });
+                }
+
+                if (!response.ok) throw new Error("No se pudo cargar datos.json");
+
+                let parsedData;
+                const contentType = response.headers.get("content-type");
+                
+                if (contentType && contentType.includes("application/json")) {
+                    parsedData = await response.json();
+                    if (parsedData.content) {
+                        fileSha = parsedData.sha;
+                        const cleanBase64 = parsedData.content.replace(/\s/g, '');
+                        const jsonString = new TextDecoder().decode(Uint8Array.from(atob(cleanBase64), c => c.charCodeAt(0)));
+                        parsedData = JSON.parse(jsonString);
+                    }
+                } else {
+                    const text = await response.text();
+                    parsedData = JSON.parse(text);
+                }
+
+                if (Array.isArray(parsedData)) {
+                    personas = parsedData;
+                    idCounter = personas.length > 0 ? Math.max(...personas.map(p => p.id)) + 1 : 1;
+                } else {
+                    personas = parsedData.personas || [];
+                    idCounter = parsedData.idCounter || (personas.length > 0 ? Math.max(...personas.map(p => p.id)) + 1 : 1);
+                }
+
+                if (token) {
+                    obtenerShaParaEdicion(user, repo, token);
+                }
+
+                renderizarArbol();
+            } catch (error) {
+                console.error("Error al cargar datos:", error);
+                cargarDatosLocalesPrueba();
+            }
+        }
+
+        async function obtenerShaParaEdicion(user, repo, token) {
+            try {
+                const res = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/datos.json`, {
+                    headers: { 'Authorization': `token ${token}` }
+                });
+                if (res.ok) {
+                    const d = await res.json();
+                    fileSha = d.sha;
+                }
+            } catch (e) {
+                console.error("No se pudo obtener el SHA:", e);
+            }
+        }
+
+        function cargarDatosLocalesPrueba() {
+            personas = [
+                { id: 1, nombre: "Roberto Gomez", fechaNacimiento: "1950-05-20", telefono: "555-123-4567", pareja: "Elena Ramos", padreId: null },
+                { id: 2, nombre: "Carlos Gomez", fechaNacimiento: "1978-11-12", telefono: "555-987-6543", pareja: "Laura Torres", padreId: 1 }
+            ];
+            idCounter = 3;
+            renderizarArbol();
+        }
+
+        async function persistirDatosEnGitHub() {
+            const { user, repo, token } = obtenerConfiguracionGitHub();
+
+            if (!token || !modoEdicionDesbloqueado) {
+                alert("Debes activar el modo edicion con tu Token para guardar cambios.");
+                abrirModalToken();
+                return false;
+            }
+
+            const contenidoObjeto = { personas, idCounter };
+            const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(contenidoObjeto, null, 4))));
+
+            try {
+                const response = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/datos.json`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: "Actualizacion del arbol genealogico",
+                        content: contentEncoded,
+                        sha: fileSha
+                    })
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.message || "Error al actualizar en GitHub.");
+                }
+
+                const responseData = await response.json();
+                fileSha = responseData.content.sha;
+                return true;
+            } catch (error) {
+                console.error(error);
+                alert("Error al guardar en GitHub: " + error.message);
+                return false;
+            }
+        }
+
+        function seleccionarNodo(id) {
+            selectedNodeId = id;
+            const persona = personas.find(p => p.id === id);
+            
+            if (persona) {
+                document.getElementById('selection-panel').style.display = 'block';
+                document.getElementById('selected-name').textContent = persona.nombre;
+            } else {
+                deseleccionarNode();
+            }
+
+            renderizarArbol();
+        }
+
+        function deseleccionarNode() {
+            selectedNodeId = null;
+            document.getElementById('selection-panel').style.display = 'none';
+            document.getElementById('form-section').style.display = 'none';
+            renderizarArbol();
+        }
+
+        function prepararAgregarHijo() {
+            if (!modoEdicionDesbloqueado) {
+                abrirModalToken();
+                return;
+            }
+            if (!selectedNodeId) return;
+            
+            tipoAccionFormulario = 'hijo';
+            targetChildIdForParent = null;
+            document.getElementById('edit-id').value = "";
+            document.getElementById('form-title').textContent = "Registrar Nuevo Hijo";
+            document.getElementById('submit-btn').textContent = "Plantar Brote";
+            document.getElementById('person-form').reset();
+            document.getElementById('form-section').style.display = 'block';
+            document.getElementById('nombre').focus();
+        }
+
+        function prepararAgregarPadre() {
+            if (!modoEdicionDesbloqueado) {
+                abrirModalToken();
+                return;
+            }
+            if (!selectedNodeId) return;
+
+            const hijoActual = personas.find(p => p.id === selectedNodeId);
+            if (!hijoActual) return;
+
+            tipoAccionFormulario = 'padre';
+            targetChildIdForParent = selectedNodeId;
+            document.getElementById('edit-id').value = "";
+            document.getElementById('form-title').textContent = `Agregar Padre/Madre a: ${hijoActual.nombre}`;
+            document.getElementById('submit-btn').textContent = "Agregar Antecesor";
+            document.getElementById('person-form').reset();
+            document.getElementById('form-section').style.display = 'block';
+            document.getElementById('nombre').focus();
+        }
+
+        function cargarEnFormularioEdicion() {
+            if (!modoEdicionDesbloqueado) {
+                abrirModalToken();
+                return;
+            }
+            if (!selectedNodeId) return;
+            const persona = personas.find(p => p.id === selectedNodeId);
+            if (!persona) return;
+
+            tipoAccionFormulario = 'editar';
+            targetChildIdForParent = null;
+            document.getElementById('edit-id').value = persona.id;
+            document.getElementById('form-title').textContent = "Modificar Rama";
+            document.getElementById('submit-btn').textContent = "Guardar Cambios";
+
+            document.getElementById('nombre').value = persona.nombre;
+            document.getElementById('fecha-nacimiento').value = persona.fechaNacimiento;
+            document.getElementById('telefono').value = persona.telefono || '';
+            document.getElementById('pareja').value = persona.pareja || '';
+
+            document.getElementById('form-section').style.display = 'block';
+            document.getElementById('nombre').focus();
+        }
+
+        function cancelarFormulario() {
+            document.getElementById('form-section').style.display = 'none';
+            document.getElementById('person-form').reset();
+        }
+
+        async function guardarPersona(e) {
+            e.preventDefault();
+
+            if (!modoEdicionDesbloqueado) {
+                abrirModalToken();
+                return;
+            }
+
+            const editId = document.getElementById('edit-id').value;
+            const nombre = document.getElementById('nombre').value.trim();
+            const fecha = document.getElementById('fecha-nacimiento').value;
+            const telefono = document.getElementById('telefono').value.trim();
+            const pareja = document.getElementById('pareja').value.trim();
+
+            if (tipoAccionFormulario === 'editar' && editId) {
+                const persona = personas.find(p => p.id === parseInt(editId));
+                if (persona) {
+                    persona.nombre = nombre;
+                    persona.fechaNacimiento = fecha;
+                    persona.telefono = telefono || null;
+                    persona.pareja = pareja || null;
+                }
+            } else if (tipoAccionFormulario === 'hijo' && selectedNodeId) {
+                const nuevoHijo = {
+                    id: idCounter++,
+                    nombre: nombre,
+                    fechaNacimiento: fecha,
+                    telefono: telefono || null,
+                    pareja: pareja || null,
+                    padreId: selectedNodeId
+                };
+                personas.push(nuevoHijo);
+            } else if (tipoAccionFormulario === 'padre' && targetChildIdForParent) {
+                const hijo = personas.find(p => p.id === targetChildIdForParent);
+                const viejoPadreId = hijo ? hijo.padreId : null;
+
+                const nuevoPadre = {
+                    id: idCounter++,
+                    nombre: nombre,
+                    fechaNacimiento: fecha,
+                    telefono: telefono || null,
+                    pareja: pareja || null,
+                    padreId: viejoPadreId
+                };
+
+                personas.push(nuevoPadre);
+                if (hijo) {
+                    hijo.padreId = nuevoPadre.id;
+                }
+            } else {
+                if (personas.length > 0 && !confirm("¿Deseas establecer esta persona como el nuevo tronco principal?")) {
+                    return;
+                }
+                const nuevaRaiz = {
+                    id: idCounter++,
+                    nombre: nombre,
+                    fechaNacimiento: fecha,
+                    telefono: telefono || null,
+                    pareja: pareja || null,
+                    padreId: null
+                };
+                personas.push(nuevaRaiz);
+            }
+
+            const exito = await persistirDatosEnGitHub();
+            if (exito) {
+                cancelarFormulario();
+                deseleccionarNode();
+                renderizarArbol();
+                alert("Cambios guardados exitosamente.");
+            }
+        }
+
+        async function eliminarPersona() {
+            if (!modoEdicionDesbloqueado) {
+                abrirModalToken();
+                return;
+            }
+            if (!selectedNodeId) return;
+            
+            const tieneHijos = personas.some(p => p.padreId === selectedNodeId);
+            if (tieneHijos) {
+                alert("No se puede eliminar una rama que tiene ramificaciones secundarias. Elimine primero los hijos.");
+                return;
+            }
+
+            if (confirm("¿Estas seguro de eliminar esta rama del arbol?")) {
+                personas = personas.filter(p => p.id !== selectedNodeId);
+                const exito = await persistirDatosEnGitHub();
+                if (exito) {
+                    deseleccionarNode();
+                    renderizarArbol();
+                    alert("Rama eliminada correctamente.");
+                }
+            }
+        }
+
+        // Estructura jerarquica que encuentra automaticamente la raiz principal global
+        function estructurarDatos() {
+            if (personas.length === 0) return null;
+
+            const mapa = {};
+            personas.forEach(p => mapa[p.id] = { ...p, children: [] });
+
+            // Identificar la verdadera raiz (la persona que no tiene padre)
+            let raizObj = personas.find(p => p.padreId === null || !mapa[p.padreId]);
+            if (!raizObj && personas.length > 0) {
+                raizObj = personas[0];
+            }
+
+            personas.forEach(p => {
+                if (p.padreId && mapa[p.padreId]) {
+                    mapa[p.padreId].children.push(mapa[p.id]);
+                }
+            });
+
+            return raizObj ? d3.hierarchy(mapa[raizObj.id]) : null;
+        }
+
+        function renderizarArbol() {
+            g.selectAll("*").remove();
+
+            const dataJerarquica = estructurarDatos();
+            if (!dataJerarquica) return;
+
+            const root = treeLayout(dataJerarquica);
+
+            g.selectAll(".link")
+                .data(root.links())
+                .enter().append("path")
+                .attr("class", "link")
+                .attr("d", d3.linkHorizontal()
+                    .x(d => d.y)
+                    .y(d => d.x));
+
+            const node = g.selectAll(".node")
+                .data(root.descendants())
+                .enter().append("g")
+                .attr("class", d => {
+                    let cls = `node node-id-${d.data.id}`;
+                    if (d.data.id === selectedNodeId) cls += ' node--selected';
+                    return cls;
+                })
+                .attr("transform", d => `translate(${d.y},${d.x})`)
+                .on("click", (event, d) => {
+                    event.stopPropagation();
+                    seleccionarNodo(d.data.id);
+                });
+
+            node.append("circle").attr("r", 9);
+
+            node.append("text")
+                .attr("dy", "-0.8em")
+                .attr("x", 14)
+                .text(d => d.data.nombre);
+
+            node.append("text")
+                .attr("class", "couple-text")
+                .attr("dy", "0.4em")
+                .attr("x", 14)
+                .text(d => d.data.pareja ? `Pareja: ${d.data.pareja}` : '');
+
+            node.append("text")
+                .attr("class", "phone-text")
+                .attr("dy", "1.6em")
+                .attr("x", 14)
+                .text(d => d.data.telefono ? `Tel: ${d.data.telefono}` : '');
+
+            node.append("text")
+                .attr("dy", "2.8em")
+                .attr("x", 14)
+                .style("fill", "#475569")
+                .style("font-size", "10px")
+                .text(d => d.data.fechaNacimiento ? `Nac: ${d.data.fechaNacimiento}` : '');
+        }
+
+        function buscarPersona() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            d3.selectAll('.node').classed('node--highlight', false);
+
+            if (query === '') return;
+
+            const coincidentes = personas.filter(p => 
+                p.nombre.toLowerCase().includes(query) || 
+                (p.pareja && p.pareja.toLowerCase().includes(query)) ||
+                (p.telefono && p.telefono.includes(query))
+            );
+
+            coincidentes.forEach(p => {
+                d3.selectAll(`.node-id-${p.id}`).classed('node--highlight', true);
+            });
+        }
+
         window.onload = () => {
             cargarDatosPublicos();
         };
