@@ -1,29 +1,25 @@
-{
-    "personas": [
-        {
-            "id": 1,
-            "nombre": "Roberto Gomez",
-            "fechaNacimiento": "1950-05-20",
-            "telefono": "555-123-4567",
-            "pareja": "Elena Ramos",
-            "padreId": 3
-        },
-        {
-            "id": 3,
-            "nombre": "juan",
-            "fechaNacimiento": "2026-10-04",
-            "telefono": "5618782196",
-            "pareja": "toña",
-            "padreId": null
-        },
-        {
-            "id": 4,
-            "nombre": "yo",
-            "fechaNacimiento": "2026-10-12",
-            "telefono": "8866",
-            "pareja": "ghj",
-            "padreId": 1
-        }
-    ],
-    "idCounter": 5
-}
+[
+  {
+    "id": "p_1",
+    "name": "José a",
+    "birth": "1945",
+    "notes": "Antepasado raíz (Abuelo)",
+    "children": [
+      {
+        "id": "p_2",
+        "name": "Carlos z",
+        "birth": "1972",
+        "notes": "Hijo",
+        "children": [
+          {
+            "id": "p_3",
+            "name": "Sofía nez",
+            "birth": "2000",
+            "notes": "Nieto / Descendiente",
+            "children": []
+          }
+        ]
+      }
+    ]
+  }
+]
