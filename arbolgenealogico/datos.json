@@ -1,0 +1,25 @@
+[
+  {
+    "id": "p_1",
+    "name": "José Pérez García",
+    "birth": "1945",
+    "notes": "Antepasado raíz (Abuelo)",
+    "children": [
+      {
+        "id": "p_2",
+        "name": "Carlos Pérez López",
+        "birth": "1972",
+        "notes": "Hijo",
+        "children": [
+          {
+            "id": "p_3",
+            "name": "Sofía Pérez Martínez",
+            "birth": "2000",
+            "notes": "Nieto / Descendiente",
+            "children": []
+          }
+        ]
+      }
+    ]
+  }
+]
