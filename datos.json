@@ -1,7 +1,7 @@
 [
   {
     "id": "p_1",
-    "name": "José a",
+    "name": "desconocido",
     "birth": "1945",
     "notes": "Antepasado raíz (Abuelo)",
     "children": [
@@ -36,10 +36,10 @@
         ]
       }
     ],
-    "birthday": "5 marzo",
-    "partner": "ella",
-    "partnerBirthday": "6 mazo",
-    "phone": "566526"
+    "birthday": "",
+    "partner": "",
+    "partnerBirthday": "",
+    "phone": ""
   },
   {
     "id": "p_1792999527208",
