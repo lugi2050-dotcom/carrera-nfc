@@ -38,7 +38,17 @@
                         "partner": "MARCEL",
                         "partnerBirthday": "",
                         "phone": "",
-                        "children": []
+                        "children": [
+                          {
+                            "id": "p_1793002433009",
+                            "name": "SEBASTIAN",
+                            "birthday": "",
+                            "partner": "",
+                            "partnerBirthday": "",
+                            "phone": "",
+                            "children": []
+                          }
+                        ]
                       },
                       {
                         "id": "p_1793002368124",
