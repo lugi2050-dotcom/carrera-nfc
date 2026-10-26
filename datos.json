@@ -6,15 +6,15 @@
             "fechaNacimiento": "1950-05-20",
             "telefono": "555-123-4567",
             "pareja": "Elena Ramos",
-            "padreId": null
+            "padreId": 3
         },
         {
             "id": 3,
-            "nombre": "luis alfredo",
-            "fechaNacimiento": "2026-10-12",
-            "telefono": null,
-            "pareja": null,
-            "padreId": 1
+            "nombre": "juan",
+            "fechaNacimiento": "2026-10-04",
+            "telefono": "5618782196",
+            "pareja": "toña",
+            "padreId": null
         }
     ],
     "idCounter": 4
