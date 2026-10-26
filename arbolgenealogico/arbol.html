@@ -393,9 +393,8 @@
         let personas = [];
         let idCounter = 1;
         let selectedNodeId = null;
-        let fileSha = null;
         let modoEdicionDesbloqueado = false;
-        let tipoAccionFormulario = ''; // 'hijo', 'padre', 'editar'
+        let tipoAccionFormulario = ''; 
         let targetChildIdForParent = null;
 
         const container = document.getElementById('tree-container');
@@ -486,7 +485,8 @@
             }
 
             try {
-                let rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/main/datos.json`;
+                // Intentar cargar primero con un parametro dinamico para evitar cache
+                let rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/main/datos.json?t=${new Date().getTime()}`;
                 let response = await fetch(rawUrl);
 
                 if (!response.ok) {
@@ -503,7 +503,6 @@
                 if (contentType && contentType.includes("application/json")) {
                     parsedData = await response.json();
                     if (parsedData.content) {
-                        fileSha = parsedData.sha;
                         const cleanBase64 = parsedData.content.replace(/\s/g, '');
                         const jsonString = new TextDecoder().decode(Uint8Array.from(atob(cleanBase64), c => c.charCodeAt(0)));
                         parsedData = JSON.parse(jsonString);
@@ -521,28 +520,10 @@
                     idCounter = parsedData.idCounter || (personas.length > 0 ? Math.max(...personas.map(p => p.id)) + 1 : 1);
                 }
 
-                if (token) {
-                    obtenerShaParaEdicion(user, repo, token);
-                }
-
                 renderizarArbol();
             } catch (error) {
                 console.error("Error al cargar datos:", error);
                 cargarDatosLocalesPrueba();
-            }
-        }
-
-        async function obtenerShaParaEdicion(user, repo, token) {
-            try {
-                const res = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/datos.json`, {
-                    headers: { 'Authorization': `token ${token}` }
-                });
-                if (res.ok) {
-                    const d = await res.json();
-                    fileSha = d.sha;
-                }
-            } catch (e) {
-                console.error("No se pudo obtener el SHA:", e);
             }
         }
 
@@ -555,6 +536,7 @@
             renderizarArbol();
         }
 
+        // Obtiene en tiempo real el SHA mas reciente antes de hacer el PUT en GitHub
         async function persistirDatosEnGitHub() {
             const { user, repo, token } = obtenerConfiguracionGitHub();
 
@@ -564,10 +546,38 @@
                 return false;
             }
 
-            const contenidoObjeto = { personas, idCounter };
-            const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(contenidoObjeto, null, 4))));
-
             try {
+                // 1. Obtener el SHA fresco del servidor de GitHub
+                const getRes = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/datos.json?t=${new Date().getTime()}`, {
+                    headers: { 
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                let currentSha = null;
+                if (getRes.ok) {
+                    const getData = await getRes.json();
+                    currentSha = getData.sha;
+                } else if (getRes.status !== 404) {
+                    throw new Error("No se pudo obtener el estado actual del archivo en GitHub.");
+                }
+
+                // 2. Codificar contenido JSON
+                const contenidoObjeto = { personas, idCounter };
+                const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(contenidoObjeto, null, 4))));
+
+                // 3. Crear el cuerpo de la peticion PUT
+                const bodyPayload = {
+                    message: "Actualizacion del arbol genealogico",
+                    content: contentEncoded
+                };
+
+                if (currentSha) {
+                    bodyPayload.sha = currentSha; // Asignar el SHA fresco obligatorio
+                }
+
+                // 4. Enviar actualizacion
                 const response = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/datos.json`, {
                     method: 'PUT',
                     headers: {
@@ -575,11 +585,7 @@
                         'Accept': 'application/vnd.github.v3+json',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        message: "Actualizacion del arbol genealogico",
-                        content: contentEncoded,
-                        sha: fileSha
-                    })
+                    body: JSON.stringify(bodyPayload)
                 });
 
                 if (!response.ok) {
@@ -587,8 +593,6 @@
                     throw new Error(errData.message || "Error al actualizar en GitHub.");
                 }
 
-                const responseData = await response.json();
-                fileSha = responseData.content.sha;
                 return true;
             } catch (error) {
                 console.error(error);
@@ -781,14 +785,12 @@
             }
         }
 
-        // Estructura jerarquica que encuentra automaticamente la raiz principal global
         function estructurarDatos() {
             if (personas.length === 0) return null;
 
             const mapa = {};
             personas.forEach(p => mapa[p.id] = { ...p, children: [] });
 
-            // Identificar la verdadera raiz (la persona que no tiene padre)
             let raizObj = personas.find(p => p.padreId === null || !mapa[p.padreId]);
             if (!raizObj && personas.length > 0) {
                 raizObj = personas[0];
