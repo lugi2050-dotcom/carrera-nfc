@@ -48,6 +48,10 @@
     header h1 {
       margin: 0;
       font-size: 1.25em;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     header p {
@@ -98,7 +102,6 @@
       transform-origin: 0 0;
       position: absolute;
       padding: 60px;
-      min-width: 100%;
       display: flex;
       justify-content: center;
     }
@@ -145,7 +148,7 @@
       width: 0; height: 20px;
     }
 
-    /* Tarjeta Ampliada para mejor visibilidad */
+    /* Tarjeta Ampliada */
     .person-card {
       border: 1px solid var(--border);
       padding: 14px 16px;
@@ -237,7 +240,10 @@
 
   <header>
     <div>
-      <h1>Árbol Genealógico</h1>
+      <h1>
+        Árbol Genealógico 
+        <span id="memberCount" style="font-size: 0.6em; font-weight: 500; color: #2563eb; background: #eff6ff; padding: 2px 8px; border-radius: 12px; border: 1px solid #bfdbfe;">(0 integrantes)</span>
+      </h1>
       <p id="modeStatus">FAMILIA BARRERA</p>
     </div>
     <div class="controls">
@@ -253,7 +259,7 @@
     <div class="zoom-controls">
       <button onclick="zoomIn()" title="Acercar">+</button>
       <button onclick="zoomOut()" title="Alejar">-</button>
-      <button class="btn-secondary" onclick="resetZoom()" title="Restablecer">🎯</button>
+      <button class="btn-secondary" onclick="resetZoom()" title="Centrar">🎯</button>
     </div>
   </main>
 
@@ -334,6 +340,19 @@
       loadTreeData();
     };
 
+    // Centrar el árbol automáticamente en la pantalla
+    function centerTree() {
+      setTimeout(() => {
+        const canvasWidth = panCanvas.clientWidth;
+        const viewportWidth = viewport.offsetWidth;
+        // Centrar horizontalmente y dejar un margen superior de 60px
+        pointX = (canvasWidth - viewportWidth) / 2;
+        pointY = 60;
+        scale = 1;
+        updateTransform();
+      }, 50);
+    }
+
     // LÓGICA DE PAN & ZOOM
     function initPanZoom() {
       panCanvas.addEventListener('mousedown', (e) => {
@@ -378,17 +397,14 @@
     }
 
     function setZoom(newScale) {
-      scale = Math.min(Math.max(0.4, newScale), 2);
+      scale = Math.min(Math.max(0.3, newScale), 2.5);
       updateTransform();
     }
 
     function zoomIn() { setZoom(scale * 1.2); }
     function zoomOut() { setZoom(scale * 0.8); }
     function resetZoom() {
-      scale = 1;
-      pointX = 0;
-      pointY = 0;
-      updateTransform();
+      centerTree(); // Reutilizamos para recentrar al presionar el botón de destino/reset
     }
 
     function updateTransform() {
@@ -446,11 +462,13 @@
         if (response.status === 404) {
           treeData = [];
           fileSha = '';
+          updateMemberCount();
           document.getElementById('tree').innerHTML = `
             <div style="text-align:center; padding: 20px;">
               <p>El archivo <b>datos.json</b> aún no existe en el repositorio.</p>
             </div>
           `;
+          centerTree();
           return;
         }
 
@@ -505,10 +523,32 @@
       }
     }
 
+    function countMembers(list) {
+      if (!list || list.length === 0) return 0;
+      let count = 0;
+      for (let person of list) {
+        count += 1; 
+        if (person.partner && person.partner.trim() !== '') {
+          count += 1; 
+        }
+        if (person.children && person.children.length > 0) {
+          count += countMembers(person.children);
+        }
+      }
+      return count;
+    }
+
+    function updateMemberCount() {
+      const total = countMembers(treeData);
+      document.getElementById('memberCount').innerText = `(${total} ${total === 1 ? 'integrante' : 'integrantes'})`;
+    }
+
     function renderTree() {
+      updateMemberCount();
       const container = document.getElementById('tree');
       if (!treeData || treeData.length === 0) {
         container.innerHTML = `<p style="color:#64748b;">No hay personas registradas.</p>`;
+        centerTree();
         return;
       }
 
@@ -518,6 +558,9 @@
       });
       html += "</ul>";
       container.innerHTML = html;
+      
+      // Centrar automáticamente cada vez que se renderiza el árbol
+      centerTree();
     }
 
     function renderNode(node) {
