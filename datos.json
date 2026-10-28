@@ -391,7 +391,17 @@
                     "partner": "EDUARDO VALIÑO",
                     "partnerBirthday": "",
                     "phone": "",
-                    "children": []
+                    "children": [
+                      {
+                        "id": "p_1793157386578",
+                        "name": "RODRIGO VALIÑO BARRERA",
+                        "birthday": "",
+                        "partner": "",
+                        "partnerBirthday": "",
+                        "phone": "",
+                        "children": []
+                      }
+                    ]
                   }
                 ]
               }
