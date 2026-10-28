@@ -364,7 +364,17 @@
                 "partner": "MARIA DE LOS ANGELES BALIÑO",
                 "partnerBirthday": "1 de Noviembre 1959",
                 "phone": "5959232051",
-                "children": []
+                "children": [
+                  {
+                    "id": "p_1793157179371",
+                    "name": "MARIA ANGELICA BARRERA BALIÑO",
+                    "birthday": "7 de Julio",
+                    "partner": "",
+                    "partnerBirthday": "",
+                    "phone": "5540974055",
+                    "children": []
+                  }
+                ]
               }
             ],
             "birthday": "",
