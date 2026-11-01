@@ -144,7 +144,6 @@
 
         .btn-photos:active { transform: scale(0.98); }
 
-        /* Botón de Facebook */
         .btn-facebook {
             display: flex;
             align-items: center;
@@ -250,12 +249,13 @@
             display: inline-block;
             margin-top: 4px;
         }
+
         .brand-logo {
-        max-width: 120px; /* Ajusta el ancho según el tamaño de tu logo */
-        height: auto;
-        margin: 0 auto 10px auto;
-        display: block;
-}
+            max-width: 120px;
+            height: auto;
+            margin: 0 auto 10px auto;
+            display: block;
+        }
 
         .error-msg {
             color: var(--danger);
@@ -282,7 +282,7 @@
 
     <div class="search-card">
         <a href="PAYNAL.html" class="logo-link" title="Ver medalla">
-        <img src="./cronometros/fotoslogo/paynallogo.png" alt="Logo Paynal Race" class="brand-logo">
+            <img src="./cronometros/fotoslogo/paynallogo.png" alt="Logo Paynal Race" class="brand-logo">
         </a>
         <div class="brand-title">PAYNAL RACE</div>
         <div class="sub-title">Consulta de Corredor</div>
@@ -298,7 +298,6 @@
             📸 Ver Fotos de Carrera
         </a>
 
-        <!-- Reemplaza el atributo href con la URL oficial de tu página de Facebook -->
         <a href="https://www.facebook.com/share/19f534Ro5L" target="_blank" rel="noopener noreferrer" class="btn-facebook">
             Visitar Facebook
         </a>
@@ -332,46 +331,11 @@
         </div>
     </div>
 
-    <canvas id="sticker-canvas" width="800" height="540" style="display:none;"></canvas>
+    <!-- Canvas optimizado a altura de 320px solo con tiempo final -->
+    <canvas id="sticker-canvas" width="800" height="320" style="display:none;"></canvas>
 
     <script>
         let currentRunnerData = null;
-
-        function parseTimeToMs(timeStr) {
-            if (!timeStr || typeof timeStr !== 'string') return 0;
-            const parts = timeStr.trim().split(':');
-            let hours = 0, minutes = 0, seconds = 0;
-
-            if (parts.length === 3) {
-                hours = parseFloat(parts[0]);
-                minutes = parseFloat(parts[1]);
-                seconds = parseFloat(parts[2]);
-            } else if (parts.length === 2) {
-                minutes = parseFloat(parts[0]);
-                seconds = parseFloat(parts[1]);
-            } else {
-                seconds = parseFloat(parts[0]);
-            }
-
-            return (hours * 3600 + minutes * 60 + seconds) * 1000;
-        }
-
-        function formatMsToTime(ms) {
-            if (ms < 0 || isNaN(ms)) ms = 0;
-            const totalSeconds = ms / 1000;
-            const hours = Math.floor(totalSeconds / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            const seconds = (totalSeconds % 60).toFixed(2);
-
-            const pad = (num, size = 2) => String(num).padStart(size, '0');
-            const secParts = String(seconds).split('.');
-            const formattedSec = pad(secParts[0]) + '.' + (secParts[1] || '00').padEnd(2, '0');
-
-            if (hours > 0) {
-                return `${pad(hours)}:${pad(minutes)}:${formattedSec}`;
-            }
-            return `${pad(minutes)}:${formattedSec}`;
-        }
 
         async function consultarCorredor(e) {
             e.preventDefault();
@@ -405,7 +369,6 @@
 
                 let mejorTiempoFinal = 'Sin tiempo';
                 let maxVueltas = 0;
-                let rawLaps = [];
 
                 const tiempos = dbData.tiempos || {};
                 Object.keys(tiempos).forEach(key => {
@@ -417,27 +380,15 @@
                         if (Array.isArray(laps) && laps.length >= maxVueltas && laps.length > 0) {
                             maxVueltas = laps.length;
                             mejorTiempoFinal = laps[laps.length - 1];
-                            rawLaps = laps;
                         }
                     }
-                });
-
-                const lapDetails = rawLaps.slice(0, 5).map((lapTimeStr, idx) => {
-                    const currentMs = parseTimeToMs(lapTimeStr);
-                    const prevMs = idx > 0 ? parseTimeToMs(rawLaps[idx - 1]) : 0;
-                    const diffMs = currentMs - prevMs;
-                    return {
-                        lapNum: idx + 1,
-                        lapTime: formatMsToTime(diffMs)
-                    };
                 });
 
                 currentRunnerData = {
                     id: corredor.id,
                     nombre: corredor.nombre,
                     categorias: nombresCategorias.join(', '),
-                    tiempo: mejorTiempoFinal,
-                    laps: lapDetails
+                    tiempo: mejorTiempoFinal
                 };
 
                 document.getElementById('res-dorsal').innerText = `DORSAL ${corredor.id}`;
@@ -478,54 +429,35 @@
 
             // Nombre del Corredor
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 50px "Segoe UI", Arial, sans-serif';
+            ctx.font = 'bold 45px "Segoe UI", Arial, sans-serif';
             let nombreText = currentRunnerData.nombre;
             if (nombreText.length > 22) nombreText = nombreText.substring(0, 22) + '...';
-            ctx.fillText(nombreText, 20, 50);
+            ctx.fillText(nombreText, 20, 48);
 
             // Número de Dorsal
             ctx.fillStyle = '#f97316';
-            ctx.font = 'bold 55px "Segoe UI", Arial, sans-serif';
+            ctx.font = 'bold 40px "Segoe UI", Arial, sans-serif';
             const dorsalStr = `DORSAL ${currentRunnerData.id}`;
-            ctx.fillText(dorsalStr, 20, 115);
+            ctx.fillText(dorsalStr, 20, 105);
 
+            // Nombre de Categoría al lado del dorsal
             const dorsalWidth = ctx.measureText(dorsalStr).width;
-            const categoryX = Math.max(20 + dorsalWidth + 30, 380);
+            const categoryX = Math.max(20 + dorsalWidth + 30, 350);
 
-            // Etiqueta y Nombre de Categoría
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 16px "Segoe UI", Arial, sans-serif';
-            ctx.fillText('CATEGORÍA:', categoryX, 120);
+            ctx.font = 'bold 14px "Segoe UI", Arial, sans-serif';
+            ctx.fillText('CATEGORÍA:', categoryX, 110);
 
             ctx.fillStyle = '#f97316';
-            ctx.font = 'bold 24px "Segoe UI", Arial, sans-serif';
-            ctx.fillText(currentRunnerData.categorias || 'General', categoryX, 142);
+            ctx.font = 'bold 20px "Segoe UI", Arial, sans-serif';
+            ctx.fillText(currentRunnerData.categorias || 'General', categoryX, 128);
 
-            // Tiempos Parciales
-            let currentY = 195;
-
-            if (currentRunnerData.laps && currentRunnerData.laps.length > 0) {
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 16px "Segoe UI", Arial, sans-serif';
-                ctx.fillText('TIEMPOS PARCIALES:', 20, currentY);
-                currentY += 24;
-
-                currentRunnerData.laps.forEach(lap => {
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = 'bold 22px monospace';
-                    ctx.fillText(`V${lap.lapNum}: ${lap.lapTime}`, 20, currentY);
-
-                    currentY += 28;
-                });
-            }
-
-            // Tiempo Final en Grande
-            currentY += 15;
+            // Tiempo Final en Grande (posicionado directamente sin parciales)
             ctx.fillStyle = '#f97316';
-            ctx.font = 'bold monospace 90px "Courier New", Courier';
-            ctx.fillText(currentRunnerData.tiempo, 20, currentY);
+            ctx.font = 'bold 85px "Courier New", Courier, monospace';
+            ctx.fillText(currentRunnerData.tiempo, 20, 175);
 
-            // Descargar la imagen PNG
+            // Descargar la imagen PNG transparente
             const link = document.createElement('a');
             link.download = `paynal-race-stiker-${currentRunnerData.id}.png`;
             link.href = canvas.toDataURL('image/png');
