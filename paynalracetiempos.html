@@ -322,7 +322,7 @@
 
             <div class="result-item">
                 <div class="label">Tiempo Final:</div>
-                <div class="value-time" id="res-tiempo">--:--:--.--</div>
+                <div class="value-time" id="res-tiempo">--:--:--</div>
             </div>
 
             <button type="button" class="btn-sticker" onclick="generarStickerTransparente()">
@@ -331,11 +331,18 @@
         </div>
     </div>
 
-    <!-- Canvas optimizado a altura de 320px solo con tiempo final -->
     <canvas id="sticker-canvas" width="800" height="320" style="display:none;"></canvas>
 
     <script>
         let currentRunnerData = null;
+
+        // Función para limpiar las centésimas de cualquier cadena de tiempo previa (ej. "00:05:23.45" -> "00:05:23")
+        function removerCentecimas(timeStr) {
+            if (!timeStr || typeof timeStr !== 'string' || timeStr === 'Sin tiempo') return timeStr;
+            // Si tiene punto decimal, cortamos antes del punto
+            const parts = timeStr.trim().split('.');
+            return parts[0];
+        }
 
         async function consultarCorredor(e) {
             e.preventDefault();
@@ -383,6 +390,9 @@
                         }
                     }
                 });
+
+                // Limpiar centésimas del tiempo obtenido
+                mejorTiempoFinal = removerCentecimas(mejorTiempoFinal);
 
                 currentRunnerData = {
                     id: corredor.id,
@@ -452,7 +462,7 @@
             ctx.font = 'bold 20px "Segoe UI", Arial, sans-serif';
             ctx.fillText(currentRunnerData.categorias || 'General', categoryX, 128);
 
-            // Tiempo Final en Grande (posicionado directamente sin parciales)
+            // Tiempo Final en Grande sin centésimas
             ctx.fillStyle = '#f97316';
             ctx.font = 'bold 85px "Courier New", Courier, monospace';
             ctx.fillText(currentRunnerData.tiempo, 20, 175);
