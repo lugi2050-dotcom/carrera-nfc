@@ -47,10 +47,13 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
 
-    <!-- HEADER / NAVBAR -->
+    <!-- ========================================================================= -->
+    <!-- HEADER / NAVBAR CON MENÚ DESPLEGABLE                                      -->
+    <!-- ========================================================================= -->
     <header class="sticky top-0 z-40 w-full glassmorphism">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20 relative">
+                <!-- Logotipo / Título Principal -->
                 <a href="index.html" class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
                         <i class="fa-solid fa-shapes font-bold text-white text-xl"></i>
@@ -60,11 +63,13 @@
                     </span>
                 </a>
 
+                <!-- Botón Menú Hamburguesa -->
                 <button id="menu-toggle-btn" class="px-4 py-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white transition-all flex items-center gap-2.5 shadow focus:outline-none" aria-label="Abrir Menú">
                     <i id="menu-icon" class="fa-solid fa-bars text-lg text-brand-400"></i>
                     <span class="text-sm font-semibold">Menú</span>
                 </button>
 
+                <!-- Menú Desplegable -->
                 <nav id="dropdown-menu" class="hidden absolute top-full right-0 mt-2 w-64 bg-slate-900/95 border border-slate-800 rounded-2xl shadow-2xl p-3 backdrop-blur-xl flex flex-col gap-1 z-50">
                     <a href="index.html" class="px-4 py-3 rounded-xl hover:bg-slate-800 text-sm font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-3">
                         <i class="fa-solid fa-house text-brand-400 w-5"></i>
@@ -93,6 +98,8 @@
 
     <!-- Contenido Principal -->
     <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+
+        <!-- Encabezado de la Sección -->
         <section class="text-center max-w-3xl mx-auto space-y-4">
             <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
                 TRABAJOS
@@ -106,6 +113,7 @@
                 Cargando fotos...
             </div>
         </section>
+
     </main>
 
     <!-- Footer -->
@@ -115,8 +123,9 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
+    <!-- Scripts de Funcionalidad y Galería -->
     <script>
+        // LÓGICA DEL MENÚ DESPLEGABLE
         const menuToggleBtn = document.getElementById('menu-toggle-btn');
         const dropdownMenu = document.getElementById('dropdown-menu');
         const menuIcon = document.getElementById('menu-icon');
@@ -151,6 +160,7 @@
             }
         });
 
+        // CARGA DE FOTOS DESDE GOOGLE DRIVE (APPS SCRIPT)
         const urlAppsScript = "https://script.google.com/macros/s/AKfycbx3TzW77Za5038JxAZ8y_n9R_KA-NqtVXryrH8bDDTO6Wv8OpI_uEdS-ATAtCWS8Qavzg/exec";
 
         async function cargarFotos() {
@@ -158,26 +168,29 @@
             
             try {
                 const respuesta = await fetch(urlAppsScript);
-                if (!respuesta.ok) throw new Error(`Error HTTP: ${respuesta.status}`);
+                
+                if (!respuesta.ok) {
+                    throw new Error(`Error HTTP: ${respuesta.status}`);
+                }
 
                 const fotos = await respuesta.json();
-                galeriaContainer.innerHTML = "";
+
+                galeriaContainer.innerHTML = ""; // Limpiar estado de carga
 
                 if (!Array.isArray(fotos) || fotos.length === 0) {
                     galeriaContainer.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 text-sm">No se encontraron imágenes o la carpeta está vacía.</div>`;
                     return;
                 }
 
+                // Genera las imágenes dinámicamente mostrando el nombre de la foto dentro de la imagen
                 fotos.forEach(foto => {
                     const div = document.createElement('div');
                     div.className = 'bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl transition-all duration-300 hover:scale-[1.02] relative group';
 
-                    // CAMBIO CLASE: Se removió "pointer-events-none" y "select-none" del banner inferior 
-                    // para asegurar que nada bloquee el menú contextual de la imagen.
                     div.innerHTML = `
                         <div class="relative h-64 w-full overflow-hidden bg-slate-950">
                             <img src="https://lh3.googleusercontent.com/d/${foto.id}" alt="${foto.name}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            <div class="absolute bottom-3 left-3 right-3 bg-slate-950/80 backdrop-blur-md text-slate-100 border border-white/10 px-3 py-1.5 text-xs font-semibold tracking-wider rounded-xl shadow-lg truncate text-center" title="${foto.name}">
+                            <div class="absolute bottom-3 left-3 right-3 bg-slate-950/80 backdrop-blur-md text-slate-100 border border-white/10 px-3 py-1.5 text-xs font-semibold tracking-wider rounded-xl shadow-lg truncate pointer-events-none select-none text-center" title="${foto.name}">
                                 ${foto.name}
                             </div>
                         </div>
