@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Probador Virtual - Catálogo AR</title>
+  <title>Tienda & Probador Virtual AR</title>
   
   <style>
     * {
@@ -24,19 +24,102 @@
 
     h1 {
       font-size: 1.6rem;
-      margin: 0 0 5px 0;
+      margin: 0 0 15px 0;
       text-align: center;
     }
 
+    /* Vistas (Catálogo vs AR) */
+    .view {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Estilo del Catálogo */
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      width: 100%;
+    }
+
+    .product-card {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 16px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .product-card:hover {
+      border-color: #00ffcc;
+      transform: translateY(-3px);
+    }
+
+    .product-card img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      margin-bottom: 10px;
+    }
+
+    .product-info {
+      text-align: center;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    .product-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #fff;
+      margin: 0 0 5px 0;
+    }
+
+    .product-price {
+      font-size: 0.9rem;
+      color: #00ffcc;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .btn-try {
+      background: #00ffcc;
+      color: #121212;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+
+    .btn-try:hover {
+      background: #00cca3;
+    }
+
+    /* Vista de Realidad Aumentada (Cámara) */
     #status {
       font-size: 0.85rem;
       color: #00ffcc;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
       text-align: center;
       font-weight: 500;
     }
 
-    /* Contenedor Principal de Realidad Aumentada */
     .ar-container {
       position: relative;
       width: 100%;
@@ -47,6 +130,7 @@
       overflow: hidden;
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
       border: 1px solid #333;
+      margin-bottom: 15px;
     }
 
     #webcam, #ar-canvas {
@@ -56,7 +140,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transform: scaleX(-1); /* Efecto espejo para la cámara */
+      transform: scaleX(-1);
     }
 
     #ar-canvas {
@@ -64,60 +148,21 @@
       pointer-events: none;
     }
 
-    /* Vista de Catálogo */
-    .catalog-section {
+    .btn-back {
+      background: #333;
+      color: #fff;
+      border: 1px solid #555;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
       width: 100%;
       max-width: 420px;
-      margin-top: 20px;
+      transition: background 0.2s;
     }
 
-    .catalog-title {
-      font-size: 1.1rem;
-      margin-bottom: 12px;
-      color: #ddd;
-      border-bottom: 1px solid #333;
-      padding-bottom: 5px;
-    }
-
-    .catalog-grid {
-      display: grid;
-      grid-template-columns: repeat( auto-fit, minmax(110px, 1fr) );
-      gap: 12px;
-      width: 100%;
-    }
-
-    .catalog-card {
-      background: #1e1e1e;
-      border: 2px solid #333;
-      border-radius: 12px;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-      transition: all 0.25s ease;
-    }
-
-    .catalog-card:hover, .catalog-card.active {
-      border-color: #00ffcc;
-      background: #282828;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 255, 204, 0.15);
-    }
-
-    .catalog-card img {
-      width: 80px;
-      height: 80px;
-      object-fit: contain;
-      margin-bottom: 8px;
-    }
-
-    .catalog-card span {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #eee;
-      text-align: center;
+    .btn-back:hover {
+      background: #444;
     }
   </style>
 
@@ -127,32 +172,45 @@
 </head>
 <body>
 
-  <h1>Probador Virtual AR</h1>
-  <div id="status">Iniciando cámara y modelo...</div>
-
-  <!-- Visor de Cámara y Canvas -->
-  <div class="ar-container">
-    <video id="webcam" playsinline></video>
-    <canvas id="ar-canvas"></canvas>
-  </div>
-
-  <!-- Vista de Catálogo -->
-  <div class="catalog-section">
-    <div class="catalog-title">Selecciona una prenda:</div>
+  <!-- 1. VISTA DE CATÁLOGO -->
+  <div id="catalog-view" class="view">
+    <h1>Catálogo de Prendas</h1>
     <div class="catalog-grid">
       
-      <!-- Ruta directa al mismo nivel que index.html -->
-      <div class="catalog-card active" onclick="selectGarment('hoodie.png', this)">
-        <img src="hoodie.png" alt="Sudadera Hoodie">
-        <span>Hoodie</span>
+      <!-- Producto 1: Hoodie -->
+      <div class="product-card">
+        <img src="hoodie.png" alt="Hoodie Urbana">
+        <div class="product-info">
+          <p class="product-name">Hoodie Urbana</p>
+          <p class="product-price">$599.00 MXN</p>
+        </div>
+        <button class="btn-try" onclick="openAR('hoodie.png')">Probar</button>
       </div>
 
-      <div class="catalog-card" onclick="selectGarment('playera.png', this)">
+      <!-- Producto 2: Playera -->
+      <div class="product-card">
         <img src="playera.png" alt="Playera Casual">
-        <span>Playera</span>
+        <div class="product-info">
+          <p class="product-name">Playera Casual</p>
+          <p class="product-price">$299.00 MXN</p>
+        </div>
+        <button class="btn-try" onclick="openAR('playera.png')">Probar</button>
       </div>
 
     </div>
+  </div>
+
+  <!-- 2. VISTA DE REALIDAD AUMENTADA (Cámara) -->
+  <div id="ar-view" class="view hidden">
+    <h1>Probador Virtual</h1>
+    <div id="status">Iniciando cámara...</div>
+
+    <div class="ar-container">
+      <video id="webcam" playsinline></video>
+      <canvas id="ar-canvas"></canvas>
+    </div>
+
+    <button class="btn-back" onclick="closeAR()">Volver al Catálogo</button>
   </div>
 
   <script>
@@ -161,19 +219,24 @@
     const canvasCtx = canvasElement.getContext('2d');
     const statusText = document.getElementById('status');
 
+    const catalogView = document.getElementById('catalog-view');
+    const arView = document.getElementById('ar-view');
+
     let currentGarmentImg = new Image();
     let garmentLoaded = false;
+    let cameraInstance = null;
 
-    // Cambiar prenda activa desde el catálogo
-    function selectGarment(imgFileName, element) {
-      document.querySelectorAll('.catalog-card').forEach(card => card.classList.remove('active'));
-      if (element) element.classList.add('active');
+    // Función para abrir la cámara al hacer clic en "Probar"
+    function openAR(imgFileName) {
+      // Cambiar de vista
+      catalogView.classList.add('hidden');
+      arView.classList.remove('hidden');
 
       garmentLoaded = false;
       statusText.innerText = "Cargando prenda...";
 
       currentGarmentImg.crossOrigin = "anonymous";
-      currentGarmentImg.src = imgFileName; // Ruta directa
+      currentGarmentImg.src = imgFileName;
 
       currentGarmentImg.onload = function() {
         garmentLoaded = true;
@@ -183,26 +246,60 @@
       currentGarmentImg.onerror = function() {
         statusText.innerText = "Error: No se encontró la imagen '" + imgFileName + "'";
       };
+
+      // Iniciar la cámara si no está iniciada
+      if (!cameraInstance) {
+        cameraInstance = new Camera(videoElement, {
+          onFrame: async () => {
+            await pose.send({ image: videoElement });
+          },
+          width: 640,
+          height: 480
+        });
+      }
+
+      cameraInstance.start()
+        .then(() => {
+          statusText.innerText = "Alinea tus hombros a la cámara";
+        })
+        .catch(err => {
+          statusText.innerText = "Error al acceder a la cámara";
+          console.error(err);
+        });
     }
 
-    // Cargar prenda por defecto al iniciar
-    selectGarment('hoodie.png', document.querySelector('.catalog-card'));
+    // Función para cerrar la cámara y volver al catálogo
+    function closeAR() {
+      if (cameraInstance) {
+        // Pausar la transmisión de video de la cámara
+        const stream = videoElement.srcObject;
+        if (stream) {
+          stream.getTracks().forEach(track => track.stop());
+        }
+        videoElement.srcObject = null;
+        cameraInstance = null;
+      }
+
+      // Regresar a la vista del catálogo
+      arView.classList.add('hidden');
+      catalogView.classList.remove('hidden');
+    }
 
     // Procesar seguimiento de MediaPipe con Hombros y Caderas
     function onPoseResults(results) {
+      if (arView.classList.contains('hidden')) return; // No procesar si estamos en el catálogo
+
       canvasElement.width = videoElement.videoWidth || 640;
       canvasElement.height = videoElement.videoHeight || 480;
 
       canvasCtx.save();
       canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
-      // Dibujar el video de la cámara
       canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
       if (results.poseLandmarks && garmentLoaded) {
         const landmarks = results.poseLandmarks;
         
-        // Puntos de Hombros (11 y 12) y Caderas (23 y 24)
         const leftShoulder = landmarks[11];
         const rightShoulder = landmarks[12];
         const leftHip = landmarks[23];
@@ -223,7 +320,6 @@
 
           const garmentWidth = shoulderWidth * 2.1;
 
-          // Altura dinámica basada en la distancia del torso (si se detectan caderas)
           let garmentHeight;
           if (leftHip.visibility > 0.3 && rightHip.visibility > 0.3) {
             const hipX = ((leftHip.x + rightHip.x) / 2) * canvasW;
@@ -238,11 +334,9 @@
           const angle = Math.atan2(y2 - y1, x2 - x1);
 
           canvasCtx.save();
-          
-          // Posicionamiento en el punto medio con el ajuste exacto (0.05)
           canvasCtx.translate(midX, midY + (garmentHeight * 0.05)); 
           canvasCtx.rotate(angle);
-          canvasCtx.rotate(Math.PI); // Mantener orientada la prenda correctamente
+          canvasCtx.rotate(Math.PI);
 
           canvasCtx.drawImage(
             currentGarmentImg, 
@@ -272,24 +366,6 @@
     });
 
     pose.onResults(onPoseResults);
-
-    // Activar la cámara
-    const camera = new Camera(videoElement, {
-      onFrame: async () => {
-        await pose.send({ image: videoElement });
-      },
-      width: 640,
-      height: 480
-    });
-
-    camera.start()
-      .then(() => {
-        statusText.innerText = "Alinea tus hombros a la cámara";
-      })
-      .catch(err => {
-        statusText.innerText = "Error al acceder a la cámara";
-        console.error(err);
-      });
   </script>
 </body>
 </html>
