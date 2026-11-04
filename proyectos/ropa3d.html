@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo & Probador Virtual AR</title>
+  
+  <!-- CSS Styles -->
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f5f5f7;
+      color: #1d1d1f;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+    }
+
+    header p {
+      color: #6e6e73;
+      margin-top: 5px;
+    }
+
+    /* Grid del catálogo */
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 25px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .product-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .product-img {
+      width: 100%;
+      height: 240px;
+      object-fit: contain;
+      background: #fafafa;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .product-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .product-price {
+      color: #0071e3;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .btn-tryon {
+      background-color: #0071e3;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-tryon:hover {
+      background-color: #005bb5;
+    }
+
+    /* Modal de Probador AR */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.75);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-container {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 20px;
+      width: 90%;
+      max-width: 680px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: transparent;
+      border: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: #6e6e73;
+    }
+
+    .viewport-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      aspect-ratio: 4/3;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    /* Video oculto (usado como fuente para MediaPipe) */
+    #webcam {
+      display: none;
+    }
+
+    /* Canvas donde se dibuja el video + ropa superpuesta */
+    #ar-canvas {
+      width: 100%;
+      height: 100%;
+      transform: scaleX(-1); /* Espejo */
+    }
+
+    .status-text {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      color: #6e6e73;
+      text-align: center;
+    }
+  </style>
+
+  <!-- MediaPipe Pose & Camera Utils -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <header>
+    <h1>Anywear Studio</h1>
+    <p>Pruébate la ropa en tiempo real desde tu navegador</p>
+  </header>
+
+  <!-- Catálogo de Productos -->
+  <main class="catalog-grid">
+    
+    <!-- Producto 1: Sudadera Hoodie -->
+    <div class="product-card">
+      <img class="product-img" src="https://pngimg.com/uploads/hoodie/hoodie_PNG40.png" alt="Sudadera Charcoal">
+      <div class="product-title">Sudadera Oversize Grey</div>
+      <div class="product-price">$65.00 USD</div>
+      <button class="btn-tryon" onclick="openTryOn('https://pngimg.com/uploads/hoodie/hoodie_PNG40.png')">Pruébatelo ✦</button>
+    </div>
+
+    <!-- Producto 2: Playera Azul -->
+    <div class="product-card">
+      <img class="product-img" src="https://pngimg.com/uploads/tshirt/tshirt_PNG5454.png" alt="Playera Azul">
+      <div class="product-title">Playera Sport Blue</div>
+      <div class="product-price">$35.00 USD</div>
+      <button class="btn-tryon" onclick="openTryOn('https://pngimg.com/uploads/tshirt/tshirt_PNG5454.png')">Pruébatelo ✦</button>
+    </div>
+
+    <!-- Producto 3: Sudadera Negra -->
+    <div class="product-card">
+      <img class="product-img" src="https://pngimg.com/uploads/hoodie/hoodie_PNG45.png" alt="Hoodie Negro">
+      <div class="product-title">Hoodie Essential Black</div>
+      <div class="product-price">$70.00 USD</div>
+      <button class="btn-tryon" onclick="openTryOn('https://pngimg.com/uploads/hoodie/hoodie_PNG45.png')">Pruébatelo ✦</button>
+    </div>
+
+  </main>
+
+  <!-- Modal del Probador Virtual AR -->
+  <div class="modal-overlay" id="ar-modal">
+    <div class="modal-container">
+      <button class="modal-close" onclick="closeTryOn()">&times;</button>
+      <h2>Probador en Vivo</h2>
+      <p style="font-size: 0.9rem; color: #6e6e73;">Asegúrate de tener buena iluminación y colocar la cámara frente a ti.</p>
+      
+      <div class="viewport-wrapper">
+        <video id="webcam" playsinline></video>
+        <canvas id="ar-canvas"></canvas>
+      </div>
+
+      <div class="status-text" id="status-text">Cargando modelo de seguimiento corporal...</div>
+    </div>
+  </div>
+
+  <!-- JavaScript Logica AR y MediaPipe -->
+  <script>
+    const modal = document.getElementById('ar-modal');
+    const videoElement = document.getElementById('webcam');
+    const canvasElement = document.getElementById('ar-canvas');
+    const canvasCtx = canvasElement.getContext('2d');
+    const statusText = document.getElementById('status-text');
+
+    let camera = null;
+    let pose = null;
+    let currentGarmentImg = new Image();
+    let garmentLoaded = false;
+
+    // Configuración inicial de MediaPipe Pose
+    function initPose() {
+      pose = new Pose({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+      });
+
+      pose.setOptions({
+        modelComplexity: 1,
+        smoothLandmarks: true,
+        enableSegmentation: false,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5
+      });
+
+      pose.onResults(onPoseResults);
+    }
+
+    // Callback de renderizado por frame
+    function onPoseResults(results) {
+      statusText.innerText = "Realidad Aumentada activa";
+
+      // Ajustar dimensiones del canvas
+      canvasElement.width = videoElement.videoWidth || 640;
+      canvasElement.height = videoElement.videoHeight || 480;
+
+      canvasCtx.save();
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      
+      // Dibujar frame de la cámara
+      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+      // Si detecta puntos clave de la pose y la imagen está lista
+      if (results.poseLandmarks && garmentLoaded) {
+        const landmarks = results.poseLandmarks;
+
+        // Punto 11: Hombro Izquierdo | Punto 12: Hombro Derecho
+        const leftShoulder = landmarks[11];
+        const rightShoulder = landmarks[12];
+
+        // Verificar visibilidad de ambos hombros
+        if (leftShoulder.visibility > 0.5 && rightShoulder.visibility > 0.5) {
+          const canvasW = canvasElement.width;
+          const canvasH = canvasElement.height;
+
+          // Coordenadas absolutas
+          const x1 = leftShoulder.x * canvasW;
+          const y1 = leftShoulder.y * canvasH;
+          const x2 = rightShoulder.x * canvasW;
+          const y2 = rightShoulder.y * canvasH;
+
+          // Distancia entre hombros
+          const shoulderWidth = Math.hypot(x2 - x1, y2 - y1);
+          
+          // Punto medio de los hombros
+          const midX = (x1 + x2) / 2;
+          const midY = (y1 + y2) / 2;
+
+          // Escala estimada de la prenda respecto al ancho de hombros
+          const garmentWidth = shoulderWidth * 2.2;
+          const aspectRatio = currentGarmentImg.height / currentGarmentImg.width;
+          const garmentHeight = garmentWidth * aspectRatio;
+
+          // Ángulo de inclinación corporal
+          const angle = Math.atan2(y2 - y1, x2 - x1);
+
+          // Posicionar y rotar la prenda sobre el cuerpo
+          canvasCtx.save();
+          canvasCtx.translate(midX, midY + (garmentHeight * 0.15)); // Ajuste vertical
+          canvasCtx.rotate(angle);
+          canvasCtx.drawImage(
+            currentGarmentImg, 
+            -garmentWidth / 2, 
+            -garmentHeight * 0.2, 
+            garmentWidth, 
+            garmentHeight
+          );
+          canvasCtx.restore();
+        }
+      }
+      canvasCtx.restore();
+    }
+
+    // Abrir probador y activar cámara
+    async function openTryOn(imgSrc) {
+      modal.classList.add('active');
+      statusText.innerText = "Iniciando cámara y prenda...";
+      
+      garmentLoaded = false;
+      currentGarmentImg.crossOrigin = "anonymous";
+      currentGarmentImg.src = imgSrc;
+      currentGarmentImg.onload = () => { garmentLoaded = true; };
+
+      if (!pose) {
+        initPose();
+      }
+
+      if (!camera) {
+        camera = new Camera(videoElement, {
+          onFrame: async () => {
+            await pose.send({ image: videoElement });
+          },
+          width: 640,
+          height: 480
+        });
+      }
+
+      await camera.start();
+    }
+
+    // Cerrar probador y detener la cámara
+    function closeTryOn() {
+      modal.classList.remove('active');
+      if (camera) {
+        camera.stop();
+        camera = null;
+      }
+    }
+  </script>
+</body>
+</html>
