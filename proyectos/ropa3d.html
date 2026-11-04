@@ -152,8 +152,6 @@
         <span>Playera</span>
       </div>
 
-      <!-- Puedes añadir más prendas duplicando esta tarjeta -->
-
     </div>
   </div>
 
@@ -190,7 +188,7 @@
     // Cargar prenda por defecto al iniciar
     selectGarment('hoodie.png', document.querySelector('.catalog-card'));
 
-    // Procesar seguimiento de MediaPipe
+    // Procesar seguimiento de MediaPipe con Hombros y Caderas
     function onPoseResults(results) {
       canvasElement.width = videoElement.videoWidth || 640;
       canvasElement.height = videoElement.videoHeight || 480;
@@ -203,8 +201,12 @@
 
       if (results.poseLandmarks && garmentLoaded) {
         const landmarks = results.poseLandmarks;
+        
+        // Puntos de Hombros (11 y 12) y Caderas (23 y 24)
         const leftShoulder = landmarks[11];
         const rightShoulder = landmarks[12];
+        const leftHip = landmarks[23];
+        const rightHip = landmarks[24];
 
         if (leftShoulder.visibility > 0.4 && rightShoulder.visibility > 0.4) {
           const canvasW = canvasElement.width;
@@ -220,18 +222,27 @@
           const midY = (y1 + y2) / 2;
 
           const garmentWidth = shoulderWidth * 2.1;
-          const aspectRatio = currentGarmentImg.height / currentGarmentImg.width;
-          const garmentHeight = garmentWidth * aspectRatio;
+
+          // Altura dinámica basada en la distancia del torso (si se detectan caderas)
+          let garmentHeight;
+          if (leftHip.visibility > 0.3 && rightHip.visibility > 0.3) {
+            const hipX = ((leftHip.x + rightHip.x) / 2) * canvasW;
+            const hipY = ((leftHip.y + rightHip.y) / 2) * canvasH;
+            const torsoLength = Math.hypot(hipX - midX, hipY - midY);
+            garmentHeight = torsoLength * 1.4;
+          } else {
+            const aspectRatio = currentGarmentImg.height / currentGarmentImg.width;
+            garmentHeight = garmentWidth * aspectRatio;
+          }
 
           const angle = Math.atan2(y2 - y1, x2 - x1);
 
           canvasCtx.save();
-          // Desplazamiento vertical al pecho
+          
+          // Posicionamiento en el punto medio con el ajuste exacto (0.05)
           canvasCtx.translate(midX, midY + (garmentHeight * 0.05)); 
           canvasCtx.rotate(angle);
-
-          // Rotación de 180° por si la prenda aparece al revés
-          canvasCtx.rotate(Math.PI);
+          canvasCtx.rotate(Math.PI); // Mantener orientada la prenda correctamente
 
           canvasCtx.drawImage(
             currentGarmentImg, 
