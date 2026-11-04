@@ -195,7 +195,8 @@
           // Posicionamiento en el punto medio + desplazamiento vertical para ubicar en el pecho
           canvasCtx.translate(midX, midY + (garmentHeight * 0.35)); 
           canvasCtx.rotate(angle);
-
+          
+          canvasCtx.rotate(Math.PI);
           // Dibujar la prenda centrada en el torso
           canvasCtx.drawImage(
             currentGarmentImg, 
